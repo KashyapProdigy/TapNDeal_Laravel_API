@@ -15,9 +15,9 @@ class cartController extends Controller
         $cart=Cart::where('user_id',$id)->get()->toarray();
         if(!empty($cart))
         {
-            return response()->json(['cart'=>$cart],200);
+            return response()->json(['error' => false ,'data'=>$cart],200);
         }
-        return response()->json(['Error'=>'Invalid Id']);
+        return response()->json(['error' => true ,'message'=>'Invalid Id']);
     }
     public function create(Request $req)
     {
@@ -27,7 +27,7 @@ class cartController extends Controller
             'qty'=>'required',
         ]);
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
         $cart=new Cart;
         $cart->product_id=$req->product_id;
@@ -38,9 +38,9 @@ class cartController extends Controller
 
         if($cart->save())
         {
-            return response()->json(['success'=>' Cart Record Inserted Successfully'],200);
+            return response()->json(['error' => false ,'message'=>' Cart Record Inserted Successfully'],200);
         }
-        return response()->json(['error'=>'Something went wrong'],500);
+        return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
 
     }
     public function update(Request $req,$id)
@@ -53,7 +53,7 @@ class cartController extends Controller
 
         ]);
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
         $cart_data=[
         'product_id'=>$req->product_id,
@@ -65,9 +65,9 @@ class cartController extends Controller
         $cart_update=Cart::where('id',$id)->update($cart_data);
         if($cart_update==1)
         {
-            return response()->json(['success'=>' Cart updated Successfully'],200);
+            return response()->json(['error' => false ,'message'=>' Cart updated Successfully'],200);
         }
-        return response()->json(['error'=>'Record not found'],500);
+        return response()->json(['error' => true ,'message'=>'Record not found'],500);
 
     }
     public function delete($id)
@@ -76,9 +76,9 @@ class cartController extends Controller
         if($cart_del)
         {
             $cart_del->delete();
-            return response()->json(['success'=>'Cart Record Deleted']);
+            return response()->json(['error' => false ,'message'=>'Cart Record Deleted'],200);
         }
-        return response()->json(['error'=>'Record not found']);
+        return response()->json(['error' => true ,'message'=>'Record not found']);
     }
 
     public function deleteByUserid($id)
@@ -87,8 +87,8 @@ class cartController extends Controller
         if($cart_del)
         {
             Cart::where('user_id',$id)->delete();
-            return response()->json(['success'=>'Cart Records Deleted']);
+            return response()->json(['error' => false ,'message'=>'Cart Records Deleted'],200);
         }
-        return response()->json(['error'=>'Record not found']);
+        return response()->json(['error' => true ,'message'=>'Record not found']);
     }
 }

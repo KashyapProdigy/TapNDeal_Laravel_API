@@ -55,6 +55,27 @@ return [
             'visibility' => 'public',
         ],
 
+        'product' => [
+            'driver' => 'local',
+            'root' => public_path('productPhotos'),
+            'url' => env('APP_URL').'/productPhotos',
+            'visibility' => 'public',
+        ],
+
+        'temp' => [
+            'driver' => 'local',
+            'root' => public_path('tempPhotos'),
+            'url' => env('APP_URL').'/tempPhotos',
+            'visibility' => 'public',
+        ],
+
+        'watermark' => [
+            'driver' => 'local',
+            'root' => public_path('watermarkPhotos'),
+            'url' => env('APP_URL').'/watermarkPhotos',
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

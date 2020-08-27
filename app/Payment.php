@@ -4,8 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Knock extends Model
+class Payment extends Model
 {
-    protected $table="knock_cust_sel_rel";
+    protected $table="payments";
     public $timestamps=false;
 }
