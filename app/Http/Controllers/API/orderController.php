@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Order;
-use Carbon\Carbon;
 use Validator;
 
 class orderController extends Controller
@@ -15,9 +14,9 @@ class orderController extends Controller
         $order=Order::where('id',$id)->get()->toarray();
         if(!empty($order))
         {
-            return response()->json(['order'=>$order],200);
+            return response()->json(['error' => false ,'data'=>$order],200);
         }
-        return response()->json(['Error'=>'Invalid Id']);
+        return response()->json(['error' => true ,'message'=>'Invalid Id']);
     }
     public function create(Request $req)
     {
@@ -29,7 +28,7 @@ class orderController extends Controller
             'total_amount'=>'required',
         ]);
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
         $order=new Order;
         $order->product_id=$req->product_id;
@@ -38,14 +37,12 @@ class orderController extends Controller
         $order->qty=$req->qty;
         $order->total_amount=$req->total_amount;
         $order->status_id=1;
-        $order->date_time=Carbon::now();
-
 
         if($order->save())
         {
-            return response()->json(['success'=>' Order Record Inserted Successfully'],200);
+            return response()->json(['error' => false ,'message'=>' Order Record Inserted Successfully'],200);
         }
-        return response()->json(['error'=>'Something went wrong'],500);
+        return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
 
     }
     public function update(Request $req,$id)
@@ -56,11 +53,10 @@ class orderController extends Controller
             'customer_id' => 'required',
             'qty'=>'required',
             'total_amount'=>'required',
-            'date_time'=>'required|date_format:Y-m-d H:i:s'
 
         ]);
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
         $order_data=[
         'product_id'=>$req->product_id,
@@ -68,15 +64,14 @@ class orderController extends Controller
         'customer_id'=>$req->customer_id,
         'qty'=>$req->qty,
         'total_amount'=>$req->total_amount,
-        'date_time'=>$req->date_time,
         ];
 
         $order_update=Order::where('id',$id)->update($order_data);
         if($order_update==1)
         {
-            return response()->json(['success'=>' Order updated Successfully'],200);
+            return response()->json(['error' => false ,'message'=>' Order updated Successfully'],200);
         }
-        return response()->json(['error'=>'Record not found'],500);
+        return response()->json(['error' => true ,'message'=>'Record not found'],500);
 
     }
     public function delete($id)
@@ -85,9 +80,9 @@ class orderController extends Controller
         if($order_del)
         {
             $order_del->delete();
-            return response()->json(['success'=>'Order Record Deleted']);
+            return response()->json(['error' => false ,'message'=>'Order Record Deleted'],200);
         }
-        return response()->json(['error'=>'Record not found']);
+        return response()->json(['error' => true ,'message'=>'Record not found']);
     }
 
 

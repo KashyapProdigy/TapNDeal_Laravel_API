@@ -1,5 +1,6 @@
 <?php
-
+use App\User;
+use App\Product;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/krishna', function () {
     return view('welcome');
 });
+
+Route::get('product/{name}', 'ImagesController@productPicture');
+
+Route::get('watermark/{name}', 'ImagesController@watermarkPicture');

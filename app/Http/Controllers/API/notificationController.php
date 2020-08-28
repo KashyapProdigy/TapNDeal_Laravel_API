@@ -15,9 +15,9 @@ class notificationController extends Controller
         $notification=Notification::where('receiver',$id)->get()->toarray();
         if(!empty($notification))
         {
-            return response()->json(['notification'=>$notification],200);
+            return response()->json(['error' => false ,'data'=>$notification],200);
         }
-        return response()->json(['Error'=>'Invalid Id']);
+        return response()->json(['error' => true ,'message'=>'Invalid Id']);
     }
     public function create(Request $req)
     {
@@ -28,7 +28,7 @@ class notificationController extends Controller
             'type'=>'required'
         ]);
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
         $notification=new Notification;
         $notification->sender=$req->sender;
@@ -40,9 +40,9 @@ class notificationController extends Controller
 
         if($notification->save())
         {
-            return response()->json(['success'=>' Notification inserted Successfully'],200);
+            return response()->json(['error' => false ,'message'=>' Notification inserted Successfully'],200);
         }
-        return response()->json(['error'=>'Somthing wents wrong'],500);
+        return response()->json(['error' => true ,'message'=>'Somthing wents wrong'],500);
 
     }
     public function update(Request $req,$id)
@@ -57,7 +57,7 @@ class notificationController extends Controller
 
         ]);
         if ($validator->fails()) {
-            return response()->json(['error'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
         $notification_data=[
         'sender'=>$req->sender,
@@ -71,9 +71,9 @@ class notificationController extends Controller
         $notification_update=Notification::where('id',$id)->update($notification_data);
         if($notification_update==1)
         {
-            return response()->json(['success'=>' Notification updated Successfully'],200);
+            return response()->json(['error' => false ,'message'=>' Notification updated Successfully'],200);
         }
-        return response()->json(['error'=>'Record not found'],500);
+        return response()->json(['error' => true ,'message'=>'Record not found'],500);
 
     }
     public function delete($id)
@@ -82,8 +82,8 @@ class notificationController extends Controller
         if($noti_del)
         {
             $noti_del->delete();
-            return response()->json(['success'=>'Notification Deleted']);
+            return response()->json(['error' => false ,'message'=>'Notification Deleted'],200);
         }
-        return response()->json(['error'=>'Record not found']);
+        return response()->json(['error' => true ,'message'=>'Record not found']);
     }
 }

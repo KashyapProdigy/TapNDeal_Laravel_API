@@ -19,10 +19,10 @@ class userController extends Controller
             $user = User::where('email',request('email'))->get()->toarray();
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
             // $user = Auth::user();
-            return response()->json(['success' => $user], $this-> successStatus);
+            return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
         }
         else{
-            return response()->json(['error'=>'Unauthorised'], 401);
+            return response()->json(['error'=> true , 'message' => 'unauthorised'], 401);
         }
     }
 }
