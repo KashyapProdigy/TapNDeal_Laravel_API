@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\CustomerCategoryRelationship;
+use App\CustomerKnock;
+use App\Product;
 use Carbon\Carbon;
 use Validator;
 
@@ -157,4 +159,53 @@ class customerRelationshipController extends Controller
                 return response()->json(['error' => true ,'message'=>'Relations not available']);
             }
         }
+
+        public function productlist(Request $req)
+        {
+            $validator = Validator::make($req->all(), [
+                'seller_id' => 'required',
+                'cust_id' => 'required'
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+            }
+
+            $relations=CustomerCategoryRelationship::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->first();
+            $knock= CustomerKnock::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->first();
+            if($relations == null && $knock == null)
+            {
+                return response()->json(['error' => true ,'message'=>'Relation not established']);
+            }
+            else if($relations == null && $knock != null )
+            {
+                return response()->json(['error' => true ,'message'=>'Knock Not Yet Approved']);
+            }
+            else if($relations!=null)
+            {
+                if($relations->isBlocked == 1){return response()->json(['error' => true ,'message'=>'User Blocked By Seller']);}
+                if($relations->isBlocked != 1)
+                {
+                    if($relations->category == 'A+')
+                    {
+                        $products = Product::where('seller_id',$req->seller_id)->get()->toarray();
+                        return response()->json(['error' => false ,'data'=>$products],200);
+                    }
+                    if($relations->category == 'A')
+                    {
+                        $cat=['A','B'];
+                        $products = Product::where('seller_id',$req->seller_id)->whereIn('category',$cat)->get()->toarray();
+                        return response()->json(['error' => false ,'data'=>$products],200);
+                    }
+                    if($relations->category == 'B')
+                    {
+                    $products = Product::where('seller_id',$req->seller_id)->where('category',$relations->category)->get()->toarray();
+                    return response()->json(['error' => false ,'data'=>$products],200);
+                    }
+                }
+            }
+            else {
+                return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
+            }
+        }
+
 }

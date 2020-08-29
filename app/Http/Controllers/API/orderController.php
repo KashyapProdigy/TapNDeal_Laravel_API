@@ -5,8 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Order;
-use Illuminate\Validation\Validator;
-
+use Validator;
 
 class orderController extends Controller
 {
@@ -60,11 +59,11 @@ class orderController extends Controller
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
         $order_data=[
-            'product_id'=>$req->product_id,
-            'seller_id'=>$req->seller_id,
-            'customer_id'=>$req->customer_id,
-            'qty'=>$req->qty,
-            'total_amount'=>$req->total_amount,
+        'product_id'=>$req->product_id,
+        'seller_id'=>$req->seller_id,
+        'customer_id'=>$req->customer_id,
+        'qty'=>$req->qty,
+        'total_amount'=>$req->total_amount,
         ];
 
         $order_update=Order::where('id',$id)->update($order_data);

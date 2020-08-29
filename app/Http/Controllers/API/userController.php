@@ -36,8 +36,6 @@ class userController extends Controller
            'state_id' => 'required',
         ]);
 
-
-
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;

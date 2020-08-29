@@ -21,6 +21,10 @@ class dashboardController extends Controller
         $customer=[];
 
         $loggedInUser=User::find($id);
+        if($loggedInUser == null)
+        {
+            return response()->json(['error' => true ,'message'=>"No User Found"]);
+        }
 
         if($loggedInUser->type_id == 1)
         {
@@ -41,11 +45,11 @@ class dashboardController extends Controller
             $A_Plus_list=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('category','=',"A+")->where('isBlocked',0)->get()->toarray();
             $A_list=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('category','=',"A")->where('isBlocked',0)->get()->toarray();
             $B_list=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('category','=',"B")->where('isBlocked',0)->get()->toarray();
-            $Blocked_list=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('isBlocked',1)->get()->toarray();
+            $Blocked_seller=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('isBlocked',1)->get()->toarray();
             $seller['A_Plus_Sellers']=User::whereIn('id',$A_Plus_list)->get()->toarray();
             $seller['A_Sellers']=User::whereIn('id',$A_list)->get()->toarray();
             $seller['B_Sellers']=User::whereIn('id',$B_list)->get()->toarray();
-            $seller['NotConnected_Sellers']=User::where('type_id',1)->where('isVerified',1)->whereNotIN('id',$Blocked_list)->whereNotIN('id',$A_Plus_list)->whereNotIN('id',$A_list)->whereNotIN('id',$B_list)->get()->toarray();
+            $seller['NotConnected_Sellers']=User::where('type_id',1)->where('isVerified',1)->whereNotIN('id',$Blocked_seller)->whereNotIN('id',$A_Plus_list)->whereNotIN('id',$A_list)->whereNotIN('id',$B_list)->get()->toarray();
 
             $customer_list=CustomerAgentRelationship::select('cust_id')->where('agent_id',$id)->where('isBlocked',0)->get()->toarray();
             $customer=User::whereIn('id',$customer_list)->where('isVerified',1)->get()->toarray();
@@ -68,11 +72,13 @@ class dashboardController extends Controller
             $A_Plus_list=CustomerCategoryRelationship::select('seller_id')->where('cust_id',$id)->where('category','=',"A+")->where('isBlocked',0)->get()->toarray();
             $A_list=CustomerCategoryRelationship::select('seller_id')->where('cust_id',$id)->where('category','=',"A")->where('isBlocked',0)->get()->toarray();
             $B_list=CustomerCategoryRelationship::select('seller_id')->where('cust_id',$id)->where('category','=',"B")->where('isBlocked',0)->get()->toarray();
-            $Blocked_list=CustomerCategoryRelationship::select('seller_id')->where('cust_id',$id)->where('isBlocked',1)->get()->toarray();
+            $Blocked_seller=CustomerCategoryRelationship::select('seller_id')->where('cust_id',$id)->where('isBlocked',1)->get()->toarray();
+            $Blocked_agent=CustomerAgentRelationship::select('agent_id')->where('cust_id',$id)->where('isBlocked',1)->get()->toarray();
             $dashboard['A_Plus_Sellers']=User::whereIn('id',$A_Plus_list)->get()->toarray();
             $dashboard['A_Sellers']=User::whereIn('id',$A_list)->get()->toarray();
             $dashboard['B_Sellers']=User::whereIn('id',$B_list)->get()->toarray();
-            $dashboard['NotConnected_Sellers']=User::where('type_id',1)->where('isVerified',1)->whereNotIN('id',$Blocked_list)->whereNotIN('id',$A_Plus_list)->whereNotIN('id',$A_list)->whereNotIN('id',$B_list)->get()->toarray();
+            $dashboard['NotConnected_Sellers']=User::where('type_id',1)->where('isVerified',1)->whereNotIN('id',$Blocked_seller)->whereNotIN('id',$A_Plus_list)->whereNotIN('id',$A_list)->whereNotIN('id',$B_list)->get()->toarray();
+            $dashboard['Agents']=User::where('type_id',2)->where('isVerified',1)->whereNotIN('id',$Blocked_agent)->get()->toarray();
 
             if(!empty($dashboard))
             {
