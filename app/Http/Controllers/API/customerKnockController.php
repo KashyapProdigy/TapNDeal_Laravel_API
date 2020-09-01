@@ -122,6 +122,14 @@ class customerKnockController extends Controller
                     }
                     if($relrecord != null && $relrecord->isBlocked == 0)
                     {
+                        if($relrecord->category == $req->category)
+                        {
+                            $knockstatus=CustomerKnock::where('id',$knockrecord->id)->update($knock_data);
+                            if($knockstatus == 1 ){
+                            return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
+                            }
+                        }
+
                         $rel_data=[
                             'cust_id'=>$id,
                             'seller_id'=>$req->seller_id,
@@ -163,7 +171,7 @@ class customerKnockController extends Controller
                     'isActive'=>0
                 ];
 
-                $knock_update=CustomerKnock::where('id',$record->id)->update($knock_data);
+                $knock_update=CustomerKnock::where('id',$knockrecord->id)->update($knock_data);
                 if($knock_update==1)
                 {
                     return response()->json(['error' => false ,'message'=>' Customer Rejected Successfully'],200);
@@ -178,12 +186,11 @@ class customerKnockController extends Controller
 
         public function show($id)
         {
-            $knocks=CustomerKnock::where('seller_id',$id)->where('isActive',1)->where('isApproved',0)->get()->toarray();
             $knockreturn = DB::table('cust_sel_knock_rel')
                             ->join('users','users.id','cust_sel_knock_rel.cust_id')
                             ->select('users.name','cust_sel_knock_rel.*')
                             ->where('cust_sel_knock_rel.seller_id',$id)
-                            ->where('cust_sel_knock_rel.isActive',1)->where('cust_sel_knock_rel.isApproved',0)
+                            ->where('cust_sel_knock_rel.isActive',1)
                             ->get()->toarray();
             if(!empty($knockreturn))
             {

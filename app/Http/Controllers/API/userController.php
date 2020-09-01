@@ -16,10 +16,10 @@ class userController extends Controller
         // $psw=Hash::make(request('password'));
         $user=User::where([['email',request('email')],['password', request('password')]])->count();
         if($user==1){
-            $user = User::where('email',request('email'))->get()->toarray();
+            $user = User::where('email',request('email'))->first();
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
             // $user = Auth::user();
-            return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
+            return response()->json(['error' => false ,'data' => $user], 200);
         }
         else{
             return response()->json(['error'=> true , 'message' => 'unauthorised'], 401);

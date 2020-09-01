@@ -4,7 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Order;
+use App\Cart;
+use App\OrderRequest;
+use App\OrderTranslation;
 use Validator;
 
 class orderController extends Controller
@@ -18,25 +22,57 @@ class orderController extends Controller
         }
         return response()->json(['error' => true ,'message'=>'Invalid Id']);
     }
-    public function create(Request $req)
+    public function createRequest(Request $req)
     {
         $validator = Validator::make($req->all(), [
-            'product_id' => 'required',
             'seller_id' => 'required',
-            'customer_id' => 'required',
-            'qty'=>'required',
-            'total_amount'=>'required',
+            'cust_id' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        $order=new Order;
-        $order->product_id=$req->product_id;
-        $order->seller_id=$req->seller_id;
-        $order->customer_id=$req->customer_id;
-        $order->qty=$req->qty;
-        $order->total_amount=$req->total_amount;
-        $order->status_id=1;
+
+        $cartrecord = Cart::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->get()->toarray();
+
+        if($cartrecord == null)
+        {
+            return response()->json(['error' => true ,'message'=>'Nothing in Cart'], 500);
+        }
+
+        if($cartrecord != null)
+        {
+            $cart = DB::table('carts')
+                            ->join('products','products.id','carts.product_id')
+                            ->select('products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','products.price as product_price')
+                            ->where('carts.cust_id',$req->cust_id)
+                            ->get()->toarray();
+
+            foreach ($cart as $record) {
+                $record->total_price = $record->product_price * $record->qty;
+            }
+
+            $order_details = new OrderDetail;
+            $order_details->seller_id = $req->seller_id;
+            $order_details->cust_id = $req->cust_id;
+            $order_details->products = $cart;
+
+            if($order_details->save())
+            {
+                $order_request = new OrderRequest;
+                $order_request->seller_id = $req->seller_id;
+                $order_request->cust_id = $req->cust_id;
+                $order_request->$order_details->id;
+                if($order_request->save())
+                {
+                    return response()->json(['error' => false ,'message'=>'Request Created'], 200);
+                }
+            }
+
+            return response()->json(['error' => false ,'message'=>$order_details], 200);
+        }
+        else{
+            return response()->json(['error' => true ,'message'=>'Something Went Wrong'], 500);
+        }
 
         if($order->save())
         {

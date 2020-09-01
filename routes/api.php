@@ -67,12 +67,13 @@ Route::get('user/notification/show/{id}','API\notificationController@show');
 Route::delete('user/notification/delete/{id}','API\notificationController@delete');
 
 Route::post('user/cart/new','API\cartController@create');
-Route::post('user/cart/update/{id}','API\cartController@update');
 Route::get('user/cart/show/{id}','API\cartController@show');
+Route::get('user/cart/check/{id}','API\cartController@check');
+Route::get('user/cart/count/{id}','API\cartController@count');
 Route::delete('user/cart/delete/{id}','API\cartController@delete');
-Route::delete('user/cart/deleteByUserID/{id}','API\cartController@deleteByUserid');
+Route::delete('user/cart/delete/all/{id}','API\cartController@deleteByUserid');
 
-Route::post('user/order/new','API\orderController@create');
+Route::post('user/order/request/new','API\orderController@createRequest');
 Route::post('user/order/update/{id}','API\orderController@update');
 Route::get('user/order/show/{id}','API\orderController@show');
 Route::delete('user/order/delete/{id}','API\orderController@delete');
