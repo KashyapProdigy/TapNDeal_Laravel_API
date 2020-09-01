@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Order;
+<<<<<<< HEAD
 use App\Cart;
 use App\OrderRequest;
 use App\OrderTranslation;
+=======
+>>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
 use Validator;
 
 class orderController extends Controller
@@ -30,6 +33,7 @@ class orderController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+<<<<<<< HEAD
         }
 
         $cartrecord = Cart::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->get()->toarray();
@@ -73,6 +77,16 @@ class orderController extends Controller
         else{
             return response()->json(['error' => true ,'message'=>'Something Went Wrong'], 500);
         }
+=======
+        }
+        $order=new Order;
+        $order->product_id=$req->product_id;
+        $order->seller_id=$req->seller_id;
+        $order->customer_id=$req->customer_id;
+        $order->qty=$req->qty;
+        $order->total_amount=$req->total_amount;
+        $order->status_id=1;
+>>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
 
         if($order->save())
         {
