@@ -14,7 +14,6 @@ class cartController extends Controller
 {
     public function show($id)
     {
-<<<<<<< HEAD
         $cart_price = 0 ;
         $cart = DB::table('carts')
                             ->join('products','products.id','carts.product_id')
@@ -37,14 +36,6 @@ class cartController extends Controller
             }
             return response()->json(['error' => true ,'message'=>'something went wrong'],500);
 
-=======
-        $cart=Cart::where('user_id',$id)->get()->toarray();
-        if(!empty($cart))
-        {
-            return response()->json(['error' => false ,'data'=>$cart],200);
-        }
-        return response()->json(['error' => true ,'message'=>'Invalid Id']);
->>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
     }
 
     public function create(Request $req)
@@ -64,14 +55,8 @@ class cartController extends Controller
 
         if($cartrecord != null )
         {
-<<<<<<< HEAD
             return response()->json(['error' => true ,'message'=>'Product Already In Cart'],500);
         }
-=======
-            return response()->json(['error' => false ,'message'=>' Cart Record Inserted Successfully'],200);
-        }
-        return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
->>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
 
         if( $product != null )
         {
@@ -116,17 +101,10 @@ class cartController extends Controller
         $cart_del=Cart::where('product_id',$id)->where('cust_id',$req->cust_id)->first();
         if($cart_del != null)
         {
-<<<<<<< HEAD
             $cart_del->delete();
             return response()->json(['error' => false ,'message'=>'Product Removed From Cart'],200);
         }
         return response()->json(['error' => true ,'message'=>'Record not found'],500);
-=======
-            return response()->json(['error' => false ,'message'=>' Cart updated Successfully'],200);
-        }
-        return response()->json(['error' => true ,'message'=>'Record not found'],500);
-
->>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
     }
 
     public function deleteByUserid($id)
@@ -134,13 +112,8 @@ class cartController extends Controller
         $cart_del=Cart::where('cust_id',$id)->get();
         if($cart_del != null)
         {
-<<<<<<< HEAD
             Cart::where('cust_id',$id)->delete();
             return response()->json(['error' => false ,'message'=>'Cart Records Deleted'],200);
-=======
-            $cart_del->delete();
-            return response()->json(['error' => false ,'message'=>'Cart Record Deleted'],200);
->>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
         }
         return response()->json(['error' => true ,'message'=>'Record not found']);
     }
@@ -166,17 +139,10 @@ class cartController extends Controller
         $cart_count=Cart::where('cust_id',$id)->count();
         if($cart_count != null)
         {
-<<<<<<< HEAD
             return response()->json(['error' => false ,'data'=>$cart_count],200);
         }
         else{
             return response()->json(['error' => false ,'data'=>0],200);
         }
-=======
-            Cart::where('user_id',$id)->delete();
-            return response()->json(['error' => false ,'message'=>'Cart Records Deleted'],200);
-        }
-        return response()->json(['error' => true ,'message'=>'Record not found']);
->>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
     }
 }

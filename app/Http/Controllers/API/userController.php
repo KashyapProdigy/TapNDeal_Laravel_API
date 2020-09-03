@@ -14,16 +14,12 @@ class userController extends Controller
     public function login()
     {
         // $psw=Hash::make(request('password'));
-        $user=User::where([['email',request('email')],['password', request('password')]])->count();
+        $user=User::where([['mobile',request('mobile')],['password', request('password')]])->count();
         if($user==1){
-            $user = User::where('email',request('email'))->first();
+            $user = User::where('mobile',request('mobile'))->first();
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
             // $user = Auth::user();
-<<<<<<< HEAD
-            return response()->json(['error' => false ,'data' => $user], 200);
-=======
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
->>>>>>> 7b515ff04d194ea0628dd723570e9c4838bcd3fe
         }
         else{
             return response()->json(['error'=> true , 'message' => 'unauthorised'], 401);

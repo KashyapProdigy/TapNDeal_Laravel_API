@@ -12,97 +12,32 @@ use Validator;
 
 class customerRelationshipController extends Controller
 {
-    public function promote(Request $req,$id)
+    public function update(Request $req,$id)
         {
             $validator = Validator::make($req->all(), [
                 'seller_id' => 'required',
+                'category' => 'required'
             ]);
             if ($validator->fails()) {
                 return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
             }
-            $relation_data=[];
+
             $relation_record=CustomerCategoryRelationship::where([['cust_id',$id],['seller_id',$req->seller_id]])->first();
+
             if(!empty($relation_record))
             {
-                if(($relation_record['category'])=="A")
+                $relation_data=['category'=>$req->category];
+                $relation_update=CustomerCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
+                if($relation_update==1)
                 {
-                    $category="A+";
-                    $relation_data=[
-                        'seller_id'=>$relation_record->seller_id,
-                        'cust_id'=>$relation_record->cust_id,
-                        'category'=>$category,
-                        'isBlocked'=>$relation_record->isBlocked,
-                    ];
-                }
-                elseif(($relation_record['category'])=="B")
-                {
-                    $category="A";
-                    $relation_data=[
-                        'seller_id'=>$relation_record->seller_id,
-                        'cust_id'=>$relation_record->cust_id,
-                        'category'=>$category,
-                        'isBlocked'=>$relation_record->isBlocked,
-                    ];
+                    return response()->json(['error' => false ,'message'=>'Customer Category Updated'],200);
                 }
             }
             else{
-                return response()->json(['error' => true ,'message'=>'User not found']);
+                return response()->json(['error' => true ,'message'=>'Record Not Found']);
             }
-            $relation_update=CustomerCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
-            if($relation_update==1)
-            {
-                return response()->json(['error' => false ,'message'=>'Customer Promoted'],200);
-            }
-            else{
-                return response()->json(['error' => true ,'message'=>'Record not found']);
-            }
-        }
 
-        public function demote(Request $req,$id)
-        {
-            $validator = Validator::make($req->all(), [
-                'seller_id' => 'required',
-            ]);
-            if ($validator->fails()) {
-                return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
-            }
-            $relation_data=[];
-            $relation_record=CustomerCategoryRelationship::where([['cust_id',$id],['seller_id',$req->seller_id]])->first();
-            if(!empty($relation_record))
-            {
-                if(($relation_record['category'])=="A+")
-                {
-                    $category="A";
-                    $relation_data=[
-                        'seller_id'=>$relation_record->seller_id,
-                        'cust_id'=>$relation_record->cust_id,
-                        'category'=>$category,
-                        'isBlocked'=>$relation_record->isBlocked,
-                    ];
-                }
-                elseif(($relation_record['category'])=="A")
-                {
-                    $category="B";
-                    $relation_data=[
-                        'seller_id'=>$relation_record->seller_id,
-                        'cust_id'=>$relation_record->cust_id,
-                        'category'=>$category,
-                        'isBlocked'=>$relation_record->isBlocked,
-
-                    ];
-                }
-            }
-            else{
-                return response()->json(['error' => true ,'message'=>'User not found']);
-            }
-            $relation_update=CustomerCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
-            if($relation_update==1)
-            {
-                return response()->json(['error' => false ,'message'=>'Customer Demoted'],200);
-            }
-            else{
-                return response()->json(['error' => true ,'message'=>'Record not found']);
-            }
+                return response()->json(['error' => true ,'message'=>'Something Went Wrong']);
         }
 
         public function block(Request $req,$id)
@@ -192,7 +127,13 @@ class customerRelationshipController extends Controller
                     }
                     if($relations->category == 'A')
                     {
-                        $cat=['A','B'];
+                        $cat=['A','B+','B'];
+                        $products = Product::where('seller_id',$req->seller_id)->whereIn('category',$cat)->get()->toarray();
+                        return response()->json(['error' => false ,'data'=>$products],200);
+                    }
+                    if($relations->category == 'B+')
+                    {
+                        $cat=['B+','B'];
                         $products = Product::where('seller_id',$req->seller_id)->whereIn('category',$cat)->get()->toarray();
                         return response()->json(['error' => false ,'data'=>$products],200);
                     }
@@ -209,3 +150,50 @@ class customerRelationshipController extends Controller
         }
 
 }
+
+// public function demote(Request $req,$id)
+// {
+//     $validator = Validator::make($req->all(), [
+//         'seller_id' => 'required',
+//     ]);
+//     if ($validator->fails()) {
+//         return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+//     }
+//     $relation_data=[];
+//     $relation_record=CustomerCategoryRelationship::where([['cust_id',$id],['seller_id',$req->seller_id]])->first();
+//     if(!empty($relation_record))
+//     {
+//         if(($relation_record['category'])=="A+")
+//         {
+//             $category="A";
+//             $relation_data=[
+//                 'seller_id'=>$relation_record->seller_id,
+//                 'cust_id'=>$relation_record->cust_id,
+//                 'category'=>$category,
+//                 'isBlocked'=>$relation_record->isBlocked,
+//             ];
+//         }
+//         elseif(($relation_record['category'])=="A")
+//         {
+//             $category="B";
+//             $relation_data=[
+//                 'seller_id'=>$relation_record->seller_id,
+//                 'cust_id'=>$relation_record->cust_id,
+//                 'category'=>$category,
+//                 'isBlocked'=>$relation_record->isBlocked,
+
+//             ];
+//         }
+//     }
+//     else{
+//         return response()->json(['error' => true ,'message'=>'User not found']);
+//     }
+//     $relation_update=CustomerCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
+//     if($relation_update==1)
+//     {
+//         return response()->json(['error' => false ,'message'=>'Customer Demoted'],200);
+//     }
+//     else{
+//         return response()->json(['error' => true ,'message'=>'Record not found']);
+//     }
+// }
