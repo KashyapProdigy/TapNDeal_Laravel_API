@@ -19,8 +19,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('login', 'API\userController@login');
+Route::post('register','API\userController@register');
+Route::post('user/reset/password/{id}','API\userController@resetPassword');
+Route::get('user/profile/display/{id}','API\userController@profileDisplay');
+Route::post('user/profile/view/log/add','API\userController@addViewLog');
+Route::post('user/profile/view/log/show/{id}','API\userController@showViewLog');
 
 Route::get('dashboard/{id}','API\dashboardController@getdashboard');
+Route::get('user/relation/show/seller/{id}','API\dashboardController@showSellerRelations');
 
 Route::post('user/knock/new/customer/{id}','API\customerKnockController@create');
 Route::post('user/knock/approve/customer/{id}','API\customerKnockController@approve');
