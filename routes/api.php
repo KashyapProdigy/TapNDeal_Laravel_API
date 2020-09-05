@@ -76,6 +76,7 @@ Route::get('user/cart/show/{id}','API\cartController@show');
 Route::get('user/cart/check/{id}','API\cartController@check');
 Route::get('user/cart/count/{id}','API\cartController@count');
 Route::delete('user/cart/delete/{id}','API\cartController@delete');
+Route::post('user/cart/update/{cid}','API\cartController@update');
 Route::delete('user/cart/delete/all/{id}','API\cartController@deleteByUserid');
 
 Route::post('user/order/request/new','API\orderController@createRequest');
