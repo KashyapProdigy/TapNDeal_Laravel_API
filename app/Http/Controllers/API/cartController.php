@@ -16,11 +16,11 @@ class cartController extends Controller
     {
         $cart_price = 0 ;
         $cart = DB::table('carts')
-                            ->join('products','products.id','carts.product_id')
-                            ->join('users','users.id','carts.seller_id')
-                            ->select('carts.seller_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','products.price as product_price','carts.created_at as cart_add_time')
-                            ->where('carts.cust_id',$id)
-                            ->get()->toarray();
+            ->join('products','products.id','carts.product_id')
+            ->join('users','users.id','carts.seller_id')
+            ->select('carts.seller_id','carts.id as cart_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','products.price as product_price','carts.created_at as cart_add_time')
+            ->where('carts.cust_id',$id)
+            ->get()->toarray();
             if($cart != null)
             {
 
@@ -103,6 +103,24 @@ class cartController extends Controller
         {
             $cart_del->delete();
             return response()->json(['error' => false ,'message'=>'Product Removed From Cart'],200);
+        }
+        return response()->json(['error' => true ,'message'=>'Record not found'],500);
+    }
+
+    public function update(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'cart_id' => 'required',
+            'qty'=>'required|numeric',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $c=Cart::find($req->cart_id);
+        if($c)
+        {
+            $c->qty=$req->qty;
+            return response()->json(['error' => false ,'message'=>'Cart Updated successfully..'],200);
         }
         return response()->json(['error' => true ,'message'=>'Record not found'],500);
     }
