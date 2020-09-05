@@ -17,6 +17,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/krishna', function () {
     return view('welcome');
 });
+Route::get('/admin','AdminController@admin');
+Route::post('/admin','AdminController@login');
+Route::middleware([AdminCheck::class])->group(function () {
+    route::get('/logout','AdminController@logout');
+    route::get('/admin/owner','ownersController@show');
+    route::post('/update/seller','ownersController@update');
+    route::post('/SellerAdd','ownersController@create');
+    route::get('/seller/delete/{uid}','ownersController@delete');
+});
 
 Route::get('product/{name}', 'ImagesController@productPicture');
 
