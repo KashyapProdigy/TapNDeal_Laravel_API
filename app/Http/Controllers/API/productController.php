@@ -157,6 +157,8 @@ class productController extends Controller
             {
                 $names=$req->oldImages;
             }
+            if($req->image)
+            {
             $image_list = json_decode($req->image);
             if( is_object($image_list) )
             {
@@ -189,7 +191,7 @@ class productController extends Controller
             else{
                 return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
-
+        }
 
             // $image_list = json_decode($req->image);
             // if( is_array($image_list) || is_object($image_list) )
