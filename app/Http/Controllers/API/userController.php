@@ -88,7 +88,7 @@ class userController extends Controller
 
     public function profileDisplay($id)
     {
-        $user=User::find($id);
+        $user=User::join('citys','citys.id','city_id')->join('states','states.id','users.state_id')->find($id);
 
         if($user != null)
         {
@@ -108,7 +108,13 @@ class userController extends Controller
         }
 
         $logrecord=ProfileViewLog::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->first();
-
+        if($logrecord != NULL)
+        {
+            if(date('d-m-Y',strtotime($logrecord['created_at']))==date('d-m-Y'))
+            {
+                return response()->json(['error' => false ,'message'=>'Log available for today..!'],200);
+            }
+        }
         if($logrecord == null)
         {
             $data=new ProfileViewLog;

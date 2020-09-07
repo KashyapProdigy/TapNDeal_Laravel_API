@@ -107,19 +107,19 @@ class cartController extends Controller
         return response()->json(['error' => true ,'message'=>'Record not found'],500);
     }
 
-    public function update(Request $req)
+    public function update(Request $req,$cid)
     {
         $validator = Validator::make($req->all(), [
-            'cart_id' => 'required',
             'qty'=>'required|numeric',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        $c=Cart::find($req->cart_id);
+        $c=Cart::find($cid);
         if($c)
         {
             $c->qty=$req->qty;
+            $c->save();
             return response()->json(['error' => false ,'message'=>'Cart Updated successfully..'],200);
         }
         return response()->json(['error' => true ,'message'=>'Record not found'],500);
