@@ -126,7 +126,7 @@ class productController extends Controller
         $product->colors=$req->colors;
         $product->watermark=$watermark_name;
         $product->agents_id=$req->agents_id;
-        $product->date_time=Carbon::now();
+        // $product->date_time=Carbon::now();
         if($product->save())
         {
             return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
@@ -143,7 +143,7 @@ class productController extends Controller
                 'name' => 'required',
                 'price' => 'required',
                 'description' => 'required',
-                'image'=>'required',
+                // 'image'=>'required',
                 'category'=>'required',
                 'tags'=>'required',
                 'colors'=>'required',
@@ -152,7 +152,11 @@ class productController extends Controller
             if ($validator->fails()) {
                 return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
             }
-
+            $names="";
+            if($req->oldImages)
+            {
+                $names=$req->oldImages;
+            }
             $image_list = json_decode($req->image);
             if( is_object($image_list) )
             {
@@ -164,7 +168,13 @@ class productController extends Controller
                         Storage::disk('product')->put($filename, $file);
                         $file = Storage::disk('temp')->delete($value);
                         if($uploadsCount == 0){
-                        $names = $names.$filename;
+                            if($names!="")
+                            {
+                                $names = $names.",".$filename;
+                            }
+                            else{
+                            $names = $names.$filename;
+                            }
                         }
                         else if($uploadsCount > 0){
                         $names = $names.",".$filename;
@@ -200,6 +210,9 @@ class productController extends Controller
                 $watermark_name = time().'-wm.png';
                 Storage::disk('watermark')->put($watermark_name, $file2);
             }
+            else{
+                $watermark_name="";
+            }
             $date_time=Carbon::now();
             $product_data=[
                 'seller_id'=>$req->seller_id,
@@ -212,7 +225,7 @@ class productController extends Controller
                 'watermark'=>$watermark_name,
                 'colors'=>$req->colors,
                 'agents_id'=>$req->agents_id,
-                'date_time'=>$date_time,
+                // 'date_time'=>$date_time,
             ];
             $product_update=Product::where('id',$id)->update($product_data);
             if($product_update==1)
