@@ -89,10 +89,11 @@ class userController extends Controller
     public function profileDisplay($id)
     {
         $user=User::join('citys','citys.id','city_id')->join('states','states.id','users.state_id')->find($id);
-
+        $citys=\DB::table('citys')->get();
+        $states=\DB::table('states')->get();
         if($user != null)
         {
-            return response()->json(['error' => false ,'data'=>$user],200);
+            return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
     }
@@ -112,7 +113,7 @@ class userController extends Controller
         {
             if(date('d-m-Y',strtotime($logrecord['created_at']))==date('d-m-Y'))
             {
-                return response()->json(['error' => false ,'message'=>'Log available for today..!'],200);
+                return response()->json(['error' => true ,'message'=>'Log already available for today..!'],200);
             }
         }
         if($logrecord == null)
