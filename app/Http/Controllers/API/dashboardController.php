@@ -30,31 +30,7 @@ class dashboardController extends Controller
         if($loggedInUser->type_id == 1)
         {
             //User is Seller
-                $A_Plus_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"A+")->where('isBlocked',0)->get()->toarray();
-                $A_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"A")->where('isBlocked',0)->get()->toarray();
-                $B_Plus_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"B+")->where('isBlocked',0)->get()->toarray();
-                $B_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"B")->where('isBlocked',0)->get()->toarray();
-                $Blocked_Customer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('isBlocked',1)->get()->toarray();
-                $customer['A_Plus_Customers']=User::whereIn('id',$A_Plus_Cust_List)->get()->toarray();
-                $customer['A_Customers']=User::whereIn('id',$A_Cust_List)->get()->toarray();
-                $customer['B_Plus_Customers']=User::whereIn('id',$B_Plus_Cust_List)->get()->toarray();
-                $customer['B_Customers']=User::whereIn('id',$B_Cust_List)->get()->toarray();
-                // $customer['NotConnected_Customers']=User::where('type_id',1)->where('isVerified',1)->whereNotIN('id',$Blocked_Customer)->whereNotIN('id',$A_Plus_Cust_List)->whereNotIN('id',$A_Cust_List)->whereNotIN('id',$B_Plus_Cust_List)->whereNotIN('id',$B_Cust_List)->get()->toarray();
-
-                $A_Plus_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"A+")->where('isBlocked',0)->get()->toarray();
-                $A_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"A")->where('isBlocked',0)->get()->toarray();
-                $B_Plus_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"B+")->where('isBlocked',0)->get()->toarray();
-                $B_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"B")->where('isBlocked',0)->get()->toarray();
-                $Blocked_Agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('isBlocked',1)->get()->toarray();
-                $agent['A_Plus_Agents']=User::whereIn('id',$A_Plus_Agent_List)->get()->toarray();
-                $agent['A_Agents']=User::whereIn('id',$A_Agent_List)->get()->toarray();
-                $agent['B_Plus_Agents']=User::whereIn('id',$B_Plus_Agent_List)->get()->toarray();
-                $agent['B_Agents']=User::whereIn('id',$B_Agent_List)->get()->toarray();
-                //$agent['NotConnected_Agents']=User::where('type_id',2)->where('isVerified',1)->whereNotIN('id',$Blocked_Agent)->get()->toarray();
-
-                $dashboard['Products']=Product::where('seller_id',$id)->get()->toarray();
-                $dashboard['Customers']=$customer;
-                $dashboard['Agents']=$agent;
+                $dashboard=Product::where('seller_id',$id)->get()->toarray();
 
                 if(!empty($dashboard))
                 {
@@ -120,5 +96,50 @@ class dashboardController extends Controller
         }
 
         return response()->json(['error' => true ,'message'=>"Something went wrong"],500);
+    }
+
+    public function showSellerRelations($id)
+    {
+        $dashboard=[];
+        $customer=[];
+        $agent=[];
+            $loggedInUser=User::find($id);
+            if($loggedInUser == null)
+            {
+              return response()->json(['error' => true ,'message'=>"No User Found"]);
+            }
+                $A_Plus_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"A+")->where('isBlocked',0)->get()->toarray();
+                $A_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"A")->where('isBlocked',0)->get()->toarray();
+                $B_Plus_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"B+")->where('isBlocked',0)->get()->toarray();
+                $B_Cust_List=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('category','=',"B")->where('isBlocked',0)->get()->toarray();
+                $Blocked_Customer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$id)->where('isBlocked',1)->get()->toarray();
+                $customer['A_Plus_Customers']=User::whereIn('id',$A_Plus_Cust_List)->get()->toarray();
+                $customer['A_Customers']=User::whereIn('id',$A_Cust_List)->get()->toarray();
+                $customer['B_Plus_Customers']=User::whereIn('id',$B_Plus_Cust_List)->get()->toarray();
+                $customer['B_Customers']=User::whereIn('id',$B_Cust_List)->get()->toarray();
+                // $customer['NotConnected_Customers']=User::where('type_id',1)->where('isVerified',1)->whereNotIN('id',$Blocked_Customer)->whereNotIN('id',$A_Plus_Cust_List)->whereNotIN('id',$A_Cust_List)->whereNotIN('id',$B_Plus_Cust_List)->whereNotIN('id',$B_Cust_List)->get()->toarray();
+
+                $A_Plus_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"A+")->where('isBlocked',0)->get()->toarray();
+                $A_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"A")->where('isBlocked',0)->get()->toarray();
+                $B_Plus_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"B+")->where('isBlocked',0)->get()->toarray();
+                $B_Agent_List=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('category','=',"B")->where('isBlocked',0)->get()->toarray();
+                $Blocked_Agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$id)->where('isBlocked',1)->get()->toarray();
+                $agent['A_Plus_Agents']=User::whereIn('id',$A_Plus_Agent_List)->get()->toarray();
+                $agent['A_Agents']=User::whereIn('id',$A_Agent_List)->get()->toarray();
+                $agent['B_Plus_Agents']=User::whereIn('id',$B_Plus_Agent_List)->get()->toarray();
+                $agent['B_Agents']=User::whereIn('id',$B_Agent_List)->get()->toarray();
+                //$agent['NotConnected_Agents']=User::where('type_id',2)->where('isVerified',1)->whereNotIN('id',$Blocked_Agent)->get()->toarray();
+
+                $dashboard['Customers']=$customer;
+                $dashboard['Agents']=$agent;
+
+                if(!empty($dashboard))
+                {
+                    return response()->json(['error' => false ,'data'=>$dashboard],200);
+                }
+                else {
+                    return response()->json(['error' => true ,'message'=>"Records Not Found"]);
+                }
+                return response()->json(['error' => true ,'message'=>"Something Went Wrong"],500);
     }
 }

@@ -34,7 +34,6 @@ class productController extends Controller
             'image'=>'required',
             'category'=>'required',
             'tags'=>'required',
-            'stock'=>'required',
             'colors'=>'required',
             'seller_id' => 'required',
         ]);
@@ -124,7 +123,6 @@ class productController extends Controller
         $product->image=$names;
         $product->category=$req->category;
         $product->tags=$req->tags;
-        $product->stock=$req->stock;
         $product->colors=$req->colors;
         $product->watermark=$watermark_name;
         $product->agents_id=$req->agents_id;
@@ -148,7 +146,6 @@ class productController extends Controller
                 'image'=>'required',
                 'category'=>'required',
                 'tags'=>'required',
-                'stock'=>'required',
                 'colors'=>'required',
                 'seller_id' => 'required',
             ]);
@@ -212,7 +209,6 @@ class productController extends Controller
                 'image'=>$names,
                 'category'=>$req->category,
                 'tags'=>$req->tags,
-                'stock'=>$req->stock,
                 'watermark'=>$watermark_name,
                 'colors'=>$req->colors,
                 'agents_id'=>$req->agents_id,
