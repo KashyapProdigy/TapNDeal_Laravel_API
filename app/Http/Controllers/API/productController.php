@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Product;
 use Carbon\Carbon;
 use Validator;
+use File;
 
 class productController extends Controller
 {
@@ -139,6 +140,7 @@ class productController extends Controller
     public function update(Request $req,$id)
         {
 
+            
             $validator = Validator::make($req->all(), [
                 'name' => 'required',
                 'price' => 'required',
@@ -156,6 +158,19 @@ class productController extends Controller
             if($req->oldImages)
             {
                 $names=$req->oldImages;
+            }
+            if($req->deleted_img)
+            {
+                
+                $images = explode(",", $req->deleted_img);
+
+                foreach ($images as $image) {
+                    $image_path = public_path().'/productPhotos/'.$image;
+                    if(File::exists($image_path)) {
+                        File::delete($image_path);
+                    }
+                    
+                }
             }
             if($req->image)
             {
