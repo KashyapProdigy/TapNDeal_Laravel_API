@@ -53,7 +53,7 @@
             
         </div>
         <div class="col-md-2">
-            <button class="btn btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Employee</button>
+            <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Employee</button>
         </div>
     </div>
     <div class="card-body">
@@ -98,8 +98,8 @@
                         <td>{{$owner->user_type}}</td>
                         <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
                         <td>
-                            <a class="btn btn-primary text-white" data-toggle="modal" data-target="#updateEmployee{{$owner->uid}}"><i class="fas fa-pen"></i>Update</a>
-                            <a class="btn btn-danger text-white" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i>Delete</a>
+                        <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateEmployee{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>
+                            <a class="btn btn-sm btn-danger text-white" data-toggle="tooltip" title="Delete" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i></a>
                         </td>
                     </tr>
                 @endforeach             
@@ -190,7 +190,7 @@
 </div>
 </form>
 @foreach($owners as $owner)
-<form action="{{url('/admin/seller/update/Employee')}}" method="post">
+<form action="{{url('/admin/seller/update/employee')}}" method="post">
 <div class="modal fade bd-example-modal-lg" tabindex="-1" id="updateEmployee{{$owner->uid}}" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 @csrf
   <div class="modal-dialog modal-lg">
@@ -220,7 +220,7 @@
             </div>
         </div>
         <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
             <label for="inputCity">City</label>
             <select id="inputState" name="city" class="form-control">
                 <option value="">Choose...</option>
@@ -229,12 +229,21 @@
                 @endforeach
             </select>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
             <label for="inputState">State</label>
             <select id="inputState" name="state" class="form-control">
                 <option value="">Choose...</option>
                 @foreach($states as $state)
                     <option @if($state->id==$owner->sid) selected @endif value="{{$state->id}}">{{$state->state_name}}</option>
+                @endforeach
+            </select>
+            </div>
+            <div class="form-group col-md-4">
+            <label for="inputState">Employee Type</label>
+            <select id="inputState" name="etype" class="form-control">
+                <option value="">Choose...</option>
+                @foreach($e_type as $e)
+                    <option @if($owner->type_id == $e->id) selected @endif value="{{$e->id}}">{{$e->user_type}}</option>
                 @endforeach
             </select>
             </div>

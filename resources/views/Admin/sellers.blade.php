@@ -40,7 +40,7 @@
         Seller Data
     </div>
     <div>
-        <button class="btn btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Seller</button>
+        <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Seller</button>
     </div>
     <div class="card-body">
         @if(count($owners)==0)
@@ -81,9 +81,9 @@
                         <td>{{$owner->state_name}}</td>
                         <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
                         <td>
-                            <a class="btn btn-success text-white" href="{{url('/seller/accounts')}}/{{$owner->uid}}"><i class="fas fa-eye"></i>Accounts</a>
-                            <a class="btn btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$owner->uid}}"><i class="fas fa-pen"></i>Update</a>
-                            <a class="btn btn-danger text-white" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i>Delete</a>
+                            <a class="btn btn-sm btn-success text-white" data-toggle="tooltip" title="Accounts" href="{{url('/seller/accounts')}}/{{$owner->uid}}"><i class="fas fa-eye"></i></a>
+                            <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>
+                            <a data-toggle="tooltip" title="Delete" class="btn btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i></a>
                         </td>
                     </tr>
                 @endforeach             
