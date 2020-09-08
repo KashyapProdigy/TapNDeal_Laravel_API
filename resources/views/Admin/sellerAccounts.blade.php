@@ -1,14 +1,15 @@
 @extends('layout')
 
 @section('title')
-    Sellers
+    Employees
 @stop
 
 @section('pageTitle')
-    Sellers
+    Employees
 @stop
 
 @section('content')
+
 <div class="card mb-4">
     
     @if($errors->any())
@@ -37,10 +38,23 @@
     @endif
     <div class="card-header">
         <i class="fas fa-table mr-1"></i>
-        Seller Data
+        Employees Data
     </div>
-    <div>
-        <button class="btn btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Seller</button>
+    <div class="row d-flex col-12">
+        <div class="col-md-10"> 
+            <div class="col-md-5">
+            <hr>
+                <h5 class="text-primary">Seller Information:</h5>
+                <h6>Name : <span class="text-secondary">{{$seller->name}}</span></h6>
+                <h6>Em@il : <span class="text-secondary">{{$seller->email}}</span></h6>
+                <h6>Mobile : <span class="text-secondary">{{$seller->mobile}}</span></h6>
+                <hr>
+            </div>
+            
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Employee</button>
+        </div>
     </div>
     <div class="card-body">
         @if(count($owners)==0)
@@ -56,6 +70,7 @@
                         <th>mobile</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>Employee Type</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -67,6 +82,7 @@
                         <th>mobile</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>Employee Type</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -79,10 +95,10 @@
                         <td>{{$owner->mobile}}</td>
                         <td>{{$owner->city_name}}</td>
                         <td>{{$owner->state_name}}</td>
+                        <td>{{$owner->user_type}}</td>
                         <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
                         <td>
-                            <a class="btn btn-success text-white" href="{{url('/seller/accounts')}}/{{$owner->uid}}"><i class="fas fa-eye"></i>Accounts</a>
-                            <a class="btn btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$owner->uid}}"><i class="fas fa-pen"></i>Update</a>
+                            <a class="btn btn-primary text-white" data-toggle="modal" data-target="#updateEmployee{{$owner->uid}}"><i class="fas fa-pen"></i>Update</a>
                             <a class="btn btn-danger text-white" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i>Delete</a>
                         </td>
                     </tr>
@@ -94,19 +110,20 @@
         @endif
     </div>
 </div>            
-<form action="{{url('/SellerAdd')}}" method="post">
+<form action="{{url('admin/seller/employee')}}" method="post">
 <div class="modal fade bd-example-modal-lg" tabindex="-1" id="AddSeller" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 @csrf
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add seller</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Employee</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <input type="hidden" name="seller" value="{{$seller->id}}">
       <div class="modal-body">
-      
+
             <div class="form-group">
             <label for="inputEmail4">Name</label>
             <input type="text" class="form-control" name="name"  placeholder="Name">
@@ -123,7 +140,7 @@
             </div>
         </div>
         <div class="form-row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
             <label for="inputCity">City</label>
             <select id="inputState" name="city" class="form-control">
                 <option value="">Choose...</option>
@@ -132,12 +149,21 @@
                 @endforeach
             </select>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
             <label for="inputState">State</label>
             <select id="inputState" name="state" class="form-control">
                 <option value="">Choose...</option>
                 @foreach($states as $state)
                     <option value="{{$state->id}}">{{$state->state_name}}</option>
+                @endforeach
+            </select>
+            </div>
+            <div class="form-group col-md-4">
+            <label for="inputState">Employee Type</label>
+            <select id="inputState" name="type" class="form-control">
+                <option value="">Choose...</option>
+                @foreach($e_type as $e)
+                    <option value="{{$e->id}}">{{$e->user_type}}</option>
                 @endforeach
             </select>
             </div>
@@ -164,8 +190,8 @@
 </div>
 </form>
 @foreach($owners as $owner)
-<form action="{{url('/update/seller')}}" method="post">
-<div class="modal fade bd-example-modal-lg" tabindex="-1" id="updateSeller{{$owner->uid}}" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<form action="{{url('/admin/seller/update/Employee')}}" method="post">
+<div class="modal fade bd-example-modal-lg" tabindex="-1" id="updateEmployee{{$owner->uid}}" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 @csrf
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -233,7 +259,7 @@
 <script>
 function delcon()
 {
-    if(confirm('Do you really wan\'t delete this seller...!!')==true)
+    if(confirm('Do you really wan\'t delete this user...!!')==true)
     {
         return true;
     }

@@ -25,6 +25,8 @@ Route::middleware([AdminCheck::class])->group(function () {
     route::post('/update/seller','ownersController@update');
     route::post('/SellerAdd','ownersController@create');
     route::get('/seller/delete/{uid}','ownersController@delete');
+    route::get('/seller/accounts/{sid}','ownersController@accounts');
+    route::post('/admin/seller/employee','ownersController@AddEmployee');
 });
 
 Route::get('product/{name}', 'ImagesController@productPicture');
