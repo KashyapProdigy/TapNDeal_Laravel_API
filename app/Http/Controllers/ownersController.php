@@ -125,7 +125,7 @@ class ownersController extends Controller
 
         $emp=new emp_sel_rel;
         $emp->emp_id=$usr->id;
-        $emp
+        $emp->seller_id=$req->seller;
         
             return redirect()->back()->with('success','Account of this seller Added succesfully...');
         
