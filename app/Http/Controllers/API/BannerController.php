@@ -14,7 +14,7 @@ class BannerController extends Controller
     public function show($mid)
     {
         $banners=Banners::where('manu_id',$mid)->get();
-        if($banners!=null)
+        if(count($banners)>0)
         {
             return response()->json(['error' => false ,'data'=>$banners], 200);
         }
@@ -82,11 +82,13 @@ class BannerController extends Controller
                 return response()->json(['error' => true ,'message'=>"You can't upload more then 4 banner..!"],500);
             }
         }
-        if(count($image_list->array)>4)
-            return response()->json(['error' => true ,'message'=>"You can't upload more then 4 banner..!"], 500);
+        
         
         if( is_object($image_list) )
         {
+            if(count($image_list->array)>4)
+                return response()->json(['error' => true ,'message'=>"You can't upload more then 4 banner..!"], 500);
+                
             $uploadsCount=0;
             foreach ($image_list->array as $value) {
                 if(Storage::disk('temp')->exists($value)){
