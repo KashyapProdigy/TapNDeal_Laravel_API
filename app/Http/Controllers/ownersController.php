@@ -82,4 +82,53 @@ class ownersController extends Controller
             
         return redirect()->back()->with('error','Somthing wents wrong...');
     }
+    public function accounts($sid)
+    {
+        $ac=User::join('emp_sel_rel','emp_id','users.id')
+            ->join('user_type','user_type.id','users.type_id')
+            ->join('citys','citys.id','users.city_id')
+            ->join('states','states.id','users.state_id')
+            ->select('users.*','user_type.user_type','citys.*','states.*','users.id as uid','users.state_id as sid')
+            ->where('seller_id',$sid)
+            ->get();
+        $seller=User::where('id',$sid)->first();
+        $city=\DB::table('citys')->get();
+        $state=\DB::table('states')->get();
+        $e_type=\DB::table('user_type')->whereIn('user_type',['Accountant','Salesman','Packaging'])->get();
+        return view('admin.sellerAccounts',['owners'=>$ac,'citys'=>$city,'states'=>$state,'seller'=>$seller,'e_type'=>$e_type]);
+    }
+    public function AddEmployee(Request $req)
+    {
+        $validatedData = $req->validate([
+            'name' => 'required|',
+            'email' => 'required|email',
+            'mobile'=>'required|digits:10',
+            'city'=>'required',
+            'type'=>'required',
+            'state'=>'required',
+            'pass'=>'required',
+            'cpass'=>'same:pass'
+        ],[
+            'cpass.same'=>'Confirm password and password not match..!!',
+            'pass.required'=>'Password filed is required',
+        ]);   
+        $usr=new User;
+        $usr->name=$req->name;
+        $usr->email=$req->email;
+        $usr->mobile=$req->mobile;
+        $usr->city_id=$req->city;
+        $usr->password=$req->pass;
+        $usr->state_id=$req->state;
+        $usr->type_id=$req->type;
+        $usr->isVerified="1";
+        $usr->save();
+
+        $emp=new emp_sel_rel;
+        $emp->emp_id=$usr->id;
+        $emp
+        
+            return redirect()->back()->with('success','Account of this seller Added succesfully...');
+        
+        return redirect()->back()->with('error','Somthing wents wrong...');   
+    }
 }
