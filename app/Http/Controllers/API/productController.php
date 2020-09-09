@@ -159,19 +159,7 @@ class productController extends Controller
             {
                 $names=$req->oldImages;
             }
-            if($req->deleted_img)
-            {
-                
-                $images = explode(",", $req->deleted_img);
-
-                foreach ($images as $image) {
-                    $image_path = public_path().'/productPhotos/'.$image;
-                    if(File::exists($image_path)) {
-                        File::delete($image_path);
-                    }
-                    
-                }
-            }
+            
             if($req->image)
             {
             $image_list = json_decode($req->image);
@@ -207,7 +195,19 @@ class productController extends Controller
                 return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
         }
+        if($req->deleted_img)
+        {
+            
+            $images = explode(",", $req->deleted_img);
 
+            foreach ($images as $image) {
+                $image_path = public_path().'/productPhotos/'.$image;
+                if(File::exists($image_path)) {
+                    File::delete($image_path);
+                }
+                
+            }
+        }
             // $image_list = json_decode($req->image);
             // if( is_array($image_list) || is_object($image_list) )
             // {
@@ -230,7 +230,7 @@ class productController extends Controller
             else{
                 $watermark_name="";
             }
-            $date_time=Carbon::now();
+            
             $product_data=[
                 'seller_id'=>$req->seller_id,
                 'name'=>$req->name,

@@ -62,6 +62,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'banner' => [
+            'driver' => 'local',
+            'root' => public_path('BannerImages'),
+            'url' => env('APP_URL').'/BannerImages',
+            'visibility' => 'public',
+        ],
+
         'temp' => [
             'driver' => 'local',
             'root' => public_path('tempPhotos'),

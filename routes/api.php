@@ -100,3 +100,11 @@ Route::post('user/payment/new','API\paymentController@create');
 Route::post('user/payment/update/{id}','API\paymentController@update');
 Route::get('user/payment/show/{id}','API\paymentController@show');
 Route::delete('user/payment/delete/{id}','API\paymentController@delete');
+
+Route::get('user/banner/show/{mid}','API\bannerController@show');
+Route::post('user/banner/new','API\bannerController@create');
+Route::post('user/banner/update/{bid}','API\bannerController@update');
+Route::post('user/banner/destroy/{bid}','API\bannerController@destroy');
+
+Route::get('Agent/list','API\agentController@List');
+Route::get('Agent/orderlist/{ref}','API\agentController@orderList');
