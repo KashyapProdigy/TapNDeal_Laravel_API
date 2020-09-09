@@ -105,3 +105,6 @@ Route::get('user/banner/show/{mid}','API\bannerController@show');
 Route::post('user/banner/new','API\bannerController@create');
 Route::post('user/banner/update/{bid}','API\bannerController@update');
 Route::post('user/banner/destroy/{bid}','API\bannerController@destroy');
+
+Route::get('Agent/list','API\agentController@List');
+Route::get('Agent/orderlist/{ref}','API\agentController@orderList');
