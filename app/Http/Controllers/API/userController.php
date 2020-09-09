@@ -13,6 +13,18 @@ class userController extends Controller
 {
 
     public $successStatus = 200;
+    public function generateRefCode($name)
+    {
+        $i=0;
+        $ref = strtoupper(substr($name, 0, 2)).date('dmy').strtoupper(substr($name, -1, 1));
+        $u=User::where('ref_code',$ref)->count();
+        while($u>0){
+            $name=$name."".$i++;
+            $ref = strtoupper(substr($name, 0, 2)).date('dmy').strtoupper(substr($name, -1, 1));
+            $u=User::where('ref_code',$ref)->count();
+        }
+        return $ref;
+    }
     public function login()
     {
         // $psw=Hash::make(request('password'));
@@ -30,15 +42,9 @@ class userController extends Controller
 
     public function register(Request $request)
     {
-        $validator = $request->validate([
-           'name' => 'required',
-           'mobile' => 'required|unique:users,mobile',
-           'password' => 'required',
-           'type_id'=>'required',
-           'city_id' => 'required',
-           'state_id' => 'required',
-        ]);
-
+        
+        
+        $ref=$this->generateRefCode($request->name);
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
@@ -48,7 +54,7 @@ class userController extends Controller
         $user->city_id = $request->city_id;
         $user->state_id = $request->state_id;
         $user->isVerified = 1;
-
+        $user->ref_code=$ref;
         if($user->save())
         {
             return response()->json(['error' => false ,'message'=>'User Added Successfully'],200);
@@ -182,5 +188,51 @@ class userController extends Controller
         else{
             return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
         }
+    }
+    public function update(Request $request,$uid)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'mobile' => 'required',
+            'type_id'=>'required',
+            'city_id' => 'required',
+            'state_id' => 'required',
+            'email'=>'required',
+        ]);
+        $u=User::where('id',$uid)->first();
+        if($u['mobile']!=$request->mobile)
+        {
+            $validator = Validator::make($request->all(), [
+            'mobile'=>'required|unique:users,mobile',
+            ]);
+        }
+        if($u['email']!=$request->email)
+        {
+            $validator = Validator::make($request->all(), [
+            'email'=>'required|unique:users,email',
+            ]);
+        }
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        
+         $user = User::find($uid);
+         if($user)
+         {
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->type_id = $request->type_id;
+            $user->city_id = $request->city_id;
+            $user->state_id = $request->state_id;
+    
+            if($user->save())
+            {
+                return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);
+            }
+            return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
+         }
+         return response()->json(['error' => true ,'message'=>'User not found '],500);
+         
     }
 }
