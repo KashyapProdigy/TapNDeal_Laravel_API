@@ -16,6 +16,7 @@ class orderController extends Controller
     {
         $validator = Validator::make($req->all(), [
             'cust_id' => 'required',
+            'agent_reference'=>'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
