@@ -26,7 +26,7 @@
                                         <div class="alert alert-danger">
                                         {{Session::get('error')}}
                                         </div>
-                                    @endif
+                                    @endif  
                                     <div id="msg"></div>
                                     <div class="card-body">
                                         <form method="post" name="logform">
