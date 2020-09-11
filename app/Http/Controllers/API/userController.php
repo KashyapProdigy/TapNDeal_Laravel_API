@@ -193,19 +193,11 @@ class userController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'mobile' => 'required',
-            'type_id'=>'required',
             'city_id' => 'required',
-            'state_id' => 'required',
             'email'=>'required',
         ]);
         $u=User::where('id',$uid)->first();
-        if($u['mobile']!=$request->mobile)
-        {
-            $validator = Validator::make($request->all(), [
-            'mobile'=>'required|unique:users,mobile',
-            ]);
-        }
+        $st=\DB::table('citys')->where('id',$request->city_id)->first();
         if($u['email']!=$request->email)
         {
             $validator = Validator::make($request->all(), [
@@ -219,13 +211,11 @@ class userController extends Controller
          $user = User::find($uid);
          if($user)
          {
-            $user->name = $request->name;
+            
             $user->email = $request->email;
-            $user->mobile = $request->mobile;
             $user->type_id = $request->type_id;
             $user->city_id = $request->city_id;
-            $user->state_id = $request->state_id;
-    
+            $user->state_id=$st->state_id;
             if($user->save())
             {
                 return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);

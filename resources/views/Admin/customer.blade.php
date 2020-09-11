@@ -1,11 +1,11 @@
 @extends('layout')
 
 @section('title')
-    Sellers
+    customer
 @stop
 
 @section('pageTitle')
-    Sellers
+    Customers
 @stop
 
 @section('content')
@@ -37,7 +37,7 @@
     @endif
     <div class="card-header">
         <i class="fas fa-table mr-1"></i>
-        Seller Data
+        Customer Data
     </div>
     <div>
         <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Seller</button>
@@ -100,7 +100,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add seller</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Customer</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -111,14 +111,6 @@
             <label for="inputEmail4">Name</label>
             <input type="text" class="form-control" name="name"  placeholder="Name">
             </div>
-            <div class="form-group">
-            <label for="inputEmail4">Address</label>
-            <input type="text" class="form-control" name="Address"  placeholder="Address">
-            </div>
-            <div class="form-group">
-            <label for="inputEmail4">GST No:</label>
-            <input type="text" class="form-control" name="gst"  placeholder="GST">
-            </div>  
         
         <div class="form-row">
             <div class="form-group col-md-6">
@@ -141,8 +133,13 @@
             </select>
             </div>
             <div class="form-group col-md-6">
-            <label for="inputState">Pincode</label>
-            <input type="text" class="form-control" name="pincode" id="pin" placeholder="Pincode">
+            <label for="inputState">State</label>
+            <select id="inputState" name="state" class="form-control">
+                <option value="">Choose...</option>
+                @foreach($states as $state)
+                    <option value="{{$state->id}}">{{$state->state_name}}</option>
+                @endforeach
+            </select>
             </div>
         </div>
         <div class="form-row">

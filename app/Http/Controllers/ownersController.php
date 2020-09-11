@@ -5,8 +5,21 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\emp_sel_rel;
+use App\com_info;
 class ownersController extends Controller
 {
+    public function generateRefCode($name)
+    {
+        $i=0;
+        $ref = strtoupper(substr($name, 0, 2)).date('dmy').strtoupper(substr($name, -1, 1));
+        $u=User::where('ref_code',$ref)->count();
+        while($u>0){
+            $name=$name."".$i++;
+            $ref = strtoupper(substr($name, 0, 2)).date('dmy').strtoupper(substr($name, -1, 1));
+            $u=User::where('ref_code',$ref)->count();
+        }
+        return $ref;
+    }
     public function show()
     {
         $owner=User::join('user_type','user_type.id','users.type_id')
@@ -49,27 +62,38 @@ class ownersController extends Controller
     {
         $validatedData = $req->validate([
             'name' => 'required|',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:u',
             'mobile'=>'required|digits:10',
             'city'=>'required',
-            'state'=>'required',
             'pass'=>'required',
-            'cpass'=>'same:pass'
+            'cpass'=>'same:pass',
+            'gst'=>'required',
+            'Address'=>'required',
+            'pincode'=>'required'
         ],[
             'cpass.same'=>'Confirm password and password not match..!!',
             'pass.required'=>'Password filed is required',
         ]);   
+        $state=\DB::table('citys')->where('id',$req->city)->first();
+        $ref=$this->generateRefCode($req->name);
         $usr=new User;
         $usr->name=$req->name;
         $usr->email=$req->email;
         $usr->mobile=$req->mobile;
         $usr->city_id=$req->city;
         $usr->password=$req->pass;
-        $usr->state_id=$req->state;
+        $usr->state_id=$state->state_id;
         $usr->type_id="1";
         $usr->isVerified="1";
+        $usr->ref_code=$ref;
         if($usr->save())
         {
+            $c=new com_info;
+            $c->sid=$usr->id;
+            $c->gst=$req->gst;
+            $c->address=$req->Address;
+            $c->pincode=$req->pincode;
+            $c->save();
             return redirect()->back()->with('success','Seller Added succesfully...');
         }
         return redirect()->back()->with('error','Somthing wents wrong...');
