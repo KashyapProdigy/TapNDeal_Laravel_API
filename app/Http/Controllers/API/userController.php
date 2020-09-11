@@ -211,7 +211,7 @@ class userController extends Controller
          $user = User::find($uid);
          if($user)
          {
-            
+            $user->name=$request->name;
             $user->email = $request->email;
             $user->type_id = $request->type_id;
             $user->city_id = $request->city_id;
