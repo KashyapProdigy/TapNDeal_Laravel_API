@@ -22,6 +22,7 @@ Route::post('login', 'API\userController@login');
 Route::post('register','API\userController@register');
 Route::post('user/reset/password/{id}','API\userController@resetPassword');
 Route::get('user/profile/display/{id}','API\userController@profileDisplay');
+Route::post('user/profile/update/{id}','API\userController@update');
 Route::post('user/profile/view/log/add','API\userController@addViewLog');
 Route::post('user/profile/view/log/show/{id}','API\userController@showViewLog');
 
@@ -42,6 +43,7 @@ Route::post('user/knock/new/agent/{id}','API\agentKnockController@create');
 Route::post('user/knock/approve/agent/{id}','API\agentKnockController@approve');
 Route::post('user/knock/reject/agent/{id}','API\agentKnockController@reject');
 Route::get('user/knock/show/agent/{id}','API\agentKnockController@show');
+
 
 Route::post('user/relation/update/agent/{id}','API\agentRelationshipController@update');
 Route::post('user/relation/block/agent/{id}','API\agentRelationshipController@block');
@@ -108,3 +110,9 @@ Route::post('user/banner/destroy/{bid}','API\bannerController@destroy');
 
 Route::get('Agent/list','API\agentController@List');
 Route::get('Agent/orderlist/{ref}','API\agentController@orderList');
+Route::get('Agent/orderCount/{ref}','API\agentController@orderCount');
+
+Route::get('buyer/orderCount/{cid}','API\buyerController@orderCount');
+
+Route::post('tempReq/new','API\tempReqController@create');
+Route::get('tempReq/show/{bid}','API\tempReqController@show');

@@ -42,7 +42,7 @@ class productController extends Controller
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
 
-            $color_list = json_decode($req->colors);
+            
 
             $image_list = json_decode($req->image);
             if( is_object($image_list) )

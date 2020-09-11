@@ -28,8 +28,32 @@ Route::middleware([AdminCheck::class])->group(function () {
     route::get('/seller/accounts/{sid}','ownersController@accounts');
     route::post('/admin/seller/employee','ownersController@AddEmployee');
     route::post('/admin/seller/update/employee','ownersController@updateEmployee');
+
+    route::get('/admin/customer','custController@show');
+});
+
+Route::get('/manufacture',function(){
+    $city=\DB::table('citys')->get();
+    return view('Registration',['citys'=>$city]);
+});
+Route::post('/manufacture','manufactureController@register');
+route::get('/confirmMob',function(){
+    return view('confirmMob');
+});
+Route::get('/login',function(){
+    return view('login');
+});
+Route::post('/login','manufactureController@login');
+Route::post('/confirmMob','manufactureController@dashboard');
+Route::get('/mobileCheck','manufactureController@mobCheck');
+
+Route::middleware([manufacture::class])->group(function () {
+    Route::get('/manufacture/index','manufactureController@index');
 });
 
 Route::get('product/{name}', 'ImagesController@productPicture');
 
 Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
+route::get('/f',function(){
+    return view('firebase');
+});

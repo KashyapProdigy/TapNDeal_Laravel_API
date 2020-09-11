@@ -26,7 +26,7 @@ class agentController extends Controller
         $order=array();
         foreach($o_list as $o)
         {
-            $list=Order::where('id',$o['id'])->first();
+            $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')->first();
             $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
             $order[]=$list;
@@ -35,5 +35,10 @@ class agentController extends Controller
             return response()->json(['error' => false ,'data'=>$order],200);
         
         return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!'],200);
+    }
+    public function orderCount($ref)
+    {
+        $o_co=Order::where('agent_reference',$ref)->count();
+        return response()->json(['error' => false ,'count'=>$o_co],200);
     }
 }
