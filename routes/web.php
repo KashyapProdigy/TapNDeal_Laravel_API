@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/krishna', function () {
+Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/admin','AdminController@admin');
@@ -49,6 +49,10 @@ Route::get('/mobileCheck','manufactureController@mobCheck');
 
 Route::middleware([manufacture::class])->group(function () {
     Route::get('/manufacture/index','manufactureController@index');
+    route::get('/mlogout','manufactureController@logout');
+    Route::get('/manufacture/orders','manufactureController@orders');
+    Route::get('/manufacture/orders/show/{id}','manufactureController@fullorder');
+    Route::get('/manufacture/Products','manufactureController@Products');
 });
 
 Route::get('product/{name}', 'ImagesController@productPicture');

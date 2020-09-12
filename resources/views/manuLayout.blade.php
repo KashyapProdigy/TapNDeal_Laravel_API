@@ -9,7 +9,9 @@
         <title>@yield('title')</title>
         <link href="{{asset('Assets/css/styles.css')}}" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+
     </head>
+    
     <body>
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <a class="navbar-brand" href="{{url('/manufacture/index')}}">Tap And Deal</a>
@@ -21,11 +23,10 @@
             <!-- Navbar-->
             <ul class="navbar-nav ml-auto ml-md-0">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i>Admin</a>
+                    <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i> {{session()->get('name')}}</a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                         
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{{url('/logout')}}">Logout</a>
+                        <a class="dropdown-item" href="{{url('/mlogout')}}">Logout</a>
                     </div>
                 </li>
             </ul>
@@ -36,17 +37,17 @@
                     <div class="sb-sidenav-menu">
                         <div class="nav">
                             <div class="sb-sidenav-menu-heading">Core</div>
-                            <a class="nav-link" href="{{url('/admin')}}">
+                            <a class="nav-link" href="{{url('/manufacture/index')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
-                            <a class="nav-link" href="{{url('admin/owner')}}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                                Sellers
+                            <a class="nav-link" href="{{url('/manufacture/orders')}}">
+                                <div class="sb-nav-link-icon"><i class="fa fa-list" aria-hidden="true"></i></div>
+                                Orders
                             </a>
-                            <a class="nav-link" href="{{url('admin/customer')}}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                                Customer
+                            <a class="nav-link" href="{{url('/manufacture/Products')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>
+                                Products
                             </a>
                             <a class="nav-link" href="tables.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
@@ -56,7 +57,7 @@
                     </div>
                     <div class="sb-sidenav-footer">
                         <div class="small">Logged in as:</div>
-                        Admin
+                        {{session()->get('name')}}
                     </div>
                 </nav>
             </div>
@@ -67,14 +68,14 @@
                         
                             @yield('path')
                             @yield('content')
-                        <div style="height: 100vh;"></div>
+                        
                         
                     </div>
                 </main>
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid">
                         <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                            <div class="text-muted">Copyright &copy;TapAndDeal</div>
                             <div>
                                 <a href="#">Privacy Policy</a>
                                 &middot;
