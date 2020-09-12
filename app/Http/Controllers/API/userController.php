@@ -94,7 +94,7 @@ class userController extends Controller
 
     public function profileDisplay($id)
     {
-        $user=User::join('citys','citys.id','city_id')->join('states','states.id','users.state_id')->find($id);
+        $user=User::find($id);
         $citys=\DB::table('citys')->get();
         $states=\DB::table('states')->get();
         if($user != null)
