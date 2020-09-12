@@ -25,8 +25,10 @@ class tempReqController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        // dd($req->request_for);
-        foreach($req->request_for as $buyer)
+        $bu=json_decode($req->request_for);
+        $bu=implode(',',$bu);
+        $bu=explode(',',$bu);
+        foreach($bu as $buyer)
         {
             $t=new temp_req;
             $t->req_by=$req->request_by;
