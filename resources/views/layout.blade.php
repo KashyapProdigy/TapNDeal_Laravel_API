@@ -23,8 +23,6 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user fa-fw"></i>Admin</a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        
-                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{url('/logout')}}">Logout</a>
                     </div>
                 </li>
@@ -67,14 +65,13 @@
                         
                             @yield('path')
                             @yield('content')
-                        <div style="height: 100vh;"></div>
                         
                     </div>
                 </main>
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid">
                         <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                            <div class="text-muted">Copyright &copy; TapAndDeal</div>
                             <div>
                                 <a href="#">Privacy Policy</a>
                                 &middot;

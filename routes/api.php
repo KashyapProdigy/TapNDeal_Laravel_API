@@ -116,3 +116,7 @@ Route::get('buyer/orderCount/{cid}','API\buyerController@orderCount');
 
 Route::post('tempReq/new','API\tempReqController@create');
 Route::get('tempReq/show/{bid}','API\tempReqController@show');
+Route::get('tempReq/agent/show/{aid}','API\tempReqController@agentShow');
+Route::get('tempReq/seller/show/{sid}','API\tempReqController@sellerShow');
+
+Route::get('regInfo','API\userController@regInfo');

@@ -41,7 +41,7 @@
                                             </div>
                                             <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
                                                 
-                                                <button id="send"  onclick="phoneAuth();" type="button" class="btn btn-primary">Send OTP</button>
+                                                <button id="send"  onclick="phoneAuth();" type="submit" class="btn btn-primary">Send OTP</button>
                                                 <button id="sub" onclick="codeverify();" type="button" class="btn d-none btn-success">Submit OTP</button>
                                                 <button  onclick="goBack()" id="cn" type="button" class="btn btn-warning">Change number</button>
                                             </div>

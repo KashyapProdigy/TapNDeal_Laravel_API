@@ -8,6 +8,7 @@ use App\User;
 use App\ProfileViewLog;
 use Illuminate\Support\Facades\DB;
 use Validator;
+use App\com_info;
 
 class userController extends Controller
 {
@@ -42,8 +43,6 @@ class userController extends Controller
 
     public function register(Request $request)
     {
-        
-        
         $ref=$this->generateRefCode($request->name);
         $user = new User;
         $user->name = $request->name;
@@ -57,6 +56,14 @@ class userController extends Controller
         $user->ref_code=$ref;
         if($user->save())
         {
+            $ci=new com_info;
+            $ci->cname=$request->cname;
+            $ci->pan=$request->pan;
+            $ci->gst=$request->gst;
+            $ci->address=$request->address;
+            $ci->pincode=$request->pin;
+            $ci->sid=$user->id;
+            $ci->save();
             return response()->json(['error' => false ,'message'=>'User Added Successfully'],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
@@ -94,7 +101,7 @@ class userController extends Controller
 
     public function profileDisplay($id)
     {
-        $user=User::join('citys','citys.id','city_id')->join('states','states.id','users.state_id')->find($id);
+        $user=User::find($id);
         $citys=\DB::table('citys')->get();
         $states=\DB::table('states')->get();
         if($user != null)
@@ -224,5 +231,12 @@ class userController extends Controller
          }
          return response()->json(['error' => true ,'message'=>'User not found '],500);
          
+    }
+    public function regInfo()
+    {
+        $data=array();
+        $data['cities']=\DB::table('citys')->get();
+        $data['users']=\DB::table('users')->where('type_id','!=',7)->join('user_type','user_type.id','users.type_id')->get();
+        return response()->json(['error' => true ,'message'=>$data],500);
     }
 }

@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <meta name="csrf-token" content="{{ csrf_token() }}" /> 
         <title>Tap And Deal</title>
         <link href="{{asset('Assets/css/styles.css')}}" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
@@ -43,6 +43,7 @@
                                             <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
                                                 
                                                 <button type="button" onclick="checkMob()" id="send" class="btn btn-primary">Send otp</button>
+                                                <a id="su" href="{{url('/manufacture')}}">Sign up</a>    
                                                 <button type="button" onclick="codeverify()" id="sub" class="btn btn-success d-none">Submit OTP</button>
                                             </div>
                                         </form>
@@ -73,6 +74,7 @@
             $('#recaptcha-container').addClass('d-none');
             $('#send').addClass('d-none');
             $('#num').addClass('d-none');
+            $('#sp').addClass('d-none');
             $('#sub').removeClass('d-none');
             $('#otp').removeClass('d-none');
             $('#msg').html('OTP sended successfully to your number..!!');
@@ -92,7 +94,7 @@
                         $('#msg').html('No Account found on this mobile number..!')
                      }
                      else{
-                        phoneAuth();
+                        document.forms["logform"].submit();
                      }
                   }});
         }
