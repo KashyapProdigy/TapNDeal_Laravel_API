@@ -238,7 +238,7 @@ class userController extends Controller
         $data['cities']=\DB::table('citys')->get();
         $data['userTypes']=\DB::table('user_type')->where('user_type','!=','admin')->get();
         if (sizeof($data['cities']) > 0) {
-            return response()->json(['error' => false, 'message' => $data], 200);
+            return response()->json(['error' => false, 'data' => $data], 200);
         } else {
             return response()->json(['error' => true, 'message' => $data], 500);
         }
