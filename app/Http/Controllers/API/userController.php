@@ -214,7 +214,7 @@ class userController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        
+
          $user = User::find($uid);
          if($user)
          {
@@ -230,13 +230,13 @@ class userController extends Controller
             return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
          }
          return response()->json(['error' => true ,'message'=>'User not found '],500);
-         
+
     }
     public function regInfo()
     {
         $data=array();
         $data['cities']=\DB::table('citys')->get();
-        $data['users']=\DB::table('users')->where('type_id','!=',7)->join('user_type','user_type.id','users.type_id')->get();
+        $data['userTypes']=\DB::table('user_type')->where('user_type','!=','admin')->get();
         return response()->json(['error' => true ,'message'=>$data],500);
     }
 }
