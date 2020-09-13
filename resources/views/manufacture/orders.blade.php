@@ -56,7 +56,7 @@
                         <th>Approved</th>
                         <th>Delivered</th>
                         <th>Total Price</th>
-                        <th>View Details</th>
+                        1<th>View Details</th>
                     </tr>
                 </thead>
                 <tfoot>

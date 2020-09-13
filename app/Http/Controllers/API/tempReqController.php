@@ -37,7 +37,7 @@ class tempReqController extends Controller
             $t->remarks=$req->remarks;
             $t->save();
         }
-        return response()->json(['error' => true ,'message'=>'Temporary Request Added..'], 401);
+        return response()->json(['error' => false ,'message'=>'Temporary Request Added..'], 200);
     }
     public function show($bid)
     {
@@ -52,8 +52,42 @@ class tempReqController extends Controller
             $rec[]=$temp;
         }
         if($rec != null)
-            return response()->json(['error' => false ,'data'=>$rec], 401);
+            return response()->json(['error' => false ,'data'=>$rec], 200);
         
-        return response()->json(['error' => true ,'message'=>'Temporary Request not found of this buyer..'], 401);
+        return response()->json(['error' => true ,'message'=>'Temporary Request not found of this buyer..'], 400);
+    }
+    public function agentShow($aid)
+    {
+        $tr=temp_req::where('req_by',$aid)->get();
+        $temp=array();
+        $rec=array();
+        foreach($tr as $t)
+        {
+            $temp=temp_req::where('req_by',$t['req_by'])->first();
+            $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
+            $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+            $rec[]=$temp;
+        }
+         if($rec != null)
+            return response()->json(['error' => false ,'data'=>$rec], 200);
+        
+        return response()->json(['error' => true ,'message'=>'Temporary Request not found of this Agent..'], 400);
+    }
+    public function sellerShow($sid)
+    {
+        $tr=temp_req::where('req_to',$sid)->get();
+        $temp=array();
+        $rec=array();
+        foreach($tr as $t)
+        {
+            $temp=temp_req::where('req_to',$t['req_to'])->first();
+            $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
+            $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
+            $rec[]=$temp;
+        }
+         if($rec != null)
+            return response()->json(['error' => false ,'data'=>$rec], 200);
+        
+        return response()->json(['error' => true ,'message'=>'Temporary Request not found of this Seller..'], 400);
     }
 }

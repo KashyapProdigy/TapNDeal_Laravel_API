@@ -225,4 +225,11 @@ class userController extends Controller
          return response()->json(['error' => true ,'message'=>'User not found '],500);
          
     }
+    public function regInfo()
+    {
+        $data=array();
+        $data['cities']=\DB::table('citys')->get();
+        $data['users']=\DB::table('users')->where('type_id','!=',7)->join('user_type','user_type.id','users.type_id')->get();
+        return response()->json(['error' => true ,'message'=>$data],500);
+    }
 }
