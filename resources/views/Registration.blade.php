@@ -42,27 +42,37 @@
                                         <form method="post">
                                         @csrf
                                         <div class="form-group">
-                                        <label for="inputEmail4">Company Name</label>
-                                        <input type="text" class="form-control" name="name"  placeholder="Company Name">
+                                            <label for="inputEmail4">Name</label>
+                                            <input type="text" class="form-control" name="name"  placeholder="Seller Name">
                                         </div>
                                         <div class="form-group">
-                                        <label for="inputEmail4">Address</label>
-                                        <input type="text" class="form-control" name="address"  placeholder="Address">
+                                            <label for="inputEmail4">Company Name</label>
+                                            <input type="text" class="form-control" name="cname"  placeholder="Company Name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="inputEmail4">Address</label>
+                                            <input type="text" class="form-control" name="address"  placeholder="Address">
                                         </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
-                                        <label for="inputPassword4">Email</label>
-                                        <input type="text" class="form-control" name="email" id="inputPassword4" placeholder="Email">
+                                            <label for="inputPassword4">Email</label>
+                                            <input type="text" class="form-control" name="email" id="inputPassword4" placeholder="Email">
                                         </div>
                                         <div class="form-group col-md-6">
-                                        <label for="inputPassword4">Mobile</label>
-                                        <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile Number">
+                                            <label for="inputPassword4">Mobile</label>
+                                            <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile Number">
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
                                             <label for="inputCity">GST no:</label>
-                                            <input type="text" class="form-control" name="gst_no" id="mobile" placeholder="GST Number">
+                                            <input type="text" class="form-control" name="gst" id="gst" placeholder="GST Number">
                                         </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="inputCity">PAN no:</label>
+                                            <input type="text" class="form-control" name="pan" id="pan" placeholder="GST Number">
+                                        </div>
+                                    </div>
                                     <div class="form-row">
                                         
                                         <div class="form-group col-md-6">
@@ -73,11 +83,6 @@
                                                     <option value="{{$city->id}}">{{$city->city_name}}</option>
                                                 @endforeach
                                             </select>
-                                        </div>
-                                        
-                                        <div class="form-group col-md-6">
-                                            <label for="inputCity">Pincode</label>
-                                            <input type="text" class="form-control" name="pincode" id="pin" placeholder="Pincode">
                                         </div>
                                     </div>
                                     

@@ -29,7 +29,7 @@
     @endif
     @if(session()->has('error'))
     <div class="alert alert-danger alert-dismissible">
-        {{session()->get('danger')}}
+        {{session()->get('error')}}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -56,7 +56,7 @@
                         <th>Approved</th>
                         <th>Delivered</th>
                         <th>Total Price</th>
-                        1<th>View Details</th>
+                        <th>View Details</th>
                     </tr>
                 </thead>
                 <tfoot>

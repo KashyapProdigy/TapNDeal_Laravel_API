@@ -1,14 +1,15 @@
-@extends('layout')
+@extends('manuLayout')
 
 @section('title')
-    Sellers
+    Employees
 @stop
 
 @section('pageTitle')
-    Sellers
+    Employees
 @stop
 
 @section('content')
+
 <div class="card mb-4">
     
     @if($errors->any())
@@ -37,10 +38,13 @@
     @endif
     <div class="card-header">
         <i class="fas fa-table mr-1"></i>
-        Seller Data
+        Employees Data
     </div>
-    <div>
-        <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Seller</button>
+    <div class="row d-flex justify-content-right col-12">
+        <div class="col-md-10"></div>
+        <div class="col-md-2">
+            <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Employee</button>
+        </div>
     </div>
     <div class="card-body">
         @if(count($owners)==0)
@@ -56,6 +60,7 @@
                         <th>mobile</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>Employee Type</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -67,6 +72,7 @@
                         <th>mobile</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>Employee Type</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -79,11 +85,11 @@
                         <td>{{$owner->mobile}}</td>
                         <td>{{$owner->city_name}}</td>
                         <td>{{$owner->state_name}}</td>
+                        <td>{{$owner->user_type}}</td>
                         <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
                         <td>
-                            <a class="btn btn-sm btn-success text-white" data-toggle="tooltip" title="Accounts" href="{{url('/seller/accounts')}}/{{$owner->uid}}"><i class="fas fa-eye"></i></a>
-                            <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>
-                            <a data-toggle="tooltip" title="Delete" class="btn btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i></a>
+                        <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateEmployee{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>
+                            <a class="btn btn-sm btn-danger text-white" data-toggle="tooltip" title="Delete" onclick="return delcon()" href="{{url('manufacture/emp/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i></a>
                         </td>
                     </tr>
                 @endforeach             
@@ -94,31 +100,24 @@
         @endif
     </div>
 </div>            
-<form action="{{url('/SellerAdd')}}" method="post">
+<form action="{{url('manufacture/emp/add')}}" method="post">
 <div class="modal fade bd-example-modal-lg" tabindex="-1" id="AddSeller" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 @csrf
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add seller</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Employee</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+      <input type="hidden" name="seller" value="{{$seller->id}}">
       <div class="modal-body">
-      
+
             <div class="form-group">
             <label for="inputEmail4">Name</label>
             <input type="text" class="form-control" name="name"  placeholder="Name">
             </div>
-            <div class="form-group">
-            <label for="inputEmail4">Address</label>
-            <input type="text" class="form-control" name="Address"  placeholder="Address">
-            </div>
-            <div class="form-group">
-            <label for="inputEmail4">GST No:</label>
-            <input type="text" class="form-control" name="gst"  placeholder="GST">
-            </div>  
         
         <div class="form-row">
             <div class="form-group col-md-6">
@@ -141,25 +140,20 @@
             </select>
             </div>
             <div class="form-group col-md-6">
-            <label for="inputState">Pincode</label>
-            <input type="text" class="form-control" name="pincode" id="pin" placeholder="Pincode">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputEmail4">Password</label>
-                <input type="password" class="form-control" name="pass"  placeholder="Password">
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputEmail4">Confirm Password</label>
-                <input type="password" class="form-control" name="cpass"  placeholder="Re-enter Password">
+            <label for="inputState">Employee Type</label>
+            <select id="inputState" name="type" class="form-control">
+                <option value="">Choose...</option>
+                @foreach($e_type as $e)
+                    <option value="{{$e->id}}">{{$e->user_type}}</option>
+                @endforeach
+            </select>
             </div>
         </div>
         
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="submit" class="btn btn-primary">+Add</button>
       </div>
       
     </div>
@@ -167,8 +161,8 @@
 </div>
 </form>
 @foreach($owners as $owner)
-<form action="{{url('/update/seller')}}" method="post">
-<div class="modal fade bd-example-modal-lg" tabindex="-1" id="updateSeller{{$owner->uid}}" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<form action="{{url('/manufacture/emp/edit')}}" method="post">
+<div class="modal fade bd-example-modal-lg" tabindex="-1" id="updateEmployee{{$owner->uid}}" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 @csrf
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -207,11 +201,11 @@
             </select>
             </div>
             <div class="form-group col-md-6">
-            <label for="inputState">State</label>
-            <select id="inputState" name="state" class="form-control">
+            <label for="inputState">Employee Type</label>
+            <select id="inputState" name="etype" class="form-control">
                 <option value="">Choose...</option>
-                @foreach($states as $state)
-                    <option @if($state->id==$owner->sid) selected @endif value="{{$state->id}}">{{$state->state_name}}</option>
+                @foreach($e_type as $e)
+                    <option @if($owner->type_id == $e->id) selected @endif value="{{$e->id}}">{{$e->user_type}}</option>
                 @endforeach
             </select>
             </div>
@@ -220,7 +214,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="submit" class="btn btn-primary">Update</button>
       </div>
       
     </div>
@@ -236,7 +230,7 @@
 <script>
 function delcon()
 {
-    if(confirm('Do you really wan\'t delete this seller...!!')==true)
+    if(confirm('Do you really wan\'t delete this user...!!')==true)
     {
         return true;
     }

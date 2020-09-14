@@ -62,7 +62,9 @@
     						<thead>
                                 <tr>
         							<td><strong>Item</strong></td>
-        							<td class="text-center"><strong>Price</strong></td>
+        							<td class="text-center"><strong>Product name</strong></td>
+									<td class="text-center"><strong>Price</strong></td>
+									<td class="text-center"><strong>Category</strong></td>
         							<td class="text-center"><strong>Quantity</strong></td>
         							<td class="text-right"><strong>Totals</strong></td>
                                 </tr>
@@ -73,6 +75,8 @@
                                 <tr>
     								<td>{{$i++}}</td>
     								<td class="text-center">{{$o->product_name}}</td>
+									<td class="text-center">{{$o->product_price}}</td>
+									<td class="text-center">{{$o->category}}</td>
     								<td class="text-center">{{$o->qty}}</td>
     								<td class="text-right">&#x20b9;{{$o->total_price}}</td>
     							</tr>
@@ -80,6 +84,8 @@
     							<tr>
     								<td class="thick-line"></td>
     								<td class="thick-line"></td>
+									<td class="thick-line"></td>
+									<td class="thick-line"></td>
     								<td class="thick-line text-center"><strong>Total</strong></td>
     								<td class="thick-line text-right">&#x20b9;{{$ord->total_price}}</td>
     							</tr>

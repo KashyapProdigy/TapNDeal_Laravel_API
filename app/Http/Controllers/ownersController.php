@@ -184,6 +184,6 @@ class ownersController extends Controller
         $usr->state_id=$req->state;
         $usr->type_id=$req->etype;
         $usr->save();
-        return redirect()->back()->with('success','Seller updated succesfully...');
+        return redirect()->back()->with('success','Employee updated succesfully...');
     }
 }

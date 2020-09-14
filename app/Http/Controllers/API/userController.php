@@ -9,6 +9,7 @@ use App\ProfileViewLog;
 use Illuminate\Support\Facades\DB;
 use Validator;
 use App\com_info;
+use App\emp_sel_rel;
 
 class userController extends Controller
 {
@@ -43,6 +44,12 @@ class userController extends Controller
 
     public function register(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'mobile' => 'required|unique:users,mobile',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
         $ref=$this->generateRefCode($request->name);
         $user = new User;
         $user->name = $request->name;
@@ -54,14 +61,29 @@ class userController extends Controller
         $user->state_id = $request->state_id;
         $user->isVerified = 1;
         $user->ref_code=$ref;
+        if($request->sel_ref!="")
+        {
+            $seller=User::where([['ref_code',$request->sel_ref],['type_id',1]])->select('id')->first();
+            if($seller == null)
+            {
+                return response()->json(['error' => true ,'message'=>'invalid Reference code..!'],400);
+            }
+        }
         if($user->save())
         {
+            if(isset($seller))
+            {
+                $es=new emp_sel_rel;
+                $es->emp_id=$user->id;
+                $es->seller_id=$seller['id'];
+                $es->save();
+            }
+
             $ci=new com_info;
             $ci->cname=$request->cname;
             $ci->pan=$request->pan;
             $ci->gst=$request->gst;
             $ci->address=$request->address;
-            $ci->pincode=$request->pin;
             $ci->sid=$user->id;
             $ci->save();
             return response()->json(['error' => false ,'message'=>'User Added Successfully'],200);
@@ -171,11 +193,12 @@ class userController extends Controller
         if($logrecords != null)
         {
 
-            $recordids = ProfileViewLog::select('id')->where('seller_id',$id)->where('isSeen',0)->get()->toarray();
+            $recordids = ProfileViewLog::select('id')->where('seller_id',$id)->get()->toarray();
             $records = DB::table('profile_view_logs')
                 ->join('users','users.id','profile_view_logs.cust_id')
                 ->select('users.name as cust_name','profile_view_logs.updated_at as view_date')
                 ->whereIn('profile_view_logs.id',$recordids)
+                ->orderby('profile_view_logs.updated_at','DESC')
                 ->get()->toarray();
 
             if($records != null)

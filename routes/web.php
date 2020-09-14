@@ -28,7 +28,6 @@ Route::middleware([AdminCheck::class])->group(function () {
     route::get('/seller/accounts/{sid}','ownersController@accounts');
     route::post('/admin/seller/employee','ownersController@AddEmployee');
     route::post('/admin/seller/update/employee','ownersController@updateEmployee');
-
     route::get('/admin/customer','custController@show');
 });
 
@@ -53,6 +52,13 @@ Route::middleware([manufacture::class])->group(function () {
     Route::get('/manufacture/orders','manufactureController@orders');
     Route::get('/manufacture/orders/show/{id}','manufactureController@fullorder');
     Route::get('/manufacture/Products','manufactureController@Products');
+    Route::get('/manufacture/Products/delete/{pid}','manufactureController@delete');
+    Route::get('/manufacture/Products/enable/{pid}','manufactureController@enable');
+    Route::get('/manufacture/Products/disable/{pid}','manufactureController@disable');
+    Route::get('/manufacture/accounts','accounts@sellerAccounts');
+    Route::post('/manufacture/emp/add','accounts@empAdd');
+    Route::post('/manufacture/emp/edit','accounts@empEdit');
+    Route::get('/manufacture/emp/delete/{id}','accounts@empDelete');
 });
 
 Route::get('product/{name}', 'ImagesController@productPicture');

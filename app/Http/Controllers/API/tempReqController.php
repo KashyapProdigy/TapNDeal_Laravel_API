@@ -25,15 +25,15 @@ class tempReqController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        $bu=json_decode($req->request_for);
-        $bu=implode(',',$bu);
-        $bu=explode(',',$bu);
-        foreach($bu as $buyer)
+        // $se=json_decode($req->request_to);
+        $se=implode(',',$req->request_to);
+        $se=explode(',',$se);
+        foreach($se as $seller)
         {
             $t=new temp_req;
             $t->req_by=$req->request_by;
-            $t->req_to=$req->request_to;
-            $t->req_for=$buyer;
+            $t->req_for=$req->request_for;
+            $t->req_to=$seller;
             $t->remarks=$req->remarks;
             $t->save();
         }
@@ -46,7 +46,7 @@ class tempReqController extends Controller
         $rec=array();
         foreach($tr as $t)
         {
-            $temp=temp_req::where('req_for',$t['req_for'])->first();
+            $temp=temp_req::where('id',$t['id'])->first();
             $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
             $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
             $rec[]=$temp;
@@ -63,7 +63,7 @@ class tempReqController extends Controller
         $rec=array();
         foreach($tr as $t)
         {
-            $temp=temp_req::where('req_by',$t['req_by'])->first();
+            $temp=temp_req::where('id',$t['id'])->first();
             $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
             $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
             $rec[]=$temp;
@@ -80,7 +80,7 @@ class tempReqController extends Controller
         $rec=array();
         foreach($tr as $t)
         {
-            $temp=temp_req::where('req_to',$t['req_to'])->first();
+            $temp=temp_req::where('id',$t['id'])->first();
             $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
             $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
             $rec[]=$temp;

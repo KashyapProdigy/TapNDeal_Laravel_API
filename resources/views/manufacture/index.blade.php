@@ -64,8 +64,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="row">
 
             <!-- Earnings (Monthly) Card Example -->
             <div class="col-xl-4 col-md-6 mb-4">

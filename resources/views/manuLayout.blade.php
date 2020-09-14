@@ -36,7 +36,7 @@
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
-                            <div class="sb-sidenav-menu-heading">Core</div>
+                            <div class="sb-sidenav-menu-heading"></div>
                             <a class="nav-link" href="{{url('/manufacture/index')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
@@ -49,9 +49,9 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>
                                 Products
                             </a>
-                            <a class="nav-link" href="tables.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Tables
+                            <a class="nav-link" href="{{url('/manufacture/accounts')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                                Accounts
                             </a>
                         </div>
                     </div>

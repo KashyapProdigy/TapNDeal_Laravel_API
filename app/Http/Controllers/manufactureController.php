@@ -47,13 +47,14 @@ class manufactureController extends Controller
     {
         $validatedData = $req->validate([
             'name' => 'required',
+            'cname' => 'required',
             'address'=>'required',
             'email'=>'required|email|unique:users,email',
             'mobile'=>'required|digits:10|unique:users,mobile',
             'city'=>'required',
             'pincode'=>'required',
-            'gst_no'=>'required',
-            
+        ],[
+            'cname.required'=>'The Company name is required'
         ]);   
         
         $state=\DB::table('citys')->where('id',$req->city)->first();
@@ -63,10 +64,11 @@ class manufactureController extends Controller
         session()->put('mobile',$req->mobile);
         session()->put('city',$req->city);
         session()->put('pincode',$req->pincode);
-        session()->put('gst',$req->gst_no);
-        session()->put('address',$req->address);
+        session()->put('gst',$req->gst);
         session()->put('state',$state->state_id);
-        
+        session()->put('address',$req->address);
+        session()->put('cname',$req->cname);
+        session()->put('pan',$req->pan);
         return redirect('confirmMob');
         
     }
@@ -88,6 +90,8 @@ class manufactureController extends Controller
         {
             $c=new com_info;
             $c->sid=$usr->id;
+            $c->cname=session()->get('cname');
+            $c->pan=session()->get('pan');
             $c->gst=session()->get('gst');
             $c->address=session()->get('address');
             $c->pincode=session()->get('pincode');
@@ -154,5 +158,33 @@ class manufactureController extends Controller
         ->select('products.*','products.id as pid','users.name as aname')
         ->get();
         return view('manufacture.products',['products'=>$product]);
+    }
+    public function delete($pid)
+    {
+        $del=Product::where([['id',$pid],['seller_id',session()->get('uid')]]);
+        if($del!=null)
+        {
+            $del->delete();
+            return back()->with('success','product deleted successfully');
+        }
+        return back()->with('danger','somthings went\'s wrong');
+    }
+    public function enable($pid)
+    {
+        $p=Product::where([['id',$pid],['seller_id',session()->get('uid')]])->update(['isDisabled'=>0]);
+        if($p!=null)
+        {
+            return back()->with('success','product Enabled successfully');
+        }
+        return back()->with('danger','somthings went\'s wrong');
+    }
+    public function disable($pid)
+    {
+        $p=Product::where([['id',$pid],['seller_id',session()->get('uid')]])->update(['isDisabled'=>1]);
+        if($p!=null)
+        {
+            return back()->with('success','product Disabled successfully');
+        }
+        return back()->with('danger','somthings went\'s wrong');
     }
 }

@@ -29,7 +29,7 @@
     @endif
     @if(session()->has('error'))
     <div class="alert alert-danger alert-dismissible">
-        {{session()->get('danger')}}
+        {{session()->get('error')}}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -88,16 +88,15 @@
                         <td>{{$prdct->stock}}</td>
                         <td>{{$prdct->colors}}</td>
                         <td>{{$prdct->aname}}</td>
-                        <td class="@if($prdct->isDisabled==1) text-muted @else text-info @endif">@if($prdct->isDisabled==1)
+                        <td class="@if($prdct->isDisabled==1) text-danger @else text-info @endif">@if($prdct->isDisabled==1)
                                 Disable
                             @else   
                                 Enable
                             @endif
                             </td>
                         <td>
-                        <a class="btn btn-sm btn-success text-white" data-toggle="tooltip" title="Accounts" href="{{url('/seller/accounts')}}/{{$prdct->id}}"><i class="fas fa-eye"></i></a>
-                            <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$prdct->id}}"><i class="fas fa-pen"></i></a></span>
-                            <a data-toggle="tooltip" title="Delete" class="btn btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('product/delete')}}/{{$prdct->id}}"><i class="far fa-trash-alt"></i></a>
+                        <a class="btn btn-sm btn-primary text-white" data-toggle="tooltip" title="Enable/Disable" @if($prdct->isDisabled==0) href="{{url('manufacture/Products/disable')}}/{{$prdct->id}} @else href="{{url('manufacture/Products/enable')}}/{{$prdct->id}} @endif"><i class="fas @if($prdct->isDisabled==1)fa-eye-slash @else fa-eye @endif"></i></a>
+                        <a data-toggle="tooltip" title="Delete" class="btn btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('manufacture/Products/delete')}}/{{$prdct->id}}"><i class="far fa-trash-alt"></i></a>
                         </td>
                    </tr>
                 @endforeach             
