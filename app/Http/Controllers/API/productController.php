@@ -41,11 +41,11 @@ class productController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-            $image_list = json_decode($req->image);
-            if( is_object($image_list) )
+            $image_list = $req->image['array'];
+            if( $image_list != null)
             {
                 $uploadsCount=0;
-                foreach ($image_list->array as $value) {
+                foreach ($image_list as $value) {
                     if(Storage::disk('temp')->exists($value)){
                         $file = Storage::disk('temp')->get($value);
                         $filename= time().$uploadsCount.'-prod.png';
@@ -317,5 +317,23 @@ class productController extends Controller
         $products=Product::where('name','like','%'.$srch.'%')->orwhere('tags','like','%'.$srch.'%')->get();
         return response()->json(['error' => false ,'data'=>$products],200);
         
+    }
+    public function delImg($pid,$img)
+    {
+        $prdct=Product::find($pid);
+        if($prdct)
+        {
+            $images=explode(',',$prdct->image);
+            if (($key = array_search($img, $images)) !== false) {
+                unset($images[$key]);
+                Storage::disk('temp')->delete($images);
+                Storage::disk('product')->delete($images);
+                $prdct->image=implode(',',$images);
+                $prdct->save();
+                return response()->json(['error' => true ,'message'=>'Product Deleted successfully'],200);
+            }
+            return response()->json(['error' => true ,'message'=>'image not found'],400);
+        }
+        return response()->json(['error' => true ,'message'=>'Product not found'],400);
     }
 }

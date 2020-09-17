@@ -110,12 +110,12 @@ class customerRelationshipController extends Controller
             if($relations == null && $knock == null)
             {
 
-                $products = Product::where('seller_id',$req->seller_id)->where('category','B')->get()->toarray();
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
                 return response()->json(['error' => false,'Knock'=>false,'relation'=>false ,'data'=>$products],200);
             }
             else if($relations == null && $knock != null )
             {
-                $products = Product::where('seller_id',$req->seller_id)->where('category','B')->get()->toarray();
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
                 return response()->json(['error' => false ,'Knock'=>true,'relation'=>false ,'data'=>$products],200);
             }
             else if($relations!=null)
@@ -125,24 +125,24 @@ class customerRelationshipController extends Controller
                 {
                     if($relations->category == 'A+')
                     {
-                        $products = Product::where('seller_id',$req->seller_id)->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
                     }
                     if($relations->category == 'A')
                     {
                         $cat=['A','B+','B'];
-                        $products = Product::where('seller_id',$req->seller_id)->whereIn('category',$cat)->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->whereIn('category',$cat)->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
                     }
                     if($relations->category == 'B+')
                     {
                         $cat=['B+','B'];
-                        $products = Product::where('seller_id',$req->seller_id)->whereIn('category',$cat)->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->whereIn('category',$cat)->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
                     }
                     if($relations->category == 'B')
                     {
-                    $products = Product::where('seller_id',$req->seller_id)->where('category',$relations->category)->get()->toarray();
+                    $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->where('category',$relations->category)->get()->toarray();
                     return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
                     }
                 }

@@ -128,6 +128,11 @@ class userController extends Controller
         $states=\DB::table('states')->get();
         if($user != null)
         {
+            if($user['type_id']==1)
+            {
+                $user=User::join('company_info','company_info.sid','users.id')->where('users.id',$id)->get();
+                return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);    
+            }
             return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
@@ -221,13 +226,28 @@ class userController extends Controller
     }
     public function update(Request $request,$uid)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'city_id' => 'required',
-            'email'=>'required',
-        ]);
         $u=User::where('id',$uid)->first();
-        $st=\DB::table('citys')->where('id',$request->city_id)->first();
+        if($u['type_id']==1)
+        {
+            $validator = Validator::make($request->all(), [
+                'cname' => 'required',
+                'address' => 'required',
+                'name' => 'required',
+                'city_id' => 'required',
+                'email'=>'required',
+            ]);
+        }
+        else{
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'city_id' => 'required',
+                'email'=>'required',
+            ]);
+        }
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        
         if($u['email']!=$request->email)
         {
             $validator = Validator::make($request->all(), [
@@ -237,22 +257,30 @@ class userController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-
-         $user = User::find($uid);
-         if($user)
-         {
-            $user->name=$request->name;
-            $user->email = $request->email;
-            $user->type_id = $request->type_id;
-            $user->city_id = $request->city_id;
-            $user->state_id=$st->state_id;
-            if($user->save())
+        $st=\DB::table('citys')->where('id',$request->city_id)->first();
+        $user = User::find($uid);
+        if($user)
+        {
+        $user->name=$request->name;
+        $user->email = $request->email;
+        $user->city_id = $request->city_id;
+        $user->state_id=$st->state_id;
+        if($user->save())
+        {   if($u['type_id']==1)
             {
-                return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);
+                $ci=com_info::where('sid',$uid)->update([
+                    'cname'=>$request->cname,
+                    'pan'=>$request->pan,
+                    'gst'=>$request->gst,
+                    'address'=>$request->address
+                ]);
             }
-            return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
-         }
-         return response()->json(['error' => true ,'message'=>'User not found '],500);
+            
+            return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);
+        }
+        return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
+        }
+        return response()->json(['error' => true ,'message'=>'User not found '],500);
 
     }
     public function regInfo()

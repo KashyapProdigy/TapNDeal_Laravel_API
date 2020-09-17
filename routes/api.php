@@ -70,6 +70,7 @@ Route::delete('user/product/delete/{id}','API\productController@delete');
 Route::get('user/product/disable/{id}','API\productController@disable');
 Route::get('user/product/enable/{id}','API\productController@enable');
 Route::get('user/product/search','API\productController@search');
+Route::get('product/image/delete/{pid}/{pname}','API\productController@delImg');
 
 Route::post('user/notification/new','API\notificationController@create');
 Route::post('user/notification/update/{id}','API\notificationController@update');
