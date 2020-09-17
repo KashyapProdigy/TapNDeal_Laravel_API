@@ -23,9 +23,10 @@ class ownersController extends Controller
     public function show()
     {
         $owner=User::join('user_type','user_type.id','users.type_id')
+        ->join('company_info','company_info.sid','users.id')
         ->join('citys','citys.id','users.city_id')
         ->join('states','states.id','users.state_id')
-        ->select('users.*','citys.*','states.*','users.id as uid','users.state_id as sid')
+        ->select('users.*','citys.*','states.*','users.id as uid','users.state_id as sid','company_info.*')
         ->where('user_type','Seller')
         ->get();
         $city=\DB::table('citys')->get();
@@ -39,40 +40,43 @@ class ownersController extends Controller
             'email' => 'required|email',
             'mobile'=>'required|digits:10',
             'city'=>'required',
-            'state'=>'required'
         ]);
         $us=User::where('id',$req->uid)->first();
         if($us['mobile']!=$req->mobile)
         {
             $validatedData = $req->validate([
                 'mobile'=>'unique:users',
+            ]);
+        }
+        if($us['email']!=$req->email)
+        {
+            $validatedData = $req->validate([
                 'email'=>'unique:users'
             ]);
         }
+        $state=\DB::table('citys')->where('id',$req->city)->first();
         $usr=User::find($req->uid);
         $usr->name=$req->name;
         $usr->email=$req->email;
         $usr->mobile=$req->mobile;
         $usr->city_id=$req->city;
-        $usr->state_id=$req->state;
+        $usr->state_id=$state->state_id;
         $usr->save();
+
+        $comp=com_info::where('sid',$req->uid)->update(['cname'=>$req->cname,'pan'=>$req->pan,'address'=>$req->address,'gst'=>$req->gst]);
         return redirect()->back()->with('success','Seller updated succesfully...');
     }
     public function create(Request $req)
     {
         $validatedData = $req->validate([
             'name' => 'required|',
-            'email' => 'required|email|unique:u',
-            'mobile'=>'required|digits:10',
+            'email' => 'required|email|unique:users,email',
+            'mobile'=>'required|digits:10|unique:users,mobile',
             'city'=>'required',
-            'pass'=>'required',
-            'cpass'=>'same:pass',
-            'gst'=>'required',
-            'Address'=>'required',
-            'pincode'=>'required'
+            'address'=>'required',
+            'cname'=>'required',
         ],[
-            'cpass.same'=>'Confirm password and password not match..!!',
-            'pass.required'=>'Password filed is required',
+            'cname.required'=>"company name required..!",
         ]);   
         $state=\DB::table('citys')->where('id',$req->city)->first();
         $ref=$this->generateRefCode($req->name);
@@ -91,7 +95,9 @@ class ownersController extends Controller
             $c=new com_info;
             $c->sid=$usr->id;
             $c->gst=$req->gst;
-            $c->address=$req->Address;
+            $c->cname=$req->cname;
+            $c->pan=$req->pan;
+            $c->address=$req->address;
             $c->pincode=$req->pincode;
             $c->save();
             return redirect()->back()->with('success','Seller Added succesfully...');
@@ -119,7 +125,7 @@ class ownersController extends Controller
         $city=\DB::table('citys')->get();
         $state=\DB::table('states')->get();
         $e_type=\DB::table('user_type')->whereIn('user_type',['Accountant','Salesman','Packaging'])->get();
-        return view('admin.sellerAccounts',['owners'=>$ac,'citys'=>$city,'states'=>$state,'seller'=>$seller,'e_type'=>$e_type]);
+        return view('Admin.sellerAccounts',['owners'=>$ac,'citys'=>$city,'states'=>$state,'seller'=>$seller,'e_type'=>$e_type]);
     }
     public function AddEmployee(Request $req)
     {
@@ -129,21 +135,18 @@ class ownersController extends Controller
             'mobile'=>'required|digits:10',
             'city'=>'required',
             'type'=>'required',
-            'state'=>'required',
-            'pass'=>'required',
-            'cpass'=>'same:pass'
-        ],[
-            'cpass.same'=>'Confirm password and password not match..!!',
-            'pass.required'=>'Password filed is required',
         ]);   
+        $ref=$this->generateRefCode($req->name);
+        $state=\DB::table('citys')->where('id',$req->city)->first();
         $usr=new User;
         $usr->name=$req->name;
         $usr->email=$req->email;
         $usr->mobile=$req->mobile;
         $usr->city_id=$req->city;
         $usr->password=$req->pass;
-        $usr->state_id=$req->state;
+        $usr->state_id=$state->state_id;
         $usr->type_id=$req->type;
+        $usr->ref_code=$ref;
         $usr->isVerified="1";
         $usr->save();
 
@@ -163,7 +166,6 @@ class ownersController extends Controller
             'email' => 'required|email',
             'mobile'=>'required|digits:10',
             'city'=>'required',
-            'state'=>'required',
             'etype'=>'required',
         ],[
             'etype.required'=>"Employee type is Required..!",
@@ -173,15 +175,22 @@ class ownersController extends Controller
         {
             $validatedData = $req->validate([
                 'mobile'=>'unique:users',
+            ]);
+        }
+        if($us['email']!=$req->email)
+        {
+            $validatedData = $req->validate([
                 'email'=>'unique:users'
             ]);
         }
+
+        $state=\DB::table('citys')->where('id',$req->city)->first();
         $usr=User::find($req->uid);
         $usr->name=$req->name;
         $usr->email=$req->email;
         $usr->mobile=$req->mobile;
         $usr->city_id=$req->city;
-        $usr->state_id=$req->state;
+        $usr->state_id=$state->state_id;
         $usr->type_id=$req->etype;
         $usr->save();
         return redirect()->back()->with('success','Employee updated succesfully...');

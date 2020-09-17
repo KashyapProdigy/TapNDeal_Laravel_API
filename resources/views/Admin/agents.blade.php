@@ -1,15 +1,14 @@
 @extends('layout')
 
 @section('title')
-    Employees
+    Agents
 @stop
 
 @section('pageTitle')
-    Employees
+    Agents
 @stop
 
 @section('content')
-
 <div class="card mb-4">
     
     @if($errors->any())
@@ -30,7 +29,7 @@
     @endif
     @if(session()->has('error'))
     <div class="alert alert-danger alert-dismissible">
-        {{session()->get('danger')}}
+        {{session()->get('error')}}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -38,23 +37,10 @@
     @endif
     <div class="card-header">
         <i class="fas fa-table mr-1"></i>
-        Employees Data
+        Agents Data
     </div>
-    <div class="row d-flex col-12">
-        <div class="col-md-10"> 
-            <div class="col-md-5">
-            <hr>
-                <h5 class="text-primary">Seller Information:</h5>
-                <h6>Name : <span class="text-secondary">{{$seller->name}}</span></h6>
-                <h6>Em@il : <span class="text-secondary">{{$seller->email}}</span></h6>
-                <h6>Mobile : <span class="text-secondary">{{$seller->mobile}}</span></h6>
-                <hr>
-            </div>
-            
-        </div>
-        <div class="col-md-2">
-            <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Employee</button>
-        </div>
+    <div>
+        <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Agent</button>
     </div>
     <div class="card-body">
         @if(count($owners)==0)
@@ -70,7 +56,6 @@
                         <th>mobile</th>
                         <th>City</th>
                         <th>State</th>
-                        <th>Employee Type</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -82,7 +67,6 @@
                         <th>mobile</th>
                         <th>City</th>
                         <th>State</th>
-                        <th>Employee Type</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -95,11 +79,10 @@
                         <td>{{$owner->mobile}}</td>
                         <td>{{$owner->city_name}}</td>
                         <td>{{$owner->state_name}}</td>
-                        <td>{{$owner->user_type}}</td>
                         <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
                         <td>
-                        <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateEmployee{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>
-                            <a class="btn btn-sm btn-danger text-white" data-toggle="tooltip" title="Delete" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i></a>
+                            <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>
+                            <a data-toggle="tooltip" title="Delete" class="btn btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i></a>
                         </td>
                     </tr>
                 @endforeach             
@@ -110,33 +93,32 @@
         @endif
     </div>
 </div>            
-<form action="{{url('admin/seller/employee')}}" method="post">
+<form action="{{url('admin/agents/add')}}" method="post">
 <div class="modal fade bd-example-modal-lg" tabindex="-1" id="AddSeller" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 @csrf
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Employee</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Add Agent</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <input type="hidden" name="seller" value="{{$seller->id}}">
       <div class="modal-body">
-
-            <div class="form-group">
+      
+        <div class="form-group">
             <label for="inputEmail4">Name</label>
             <input type="text" class="form-control" name="name"  placeholder="Name">
-            </div>
+        </div>
         
         <div class="form-row">
             <div class="form-group col-md-6">
-            <label for="inputPassword4">Email</label>
-            <input type="text" class="form-control" name="email" id="inputPassword4" placeholder="Email">
+                 <label for="inputPassword4">Email</label>
+                 <input type="text" class="form-control" name="email" id="inputPassword4" placeholder="Email">
             </div>
             <div class="form-group col-md-6">
-            <label for="inputPassword4">Mobile</label>
-            <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile Number">
+                <label for="inputPassword4">Mobile</label>
+                <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile Number">
             </div>
         </div>
         <div class="form-row">
@@ -150,19 +132,15 @@
             </select>
             </div>
             <div class="form-group col-md-6">
-            <label for="inputState">Employee Type</label>
-            <select id="inputState" name="type" class="form-control">
-                <option value="">Choose...</option>
-                @foreach($e_type as $e)
-                    <option value="{{$e->id}}">{{$e->user_type}}</option>
-                @endforeach
-            </select>
+                <label for="inputState">Pincode</label>
+                <input type="text" class="form-control" name="pincode" id="pin" placeholder="Pincode">
             </div>
-        </div>
+        </div>  
+        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">+Add Employee</button>
+        <button type="submit" class="btn btn-primary">+Add</button>
       </div>
       
     </div>
@@ -170,14 +148,14 @@
 </div>
 </form>
 @foreach($owners as $owner)
-<form action="{{url('/admin/seller/update/employee')}}" method="post">
-<div class="modal fade bd-example-modal-lg" tabindex="-1" id="updateEmployee{{$owner->uid}}" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<form action="{{url('/update/seller')}}" method="post">
+<div class="modal fade bd-example-modal-lg" tabindex="-1" id="updateSeller{{$owner->uid}}" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
 @csrf
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
     <input type="hidden" name="uid" value="{{$owner->uid}}">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Update seller</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Update Agent</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -209,15 +187,6 @@
                 @endforeach
             </select>
             </div>
-            <div class="form-group col-md-6">
-            <label for="inputState">Employee Type</label>
-            <select id="inputState" name="etype" class="form-control">
-                <option value="">Choose...</option>
-                @foreach($e_type as $e)
-                    <option @if($owner->type_id == $e->id) selected @endif value="{{$e->id}}">{{$e->user_type}}</option>
-                @endforeach
-            </select>
-            </div>
         </div>
         
       </div>
@@ -239,7 +208,7 @@
 <script>
 function delcon()
 {
-    if(confirm('Do you really wan\'t delete this user...!!')==true)
+    if(confirm('Do you really wan\'t delete this seller...!!')==true)
     {
         return true;
     }

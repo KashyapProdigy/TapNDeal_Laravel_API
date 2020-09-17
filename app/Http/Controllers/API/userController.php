@@ -266,4 +266,24 @@ class userController extends Controller
             return response()->json(['error' => true, 'message' => $data], 500);
         }
     }
+    public function agentSearch(Request $req)
+    {
+        $srch=$req->search;
+        $agents=User::where([['name','like','%'.$srch.'%'],['type_id','2']])->get();
+        if(count($agents)>0)
+        {
+            return response()->json(['error' => true, 'data' => $agents], 500);
+        }
+        return response()->json(['error' => true, 'message' => 'Agents not found'], 500);
+    }
+    public function suplierSearch(Request $req)
+    {
+        $srch=$req->search;
+        $agents=User::where([['name','like','%'.$srch.'%'],['type_id','1']])->get();
+        if(count($agents)>0)
+        {
+            return response()->json(['error' => true, 'data' => $agents], 500);
+        }
+        return response()->json(['error' => true, 'message' => 'Supliers not found'], 500);
+    }
 }

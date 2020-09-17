@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\temp_req;
 use Validator;
 use App\User;
+use App\temp_req_product;
 
 class tempReqController extends Controller
 {
@@ -89,5 +90,73 @@ class tempReqController extends Controller
             return response()->json(['error' => false ,'data'=>$rec], 200);
         
         return response()->json(['error' => true ,'message'=>'Temporary Request not found of this Seller..'], 400);
+    }
+    public function responseReq(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            
+            'sid' => 'required|numeric',
+            'pid'=>'required',
+            'trid'=>'required|numeric',
+            'time_period'=>'required|numeric'
+            
+        ],[
+            'sid.required'=>'Seller id is required..',
+            'pid.required'=>'Products ids are required',
+            'trid.required'=>'temporary request id required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $tempReq=temp_req::find($req->trid);
+        if($tempReq)
+        {
+            $tempReq->isResponded=1;
+            if($tempReq->save())
+            {
+                $pi=implode(',',$req->pid);
+                $pi=explode(',',$pi);
+                foreach($pi as $p)
+                {    
+                    $tr=new temp_req_product;
+                    $tr->sid=$req->sid;
+                    $tr->trid=$req->trid;
+                    $tr->pid=$p;
+                    $tr->end_period=date('Y-m-d H:i:s', strtotime("+".$req->time_period." days"));
+                    $tr->save();
+                }
+                return response()->json(['error' => false ,'message'=>"Response Added successfully.."], 200);
+            }
+                
+        }
+        return response()->json(['error' => true ,'message'=>"Somethings went wrong."], 400);
+    }
+    public function showResponseBuyer($bid)
+    {
+        $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
+        ->join('users','temp_req_pro.sid','users.id')
+        ->join('products','products.id','temp_req_pro.pid')
+        ->where('req_for',$bid)
+        ->select('users.id as seller_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.*','temp_req_pro.end_period')
+        ->get();
+        if(count($data)>0)
+        {
+            return response()->json(['error' => false ,'message'=>$data], 200);
+        }
+        return response()->json(['error' => true ,'message'=>'Respone of this buyer not found..'], 400);
+    }
+    public function showResponseAgent($aid)
+    {
+        $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
+        ->join('users','temp_req_pro.sid','users.id')
+        ->join('products','products.id','temp_req_pro.pid')
+        ->where('req_by',$aid)
+        ->select('users.id as seller_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.*','temp_req_pro.end_period')
+        ->get();
+        if(count($data)>0)
+        {
+            return response()->json(['error' => false ,'message'=>$data], 200);
+        }
+        return response()->json(['error' => true ,'message'=>'Respone of this agent not found..'], 400);
     }
 }

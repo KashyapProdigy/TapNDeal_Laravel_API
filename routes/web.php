@@ -29,6 +29,10 @@ Route::middleware([AdminCheck::class])->group(function () {
     route::post('/admin/seller/employee','ownersController@AddEmployee');
     route::post('/admin/seller/update/employee','ownersController@updateEmployee');
     route::get('/admin/customer','custController@show');
+    route::get('/admin/agents','agentController@show');
+    route::post('/admin/agents/add','agentController@create');
+    route::get('admin/orders','orderController@showAll');
+    Route::get('admin/orders/show/{id}','orderController@fullorder');
 });
 
 Route::get('/manufacture',function(){

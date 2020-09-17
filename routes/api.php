@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*k
+/*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
@@ -28,7 +28,6 @@ Route::post('user/profile/view/log/show/{id}','API\userController@showViewLog');
 
 Route::get('dashboard/{id}','API\dashboardController@getdashboard');
 Route::get('user/relation/show/seller/{id}','API\dashboardController@showSellerRelations');
-
 Route::post('user/knock/new/customer/{id}','API\customerKnockController@create');
 Route::post('user/knock/approve/customer/{id}','API\customerKnockController@approve');
 Route::post('user/knock/reject/customer/{id}','API\customerKnockController@reject');
@@ -38,6 +37,7 @@ Route::post('user/relation/update/customer/{id}','API\customerRelationshipContro
 Route::post('user/relation/block/customer/{id}','API\customerRelationshipController@block');
 Route::get('user/relation/show/customer/{id}','API\customerRelationshipController@show');
 Route::get('user/relation/show/seller/productlist/customer','API\customerRelationshipController@productlist');
+
 
 Route::post('user/knock/new/agent/{id}','API\agentKnockController@create');
 Route::post('user/knock/approve/agent/{id}','API\agentKnockController@approve');
@@ -67,6 +67,9 @@ Route::post('user/product/upload','API\productController@upload');
 Route::post('user/product/update/{id}','API\productController@update');
 Route::get('user/product/show/{id}','API\productController@show');
 Route::delete('user/product/delete/{id}','API\productController@delete');
+Route::get('user/product/disable/{id}','API\productController@disable');
+Route::get('user/product/enable/{id}','API\productController@enable');
+Route::get('user/product/search','API\productController@search');
 
 Route::post('user/notification/new','API\notificationController@create');
 Route::post('user/notification/update/{id}','API\notificationController@update');
@@ -77,7 +80,7 @@ Route::post('user/cart/new','API\cartController@create');
 Route::get('user/cart/show/{id}','API\cartController@show');
 Route::get('user/cart/check/{id}','API\cartController@check');
 Route::get('user/cart/count/{id}','API\cartController@count');
-Route::delete('user/cart/delete/{id}','API\cartController@delete');
+Route::post('user/cart/delete/{id}','API\cartController@delete');
 Route::post('user/cart/update/{cid}','API\cartController@update');
 Route::delete('user/cart/delete/all/{id}','API\cartController@deleteByUserid');
 
@@ -118,5 +121,11 @@ Route::post('tempReq/new','API\tempReqController@create');
 Route::get('tempReq/show/{bid}','API\tempReqController@show');
 Route::get('tempReq/agent/show/{aid}','API\tempReqController@agentShow');
 Route::get('tempReq/seller/show/{sid}','API\tempReqController@sellerShow');
+Route::post('tempReq/response','API\tempReqController@responseReq');
+Route::get('tempReq/response/buyer/show/{bid}','API\tempReqController@showResponseBuyer');
+Route::get('tempReq/response/agent/show/{aid}','API\tempReqController@showResponseAgent');
 
+Route::get('agent/search','API\userController@agentSearch');
+Route::get('suplier/search','API\userController@suplierSearch');
 Route::get('regInfo','API\userController@regInfo');
+

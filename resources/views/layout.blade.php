@@ -46,9 +46,13 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                                 Customer
                             </a>
-                            <a class="nav-link" href="tables.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Tables
+                            <a class="nav-link" href="{{url('admin/agents')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                                Agents
+                            </a>
+                            <a class="nav-link" href="{{url('admin/orders')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                                Orders
                             </a>
                         </div>
                     </div>

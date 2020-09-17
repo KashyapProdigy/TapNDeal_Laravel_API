@@ -41,9 +41,6 @@ class productController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-
-            
-
             $image_list = json_decode($req->image);
             if( is_object($image_list) )
             {
@@ -138,7 +135,7 @@ class productController extends Controller
     }
 
     public function update(Request $req,$id)
-        {
+    {
 
             
             $validator = Validator::make($req->all(), [
@@ -289,5 +286,36 @@ class productController extends Controller
             return response()->json(['error' => false ,'message'=>'Product Deleted'],200);
         }
         return response()->json(['error' => true ,'message'=>'Product not found']);
+    }
+    public function disable($pid)
+    {
+        $product=Product::find($pid);
+        
+        if($product)
+        {
+            $product->isDisabled=1;
+            $product->save();
+            return response()->json(['error' => false ,'message'=>'Product Disabled successfully..'],200);
+        }
+        return response()->json(['error' => true ,'message'=>'Product not found'],400);
+    }
+    public function enable($pid)
+    {
+        $product=Product::find($pid);
+        
+        if($product)
+        {
+            $product->isDisabled=0;
+            $product->save();
+            return response()->json(['error' => false ,'message'=>'Product Enabled successfully..'],200);
+        }
+        return response()->json(['error' => true ,'message'=>'Product not found'],400);
+    }
+    public function search(Request $req)
+    {
+        $srch=$req->search;
+        $products=Product::where('name','like','%'.$srch.'%')->orwhere('tags','like','%'.$srch.'%')->get();
+        return response()->json(['error' => false ,'data'=>$products],200);
+        
     }
 }

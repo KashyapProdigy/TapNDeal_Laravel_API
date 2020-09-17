@@ -77,8 +77,13 @@ class accounts extends Controller
         if($us['mobile']!=$req->mobile)
         {
             $validatedData = $req->validate([
-                'mobile'=>'unique:users,mobile',
-                'email'=>'unique:users,email'
+                'mobile'=>'unique:users',
+            ]);
+        }
+        if($us['email']!=$req->email)
+        {
+            $validatedData = $req->validate([
+                'email'=>'unique:users'
             ]);
         }
         $state=\DB::table('citys')->where('id',$req->city)->first();

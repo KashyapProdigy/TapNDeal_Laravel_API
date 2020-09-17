@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\user;
+use App\User;
 use App\Order;
 
 class agentController extends Controller
@@ -12,7 +12,7 @@ class agentController extends Controller
     public function List()
     {
         $agents=User::join('user_type','user_type.id','users.type_id')
-        ->select('users.id as agent_id','name','ref_code')
+        ->select('users.id as agent_id','name','ref_code','mobile')
         ->where('user_type','Agent')->get();
         if(count($agents)>0)
             return response()->json(['error' => false ,'data'=>$agents],200);

@@ -52,21 +52,29 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Company name</th>
                         <th>email</th>
                         <th>mobile</th>
+                        <th>Address</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>PAN No</th>
+                        <th>GST No</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>Name</th>   
+                    <th>Name</th>
+                        <th>Company name</th>
                         <th>email</th>
                         <th>mobile</th>
+                        <th>Address</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>PAN No</th>
+                        <th>GST No</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -75,10 +83,14 @@
                 @foreach($owners as $owner)
                     <tr>
                         <td>{{$owner->name}}</td>
+                        <td>{{$owner->cname}}</td>
                         <td>{{$owner->email}}</td>
                         <td>{{$owner->mobile}}</td>
+                        <td>{{$owner->address}}</td>
                         <td>{{$owner->city_name}}</td>
                         <td>{{$owner->state_name}}</td>
+                        <td>{{$owner->pan}}</td>
+                        <td>{{$owner->gst}}</td>
                         <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
                         <td>
                             <a class="btn btn-sm btn-success text-white" data-toggle="tooltip" title="Accounts" href="{{url('/seller/accounts')}}/{{$owner->uid}}"><i class="fas fa-eye"></i></a>
@@ -106,60 +118,55 @@
         </button>
       </div>
       <div class="modal-body">
-      
-            <div class="form-group">
-            <label for="inputEmail4">Name</label>
-            <input type="text" class="form-control" name="name"  placeholder="Name">
-            </div>
-            <div class="form-group">
-            <label for="inputEmail4">Address</label>
-            <input type="text" class="form-control" name="Address"  placeholder="Address">
-            </div>
-            <div class="form-group">
-            <label for="inputEmail4">GST No:</label>
-            <input type="text" class="form-control" name="gst"  placeholder="GST">
-            </div>  
-        
-        <div class="form-row">
-            <div class="form-group col-md-6">
-            <label for="inputPassword4">Email</label>
-            <input type="text" class="form-control" name="email" id="inputPassword4" placeholder="Email">
-            </div>
-            <div class="form-group col-md-6">
-            <label for="inputPassword4">Mobile</label>
-            <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile Number">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-            <label for="inputCity">City</label>
-            <select id="inputState" name="city" class="form-control">
-                <option value="">Choose...</option>
-                @foreach($citys as $city)
-                    <option value="{{$city->id}}">{{$city->city_name}}</option>
-                @endforeach
-            </select>
-            </div>
-            <div class="form-group col-md-6">
-            <label for="inputState">Pincode</label>
-            <input type="text" class="form-control" name="pincode" id="pin" placeholder="Pincode">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputEmail4">Password</label>
-                <input type="password" class="form-control" name="pass"  placeholder="Password">
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputEmail4">Confirm Password</label>
-                <input type="password" class="form-control" name="cpass"  placeholder="Re-enter Password">
-            </div>
-        </div>
+      <div class="form-group">
+        <label for="inputEmail4">Name</label>
+        <input type="text" class="form-control" name="name"  placeholder="Seller Name">
+    </div>
+    <div class="form-group">
+        <label for="inputEmail4">Company Name</label>
+        <input type="text" class="form-control" name="cname"  placeholder="Company Name">
+    </div>
+    <div class="form-group">
+        <label for="inputEmail4">Address</label>
+        <input type="text" class="form-control" name="address"  placeholder="Address">
+    </div>
+    <div class="form-row">
+    <div class="form-group col-md-6">
+        <label for="inputPassword4">Email</label>
+        <input type="text" class="form-control" name="email" id="inputPassword4" placeholder="Email">
+    </div>
+    <div class="form-group col-md-6">
+        <label for="inputPassword4">Mobile</label>
+        <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Mobile Number">
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-6">
+        <label for="inputCity">GST no:</label>
+        <input type="text" class="form-control" name="gst" id="gst" placeholder="GST Number">
+    </div>
+    <div class="form-group col-md-6">
+        <label for="inputCity">PAN no:</label>
+        <input type="text" class="form-control" name="pan" id="pan" placeholder="GST Number">
+    </div>
+</div>
+<div class="form-row">
+    
+    <div class="form-group col-md-6">
+        <label for="inputCity">City</label>
+        <select id="inputState" name="city" class="form-control">
+            <option value="">Choose...</option>
+            @foreach($citys as $city)
+                <option value="{{$city->id}}">{{$city->city_name}}</option>
+            @endforeach
+        </select>
+    </div>
+</div>
         
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="submit" class="btn btn-primary">+Add</button>
       </div>
       
     </div>
@@ -182,10 +189,17 @@
       <div class="modal-body">
       
             <div class="form-group">
-            <label for="inputEmail4">Name</label>
-            <input type="text" class="form-control" name="name" value="{{$owner->name}}" placeholder="Name">
+                <label for="inputEmail4">Name</label>
+                <input type="text" class="form-control" name="name" value="{{$owner->name}}" placeholder="Name">
             </div>
-        
+            <div class="form-group">
+                <label for="inputEmail4">Company Name</label>
+                <input type="text" class="form-control" name="cname" value="{{$owner->cname}}"  placeholder="Company Name">
+            </div>
+            <div class="form-group">
+                <label for="inputEmail4">Address</label>
+                <input type="text" class="form-control" name="address" value="{{$owner->address}}"  placeholder="Address">
+            </div>
         <div class="form-row">
             <div class="form-group col-md-6">
             <label for="inputPassword4">Email</label>
@@ -198,20 +212,21 @@
         </div>
         <div class="form-row">
             <div class="form-group col-md-6">
+                <label for="inputCity">GST no:</label>
+                <input type="text" class="form-control" name="gst" id="gst" value="{{$owner->gst}}" placeholder="GST Number">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputCity">PAN no:</label>
+                <input type="text" class="form-control" name="pan" id="pan" value="{{$owner->pan}}" placeholder="GST Number">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
             <label for="inputCity">City</label>
             <select id="inputState" name="city" class="form-control">
                 <option value="">Choose...</option>
                 @foreach($citys as $city)
                     <option @if($owner->city_id==$city->id) selected @endif value="{{$city->id}}">{{$city->city_name}}</option>
-                @endforeach
-            </select>
-            </div>
-            <div class="form-group col-md-6">
-            <label for="inputState">State</label>
-            <select id="inputState" name="state" class="form-control">
-                <option value="">Choose...</option>
-                @foreach($states as $state)
-                    <option @if($state->id==$owner->sid) selected @endif value="{{$state->id}}">{{$state->state_name}}</option>
                 @endforeach
             </select>
             </div>

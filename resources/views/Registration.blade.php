@@ -38,7 +38,7 @@
                                         </button>
                                     </div>
                                     @endif
-                                    <div class="card-body">
+                                <div class="card-body">
                                         <form method="post">
                                         @csrf
                                         <div class="form-group">
@@ -53,7 +53,7 @@
                                             <label for="inputEmail4">Address</label>
                                             <input type="text" class="form-control" name="address"  placeholder="Address">
                                         </div>
-                                    <div class="form-row">
+                                      <div class="form-row">
                                         <div class="form-group col-md-6">
                                             <label for="inputPassword4">Email</label>
                                             <input type="text" class="form-control" name="email" id="inputPassword4" placeholder="Email">

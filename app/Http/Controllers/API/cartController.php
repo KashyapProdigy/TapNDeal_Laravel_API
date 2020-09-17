@@ -89,15 +89,8 @@ class cartController extends Controller
         }
     }
 
-    public function delete($id,Request $req)
+    public function delete(Request $req,$id)
     {
-        $validator = Validator::make($req->all(), [
-            'cust_id' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
-        }
-
         $cart_del=Cart::where('product_id',$id)->where('cust_id',$req->cust_id)->first();
         if($cart_del != null)
         {
