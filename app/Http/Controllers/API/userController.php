@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Validator;
 use App\com_info;
 use App\emp_sel_rel;
+use App\custome_agent;
 
 class userController extends Controller
 {
@@ -50,7 +51,20 @@ class userController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        $ref=$this->generateRefCode($request->name);
+        if($request->type_id==2)
+        {
+            $ag=custome_agent::where('mobile',$request->mobile)->first();
+            if($ag!=null){
+                $ref=$ag['ref_code'];
+            }
+            else{
+                $ref=$this->generateRefCode($request->name);     
+            }
+        }
+        else{
+            $ref=$this->generateRefCode($request->name);
+        }
+        
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
@@ -78,14 +92,16 @@ class userController extends Controller
                 $es->seller_id=$seller['id'];
                 $es->save();
             }
-
-            $ci=new com_info;
-            $ci->cname=$request->cname;
-            $ci->pan=$request->pan;
-            $ci->gst=$request->gst;
-            $ci->address=$request->address;
-            $ci->sid=$user->id;
-            $ci->save();
+            if($request->type_id==1)
+            { 
+                $ci=new com_info;
+                $ci->cname=$request->cname;
+                $ci->pan=$request->pan;
+                $ci->gst=$request->gst;
+                $ci->address=$request->address;
+                $ci->sid=$user->id;
+                $ci->save();
+            }
             return response()->json(['error' => false ,'message'=>'User Added Successfully'],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
@@ -123,14 +139,14 @@ class userController extends Controller
 
     public function profileDisplay($id)
     {
-        $user=User::join('user_type','user_type.id','users.type_id')->where('users.id',$id)->first();
+        $user=User::join('user_type','user_type.id','users.type_id')->select('users.id as uid','users.*','user_type.*')->where('users.id',$id)->first();
         $citys=\DB::table('citys')->get();
         $states=\DB::table('states')->get();
         if($user != null)
         {
             if($user['type_id']==1)
             {
-                $user=User::join('company_info','company_info.sid','users.id')->join('user_type','user_type.id','users.type_id')->where('users.id',$id)->first();
+                $user=User::join('company_info','company_info.sid','users.id')->join('user_type','user_type.id','users.type_id')->select('users.id as uid','users.*','user_type.*','company_info.*')->where('users.id',$id)->first();
                 return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);    
             }
             return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);

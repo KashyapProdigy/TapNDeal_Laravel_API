@@ -52,7 +52,6 @@ class manufactureController extends Controller
             'email'=>'required|email|unique:users,email',
             'mobile'=>'required|digits:10|unique:users,mobile',
             'city'=>'required',
-            'pincode'=>'required',
         ],[
             'cname.required'=>'The Company name is required'
         ]);   

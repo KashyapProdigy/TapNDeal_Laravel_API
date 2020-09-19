@@ -62,15 +62,17 @@ Route::post('user/seller/new/employee','API\employeeSellerRelationshipController
 Route::post('user/seller/block/employee/{id}','API\employeeSellerRelationshipController@block');
 Route::get('user/seller/show/employee/{id}','API\employeeSellerRelationshipController@show');
 
+Route::get('user/product/showPro/{id}','API\productController@showPro');
 Route::post('user/product/new','API\productController@create');
 Route::post('user/product/upload','API\productController@upload');
 Route::post('user/product/update/{id}','API\productController@update');
-Route::get('user/product/show/{id}','API\productController@show');
+Route::get('user/product/show/{sid}','API\productController@show');
 Route::delete('user/product/delete/{id}','API\productController@delete');
 Route::get('user/product/disable/{id}','API\productController@disable');
 Route::get('user/product/enable/{id}','API\productController@enable');
 Route::get('user/product/search','API\productController@search');
 Route::get('product/image/delete/{pid}/{pname}','API\productController@delImg');
+Route::get('user/product/search/{sid}','API\productController@searchPro');
 
 Route::post('user/notification/new','API\notificationController@create');
 Route::post('user/notification/update/{id}','API\notificationController@update');
@@ -130,3 +132,7 @@ Route::get('agent/search','API\userController@agentSearch');
 Route::get('suplier/search','API\userController@suplierSearch');
 Route::get('regInfo','API\userController@regInfo');
 
+Route::post('chat/store','API\chatController@store');
+Route::get('chat/list/{uid}','API\chatController@list');
+
+Route::post('custome/agent','API\agentController@customeAgent');

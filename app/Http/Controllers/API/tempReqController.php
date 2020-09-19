@@ -8,6 +8,7 @@ use App\temp_req;
 use Validator;
 use App\User;
 use App\temp_req_product;
+use App\Product;
 
 class tempReqController extends Controller
 {
@@ -115,16 +116,14 @@ class tempReqController extends Controller
             if($tempReq->save())
             {
                 $pi=implode(',',$req->pid);
-                $pi=explode(',',$pi);
-                foreach($pi as $p)
-                {    
+                
                     $tr=new temp_req_product;
                     $tr->sid=$req->sid;
                     $tr->trid=$req->trid;
-                    $tr->pid=$p;
+                    $tr->pid=$pi;
                     $tr->end_period=date('Y-m-d H:i:s', strtotime("+".$req->time_period." days"));
                     $tr->save();
-                }
+                
                 return response()->json(['error' => false ,'message'=>"Response Added successfully.."], 200);
             }
                 
@@ -134,28 +133,57 @@ class tempReqController extends Controller
     public function showResponseBuyer($bid)
     {
         $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
-        ->join('users','temp_req_pro.sid','users.id')
-        ->join('products','products.id','temp_req_pro.pid')
         ->where('req_for',$bid)
-        ->select('users.id as seller_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.*','temp_req_pro.end_period')
         ->get();
+        $li=array();
+        $list=array();
+        $prod=array();
+        foreach($data as $d)
+        {
+            $prdct=explode(',',$d['pid']);
+            $list['seller']=User::where('id',$d['sid'])->first();
+            foreach($prdct as $p)
+            {
+                $prod[]=Product::where('id',$p)->get();
+            }
+            
+            $list['seller']['product']=$prod;
+            $li[]=$list;
+            $prod=null;
+            
+        }
+        
         if(count($data)>0)
         {
-            return response()->json(['error' => false ,'message'=>$data], 200);
+            return response()->json(['error' => false ,'message'=>$li], 200);
         }
         return response()->json(['error' => true ,'message'=>'Respone of this buyer not found..'], 400);
     }
     public function showResponseAgent($aid)
     {
         $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
-        ->join('users','temp_req_pro.sid','users.id')
-        ->join('products','products.id','temp_req_pro.pid')
         ->where('req_by',$aid)
-        ->select('users.id as seller_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.*','temp_req_pro.end_period')
         ->get();
+        $li=array();
+        $list=array();
+        $prod=array();
+        foreach($data as $d)
+        {
+            $prdct=explode(',',$d['pid']);
+            $list['seller']=User::where('id',$d['sid'])->first();
+            foreach($prdct as $p)
+            {
+                $prod[]=Product::where('id',$p)->get();
+            }
+            
+            $list['seller']['product']=$prod;
+            $li[]=$list;
+            $prod=null;
+            
+        }
         if(count($data)>0)
         {
-            return response()->json(['error' => false ,'message'=>$data], 200);
+            return response()->json(['error' => false ,'message'=>$li], 200);
         }
         return response()->json(['error' => true ,'message'=>'Respone of this agent not found..'], 400);
     }

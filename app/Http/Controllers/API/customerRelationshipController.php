@@ -107,16 +107,26 @@ class customerRelationshipController extends Controller
 
             $relations=CustomerCategoryRelationship::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->first();
             $knock= CustomerKnock::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->first();
+            if($knock != null)
+            {
+                if($knock['isApproved'] == 1)
+                {
+                    $ac=true;
+                }
+                else{
+                    $ac=false;
+                }
+            }
             if($relations == null && $knock == null)
             {
 
                 $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
-                return response()->json(['error' => false,'Knock'=>false,'relation'=>false ,'data'=>$products],200);
+                return response()->json(['error' => false,'Knock'=>false,'relation'=>false,'accepted'=>false ,'data'=>$products],200);
             }
             else if($relations == null && $knock != null )
             {
                 $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
-                return response()->json(['error' => false ,'Knock'=>true,'relation'=>false ,'data'=>$products],200);
+                return response()->json(['error' => false ,'Knock'=>true,'relation'=>false ,'accepted'=>$ac,'data'=>$products],200);
             }
             else if($relations!=null)
             {
@@ -126,24 +136,24 @@ class customerRelationshipController extends Controller
                     if($relations->category == 'A+')
                     {
                         $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->get()->toarray();
-                        return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
+                        return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'relation'=>true ,'data'=>$products],200);
                     }
                     if($relations->category == 'A')
                     {
                         $cat=['A','B+','B'];
                         $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->whereIn('category',$cat)->get()->toarray();
-                        return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
+                        return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'relation'=>true ,'data'=>$products],200);
                     }
                     if($relations->category == 'B+')
                     {
                         $cat=['B+','B'];
                         $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->whereIn('category',$cat)->get()->toarray();
-                        return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
+                        return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'relation'=>true ,'data'=>$products],200);
                     }
                     if($relations->category == 'B')
                     {
                     $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->where('category',$relations->category)->get()->toarray();
-                    return response()->json(['error' => false ,'Knock'=>true,'relation'=>true ,'data'=>$products],200);
+                    return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'relation'=>true ,'data'=>$products],200);
                     }
                 }
             }
