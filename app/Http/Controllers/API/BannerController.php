@@ -71,9 +71,33 @@ class BannerController extends Controller
     public function update(Request $req,$bid)
     {
         
-        $image_list = json_decode($req->image);
-        $names="";
-        if($req->oldImages)
+        $image = $req->image;
+        $names=$bid;
+        $banners=Banners::find($bid);
+        if($banners)
+        {
+            $img=explode(',',$banners['img_name']);
+            if(count($img)>=4)
+            {
+                return response()->json(['error' => true ,'message'=>"You can't upload more then 4 banner..!"],500);
+            }
+            else
+            {
+                if (($key = array_search($req->oldImage, $img)) !== false) {
+                    unset($img[$key]);
+                    $img[$key]=$image;
+                }
+                else{
+                    return response()->json(['error' => true ,'message'=>"Old image not found"],400);
+                }
+            }
+        }
+        else{
+            return response()->json(['error' => true ,'message'=>"Banner not found"],400);
+        }
+        
+        
+        if($req->oldImage)
         {
             $names=$req->oldImages;
             $img=count(explode(',',$req->oldImages))+count($image_list->array);
