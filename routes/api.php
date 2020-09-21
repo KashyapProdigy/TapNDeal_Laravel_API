@@ -129,6 +129,7 @@ Route::get('tempReq/response/buyer/show/{bid}/{trid}','API\tempReqController@sho
 Route::get('tempReq/response/agent/show/{aid}/{trid}','API\tempReqController@showResponseAgent');
 
 Route::get('agent/search','API\userController@agentSearch');
+Route::get('agent/search/{cat}','API\userController@agentCatSearch');
 Route::get('suplier/search','API\userController@suplierSearch');
 Route::get('regInfo','API\userController@regInfo');
 

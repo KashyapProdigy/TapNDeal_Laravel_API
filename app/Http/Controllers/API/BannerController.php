@@ -18,7 +18,7 @@ class BannerController extends Controller
         {
             return response()->json(['error' => false ,'data'=>$banners], 200);
         }
-        return response()->json(['error' => true ,'message'=>"No banners found of this manufacturer..!"], 401);
+        return response()->json(['error' => false,'data'=>null ,'message'=>"first time banner show!"], 401);
     }
     public function create(Request $req)
     {
@@ -40,7 +40,7 @@ class BannerController extends Controller
                     $file = Storage::disk('temp')->get($value);
                     $filename= time().$uploadsCount.'-prod.png';
                     Storage::disk('banner')->put($filename, $file);
-                    $file = Storage::disk('temp')->delete($value);
+                    // $file = Storage::disk('temp')->delete($value);
                     if($uploadsCount == 0){
                     $names = $filename;
                     }
