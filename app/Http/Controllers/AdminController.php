@@ -19,7 +19,8 @@ class AdminController extends Controller
             $tot_agt=User::where('type_id',2)->count();
             $tot_pro=Product::count();
             $to=Order::count();
-            return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to]);
+            $selling=Order::where('isDelivered',1)->sum('total_price');
+            return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to,'sel'=>$selling]);
         }
         return view('Admin.login');   
     }
@@ -35,7 +36,8 @@ class AdminController extends Controller
             $tot_agt=User::where('type_id',2)->count();
             $tot_pro=Product::count();
             $to=Order::count();
-            return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to]);
+            $selling=Order::where('isDelivered',1)->sum('total_price');
+            return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to,'sel'=>$selling]);
         }
         else{
             return redirect()->back()->with('error','Invalid Mobile number or Password..');

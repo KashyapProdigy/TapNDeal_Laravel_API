@@ -88,10 +88,10 @@
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-muted text-uppercase mb-1">Total selling</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800">{{$ts}}</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800">&#x20b9; {{$sel}}</div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-check-circle fa-2x text-muted"></i>
+                    <i class="h1 text-gray-800">&#x20b9;</i>
                     </div>
                   </div>
                 </div>

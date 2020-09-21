@@ -125,8 +125,8 @@ Route::get('tempReq/show/{bid}','API\tempReqController@show');
 Route::get('tempReq/agent/show/{aid}','API\tempReqController@agentShow');
 Route::get('tempReq/seller/show/{sid}','API\tempReqController@sellerShow');
 Route::post('tempReq/response','API\tempReqController@responseReq');
-Route::get('tempReq/response/buyer/show/{bid}','API\tempReqController@showResponseBuyer');
-Route::get('tempReq/response/agent/show/{aid}','API\tempReqController@showResponseAgent');
+Route::get('tempReq/response/buyer/show/{bid}/{trid}','API\tempReqController@showResponseBuyer');
+Route::get('tempReq/response/agent/show/{aid}/{trid}','API\tempReqController@showResponseAgent');
 
 Route::get('agent/search','API\userController@agentSearch');
 Route::get('suplier/search','API\userController@suplierSearch');

@@ -130,10 +130,11 @@ class tempReqController extends Controller
         }
         return response()->json(['error' => true ,'message'=>"Somethings went wrong."], 400);
     }
-    public function showResponseBuyer($bid)
+    public function showResponseBuyer($bid,$trid)
     {
         $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
         ->where('req_for',$bid)
+        ->where('temp_req.id',$trid)
         ->get();
         $li=array();
         $list=array();
