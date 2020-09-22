@@ -83,8 +83,8 @@ class tempReqController extends Controller
         foreach($tr as $t)
         {
             $temp=temp_req::where('id',$t['id'])->first();
-            $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
-            $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
+            $temp['buyer']=User::where('id',$t['req_for'])->select('id','name','mobile')->first();
+            $temp['agent']=User::where('id',$t['req_by'])->select('id','name','mobile')->first();
             $rec[]=$temp;
         }
          if($rec != null)

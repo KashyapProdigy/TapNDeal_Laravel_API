@@ -50,6 +50,60 @@ class agentController extends Controller
         
         return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!'],200);
     }
+    public function pastOrderList($ref)
+    {
+        $o_list=Order::where('agent_reference',$ref)->where('orders.isDelivered',1)->get();
+        $list=array();
+        $order=array();
+        foreach($o_list as $o)
+        {
+            $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')
+            ->first();
+            $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
+            $order[]=$list;
+        }
+        if(count($order)>0)    
+            return response()->json(['error' => false ,'data'=>$order],200);
+        
+        return response()->json(['error' => true ,'messege'=>'No past orders found for this Agent..!'],200);
+    }
+    public function ongoingOrderList($ref)
+    {
+        $o_list=Order::where('agent_reference',$ref)->where('orders.isApproved',1)->where('orders.isDelivered',0)->get();
+        $list=array();
+        $order=array();
+        foreach($o_list as $o)
+        {
+            $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')
+            ->first();
+            $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
+            $order[]=$list;
+        }
+        if(count($order)>0)    
+            return response()->json(['error' => false ,'data'=>$order],200);
+        
+        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!'],200);
+    }
+    public function newOrderList($ref)
+    {
+        $o_list=Order::where('agent_reference',$ref)->where('orders.isApproved',0)->get();
+        $list=array();
+        $order=array();
+        foreach($o_list as $o)
+        {
+            $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')
+            ->first();
+            $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
+            $order[]=$list;
+        }
+        if(count($order)>0)    
+            return response()->json(['error' => false ,'data'=>$order],200);
+        
+        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!'],200);
+    }
     public function orderCount($ref)
     {
         $o_co=Order::where('agent_reference',$ref)->count();

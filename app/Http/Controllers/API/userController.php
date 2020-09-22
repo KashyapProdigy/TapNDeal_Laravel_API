@@ -146,7 +146,7 @@ class userController extends Controller
         {
             if($user['type_id']==1)
             {
-                $user=User::join('company_info','company_info.sid','users.id')->join('user_type','user_type.id','users.type_id')->select('users.id as uid','users.*','user_type.*','company_info.*')->where('users.id',$id)->first();
+                $user=User::join('company_info','company_info.sid','users.id')->join('user_type','user_type.id','users.type_id')->select('users.id as uid','users.*','user_type.*','company_info.*')->where('users.id',$id)->join('citys','users.city_id')->first();
                 return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);    
             }
             return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);
@@ -204,7 +204,7 @@ class userController extends Controller
     public function showViewLog($id)
     {
 
-        $logrecords=ProfileViewLog::where('seller_id',$id)->get()->toarray();
+        $logrecords=ProfileViewLog::join('users','users.id','cust_id')->where('seller_id',$id)->get()->toarray();
 
         if($logrecords == null)
         {
@@ -213,11 +213,12 @@ class userController extends Controller
 
         if($logrecords != null)
         {
-
             $recordids = ProfileViewLog::select('id')->where('seller_id',$id)->get()->toarray();
             $records = DB::table('profile_view_logs')
                 ->join('users','users.id','profile_view_logs.cust_id')
-                ->select('users.name as cust_name','profile_view_logs.updated_at as view_date')
+                ->join('citys','users.city_id','citys.id')
+                ->join('states','users.state_id','states.id')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','profile_view_logs.updated_at as view_date','citys.city_name','states.state_name')
                 ->whereIn('profile_view_logs.id',$recordids)
                 ->orderby('profile_view_logs.updated_at','DESC')
                 ->get()->toarray();
@@ -225,11 +226,9 @@ class userController extends Controller
             if($records != null)
             {
                 $log_data=['isSeen'=>1];
-                $log_update=ProfileViewLog::whereIn('id',$recordids)->update($log_data);
-                if($log_update != null)
-                {
+                $log_update=\DB::table('profile_view_logs')->whereIn('id',$recordids)->update($log_data);
                     return response()->json(['error' => false ,'data'=>$records],200);
-                }
+                
             }
             else{
                 return response()->json(['error' => false ,'data'=>null],200);

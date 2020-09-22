@@ -116,6 +116,9 @@ Route::post('user/banner/destroy/{bid}','API\bannerController@destroy');
 
 Route::get('Agent/list','API\agentController@List');
 Route::get('Agent/orderlist/{ref}','API\agentController@orderList');
+Route::get('Agent/past/orderlist/{ref}','API\agentController@pastOrderList');
+Route::get('Agent/ongoing/orderlist/{ref}','API\agentController@ongoingOrderList');
+Route::get('Agent/new/orderlist/{ref}','API\agentController@newOrderList');
 Route::get('Agent/orderCount/{ref}','API\agentController@orderCount');
 
 Route::get('buyer/orderCount/{cid}','API\buyerController@orderCount');
