@@ -24,42 +24,12 @@ class BannerController extends Controller
     {
         $validator = Validator::make($req->all(), [
             'manufacturer_id' => 'required|numeric',
-            'image'=>'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        $image_list =$req->image["array"];
-        if(count($image_list)>4)
-            return response()->json(['error' => true ,'message'=>"You can't upload more then 4 banner..!"], 401);
-        if( $image_list != null )
-        {
-            $uploadsCount=0;
-            foreach ($image_list as $value) {
-                if(Storage::disk('temp')->exists($value)){
-                    $file = Storage::disk('temp')->get($value);
-                    $filename= time().$uploadsCount.'-prod.png';
-                    Storage::disk('banner')->put($filename, $file);
-                    // $file = Storage::disk('temp')->delete($value);
-                    if($uploadsCount == 0){
-                    $names = $filename;
-                    }
-                    else if($uploadsCount > 0){
-                    $names = $names.",".$filename;
-                    }
-                }
-                else{
-                    return response()->json(['error' => true ,'message'=>'Image does not exist'],500);
-                }
-            $uploadsCount++;
-            }
-        }
-        else{
-            return response()->json(['error' => true ,'message'=>'Image File ERROR']);
-        }
         $ban=new Banners;
         $ban->manu_id=$req->manufacturer_id;
-        $ban->img_name=$names;
         if($ban->save())
         { 
             return response()->json(['error' => false ,'message'=>'Banner added Successfully'],200);
@@ -120,6 +90,50 @@ class BannerController extends Controller
             return response()->json(['error' => true ,'message'=>"Banner not found"],400);
         }
     
+    }
+    public function AddBanner(Request $req,$bid)
+    {
+        $validator = Validator::make($req->all(), [
+            'image'=>'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $image=$req->image;
+        $banners=Banners::find($bid);
+        if($banners)
+        {
+            $img=$banners['img_name'];
+            $image=$req->image;
+            if(Storage::disk('temp')->exists($image)){
+                $file = Storage::disk('temp')->get($image);
+                $filename= time().'-prod.png';
+                Storage::disk('banner')->put($filename, $file);
+                // $file = Storage::disk('temp')->delete($image);
+                if($img!="")
+                {
+                    $names=$img.",".$filename;
+                }
+                else{
+                    $names=$filename;
+                }
+                $banners->img_name=$names;
+                if($banners->save())
+                { 
+                    return response()->json(['error' => false ,'message'=>'Banner added Successfully'],200);
+                }
+                else{
+                    return response()->json(['error' => true ,'message'=>'something went wrong'],500);
+                }
+            }
+            else{
+                return response()->json(['error' => true ,'message'=>'Image does not exist'],500);
+            }
+            
+        }
+        else{
+            return response()->json(['error' => true ,'message'=>"Banner not found"],400);
+        }
     }
     public function destroy(Request $req,$bid)
     {

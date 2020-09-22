@@ -139,14 +139,22 @@ class userController extends Controller
 
     public function profileDisplay($id)
     {
-        $user=User::join('user_type','user_type.id','users.type_id')->select('users.id as uid','users.*','user_type.*')->where('users.id',$id)->first();
+        $user=User::join('user_type','user_type.id','users.type_id')
+        ->join('citys','users.city_id','citys.id')
+        ->join('states','states.id','users.state_id')
+        ->select('users.id as uid','users.*','user_type.*','citys.city_name','states.state_name')
+        ->where('users.id',$id)->first();
         $citys=\DB::table('citys')->get();
         $states=\DB::table('states')->get();
         if($user != null)
         {
             if($user['type_id']==1)
             {
-                $user=User::join('company_info','company_info.sid','users.id')->join('user_type','user_type.id','users.type_id')->select('users.id as uid','users.*','user_type.*','company_info.*')->where('users.id',$id)->join('citys','users.city_id')->first();
+                $user=User::join('company_info','company_info.sid','users.id')
+                ->join('user_type','user_type.id','users.type_id')
+                ->join('states','states.id','users.state_id')
+                ->select('users.id as uid','users.*','user_type.*','company_info.*','citys.city_name','states.state_name')
+                ->where('users.id',$id)->join('citys','users.city_id','citys.id')->first();
                 return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);    
             }
             return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);
