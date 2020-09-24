@@ -373,7 +373,7 @@ class userController extends Controller
     public function updatePic(Request $request,$id)
     {
         $validator = Validator::make($request->all(), [
-        'image'=>'required',
+        'image'=>'required|mimes:jpeg,jpg,png,gif',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
@@ -393,6 +393,6 @@ class userController extends Controller
             $usr->save();
             return response()->json(['error' => false, 'data' => 'Profile photo updated successfully'], 200);
         }
-        
+        return response()->json(['error' => true ,'message'=>'User not found'], 200);
     }
 }
