@@ -14,6 +14,7 @@ class orderController extends Controller
 {
     public function createRequest(Request $req)
     {
+        
         $validator = Validator::make($req->all(), [
             'cust_id' => 'required',
             'agent_reference'=>'required'
@@ -43,10 +44,23 @@ class orderController extends Controller
                 $record->total_price = $record->product_price * $record->qty;
                 $order_amount = $order_amount + $record->total_price;
             }
-
+            
             if(DB::table('carts')->whereIn('id',$cartID)->delete())
             {
+                $firm=\DB::table('company_info')->where('sid', $cartrecord->seller_id)->first();
+                $words = explode(" ",$firm->cname);
+                $fcode = "";
+        
+                foreach ($words as $w) {
+                    $fcode .= $w[0];
+                }
+                $i=1;
+                do{
+                    $o_name=$fcode.'-'.$i++;
+                }while(Order::where('order_name',$o_name)->first());
+                
             $orderinsert = new Order;
+            $orderinsert->order_name=$o_name;
             $orderinsert->seller_id = $cartrecord->seller_id;
             $orderinsert->cust_id = $req->cust_id;
             $orderinsert->agent_reference = $req->agent_reference;
@@ -73,7 +87,7 @@ class orderController extends Controller
     {
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
-        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products')
+        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products')
         ->where('orders.seller_id',$id)
         ->where('orders.isApproved',0)
         ->get()->toarray();
@@ -109,7 +123,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                 ->join('users','users.id','orders.cust_id')
                 ->join('order_status','order_status.id','orders.status_id')
-                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                 ->where('orders.seller_id',$id)
                 ->whereIn('order_status.status_name',['Accepted','Ready'])
                 ->get()->toarray();
@@ -133,7 +147,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->whereIn('order_status.status_name',['Accepted','Ready'])
                             ->get()->toarray();
@@ -172,7 +186,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.cust_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.seller_id',$id)
                             ->where('order_status.status_name','Dispatched')
                             ->get()->toarray();
@@ -196,7 +210,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->where('order_status.status_name','Dispatched')
                             ->get()->toarray();
