@@ -11,7 +11,7 @@ use Validator;
 use App\com_info;
 use App\emp_sel_rel;
 use App\custome_agent;
-
+use File;
 class userController extends Controller
 {
 
@@ -356,7 +356,7 @@ class userController extends Controller
         $agents=User::where([['name','like','%'.$srch.'%'],['type_id','2']])->get();
         if(count($agents)>0)
         {
-            return response()->json(['error' => true, 'data' => $agents], 500);
+            return response()->json(['error' => true, 'data' => $agents], 200);
         }
         return response()->json(['error' => true, 'message' => 'Agents not found'], 500);
     }
@@ -366,8 +366,33 @@ class userController extends Controller
         $agents=User::where([['name','like','%'.$srch.'%'],['type_id','1']])->get();
         if(count($agents)>0)
         {
-            return response()->json(['error' => true, 'data' => $agents], 500);
+            return response()->json(['error' => false, 'data' => $agents], 200);
         }
         return response()->json(['error' => true, 'message' => 'Supliers not found'], 500);
+    }
+    public function updatePic(Request $request,$id)
+    {
+        $validator = Validator::make($request->all(), [
+        'image'=>'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $usr=User::find($id);
+        if($usr)
+        {
+            $image_path = public_path().'/userProfile/'.$usr->profile_picture;
+            if(File::exists($image_path)) {
+                File::delete($image_path);
+            }
+            $file = $request->file('image');
+            $fname=time().".".$file->getClientOriginalExtension();
+            $destinationPath = public_path().'/userProfile/';
+            $file->move($destinationPath,$fname);
+            $usr->profile_picture=$fname;
+            $usr->save();
+            return response()->json(['error' => false, 'data' => 'Profile photo updated successfully'], 200);
+        }
+        
     }
 }

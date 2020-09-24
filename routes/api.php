@@ -27,6 +27,7 @@ Route::post('user/profile/view/log/add','API\userController@addViewLog');
 Route::post('user/profile/view/log/show/{id}','API\userController@showViewLog');
 Route::get('user/mobile/{mno}','API\userController@mobUser');
 Route::post('user/update/pass','API\userController@updatePass');
+Route::post('user/profilepic/update/{uid}','API\userController@updatePic');
 
 Route::get('dashboard/{id}','API\dashboardController@getdashboard');
 Route::get('user/relation/show/seller/{id}','API\dashboardController@showSellerRelations');
