@@ -171,7 +171,7 @@ class customerKnockController extends Controller
                     'isActive'=>0
                 ];
 
-                $knock_update=CustomerKnock::where('id',$knockrecord->id)->update($knock_data);
+                $knock_update=CustomerKnock::where('id',$knockrecord->id)->delete();
                 if($knock_update==1)
                 {
                     return response()->json(['error' => false ,'message'=>' Customer Rejected Successfully'],200);

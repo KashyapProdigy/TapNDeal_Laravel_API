@@ -25,6 +25,8 @@ Route::get('user/profile/display/{id}','API\userController@profileDisplay');
 Route::post('user/profile/update/{id}','API\userController@update');
 Route::post('user/profile/view/log/add','API\userController@addViewLog');
 Route::post('user/profile/view/log/show/{id}','API\userController@showViewLog');
+Route::get('user/mobile/{mno}','API\userController@mobUser');
+Route::post('user/update/pass','API\userController@updatePass');
 
 Route::get('dashboard/{id}','API\dashboardController@getdashboard');
 Route::get('user/relation/show/seller/{id}','API\dashboardController@showSellerRelations');
@@ -93,6 +95,9 @@ Route::post('user/order/request/accept/{id}','API\orderController@acceptRequest'
 Route::post('user/order/request/reject/{id}','API\orderController@rejectRequest');
 Route::get('user/order/show/{id}','API\orderController@showOrders');
 Route::get('user/order/show/past/{id}','API\orderController@showPastOrders');
+Route::get('order/status/all','API\orderController@allStatus');
+Route::get('order/status/{oid}','API\orderController@orderStatus');
+Route::post('order/status/change/{oid}','API\orderController@changeStatus');
 
 Route::post('user/chat/new','API\chatController@create');
 Route::post('user/chat/update/{id}','API\chatController@update');

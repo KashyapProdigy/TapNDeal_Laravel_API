@@ -28,16 +28,14 @@ class customerRelationshipController extends Controller
             {
                 $relation_data=['category'=>$req->category];
                 $relation_update=CustomerCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
-                if($relation_update==1)
-                {
-                    return response()->json(['error' => false ,'message'=>'Customer Category Updated'],200);
-                }
+                return response()->json(['error' => false ,'message'=>'Customer Category Updated'],200);
+                
             }
             else{
                 return response()->json(['error' => true ,'message'=>'Record Not Found']);
             }
 
-                return response()->json(['error' => true ,'message'=>'Something Went Wrong']);
+            return response()->json(['error' => true ,'message'=>'Something Went Wrong']);
         }
 
         public function block(Request $req,$id)

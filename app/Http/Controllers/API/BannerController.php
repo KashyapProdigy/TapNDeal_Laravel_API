@@ -52,7 +52,24 @@ class BannerController extends Controller
         if($banners)
         {
             $img=explode(',',$banners['img_name']);
-            
+                $oi=$req->oldImage;
+                if($oi=="d1.png" || $oi=="d2.png" || $oi=="d3.png" || $oi=="d4.png")
+                {
+                    if(Storage::disk('temp')->exists($image)){
+                        $file = Storage::disk('temp')->get($image);
+                        $filename= time().'-prod.png';
+                        Storage::disk('banner')->put($filename, $file);
+                        // $file = Storage::disk('temp')->delete($image);
+                        $banners->img_name=$filename;
+                        if($banners->save())
+                        { 
+                            return response()->json(['error' => false ,'message'=>'Banner added Successfully'],200);
+                        }
+                        else{
+                            return response()->json(['error' => true ,'message'=>'something went wrong'],500);
+                        }
+                    }
+                }
                 if (($key = array_search($req->oldImage, $img)) !== false) {
                     unset($img[$key]);
                     $img[$key]=$image;
@@ -60,7 +77,7 @@ class BannerController extends Controller
                         $file = Storage::disk('temp')->get($image);
                         $filename= time().'-prod.png';
                         Storage::disk('banner')->put($filename, $file);
-                        // $file = Storage::disk('temp')->delete($image);
+                        $file = Storage::disk('temp')->delete($image);
                         $img[$key]=$filename;
 
                         $image_path = public_path().'/BannerImages/'.$req->oldImage;

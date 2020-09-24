@@ -72,11 +72,11 @@ class orderController extends Controller
     public function showRequest($id)
     {
         $listreturn = DB::table('orders')
-                            ->join('users','users.id','orders.cust_id')
-                            ->select('users.name as cust_name','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products')
-                            ->where('orders.seller_id',$id)
-                            ->where('orders.isApproved',0)
-                            ->get()->toarray();
+        ->join('users','users.id','orders.cust_id')
+        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products')
+        ->where('orders.seller_id',$id)
+        ->where('orders.isApproved',0)
+        ->get()->toarray();
 
         if(!empty($listreturn))
         {
@@ -107,11 +107,12 @@ class orderController extends Controller
             if($User->type_id == 1)
             {
                 $listreturn = DB::table('orders')
-                            ->join('users','users.id','orders.cust_id')
-                            ->select('users.name as cust_name','users.mobile','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products')
-                            ->where('orders.seller_id',$id)
-                            ->where('orders.isApproved',1)
-                            ->get()->toarray();
+                ->join('users','users.id','orders.cust_id')
+                ->join('order_status','order_status.id','orders.status_id')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                ->where('orders.seller_id',$id)
+                ->where('orders.isApproved',1)
+                ->get()->toarray();
                 if(!empty($listreturn))
                 {
                     foreach($listreturn as $record){
@@ -131,7 +132,8 @@ class orderController extends Controller
             {
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
-                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.total_price as order_price','orders.created_at as order_date','orders.products')
+                            ->join('order_status','order_status.id','orders.status_id')
+                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->where('orders.isApproved',1)
                             ->get()->toarray();
@@ -169,7 +171,8 @@ class orderController extends Controller
             {
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.cust_id')
-                            ->select('users.name as cust_name','users.mobile','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products')
+                            ->join('order_status','order_status.id','orders.status_id')
+                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.seller_id',$id)
                             ->where('orders.isDelivered',1)
                             ->get()->toarray();
@@ -192,7 +195,8 @@ class orderController extends Controller
             {
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
-                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.total_price as order_price','orders.created_at as order_date','orders.products')
+                            ->join('order_status','order_status.id','orders.status_id')
+                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->where('orders.isDelivered',1)
                             ->get()->toarray();
@@ -244,5 +248,34 @@ class orderController extends Controller
                 }
                 return response()->json(['error' => true ,'message'=>'Record not found'],500);
         }
+    }
+    public function allStatus()
+    {
+        $status=\DB::table('order_status')->get();
+        return response()->json(['error' => false ,'status'=>$status],200);
+    }
+    public function orderStatus($id)
+    {
+        $status=Order::join('order_status','order_status.id','orders.status_id')->select('status_id','status_name')->where('orders.id',$id)->first();
+        if($status!=null)
+            return response()->json(['error' => false ,'status'=>$status],200);
+        return response()->json(['error' => true ,'message'=>'order not found'],200);
+    }
+    public function changeStatus(Request $req,$oid)
+    {
+        $validator = Validator::make($req->all(), [
+            'status_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $ordr=Order::find($oid);
+        if($ordr)
+        {
+            $ordr->status_id=$req->status_id;
+            $ordr->save();
+            return response()->json(['error' => false ,'message'=>'Order status change'],200);
+        }
+        return response()->json(['error' => true ,'message'=>'Order not found'],200);
     }
 }

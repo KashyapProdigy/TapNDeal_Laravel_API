@@ -26,10 +26,9 @@ class agentRelationshipController extends Controller
             {
                 $relation_data=['category'=>$req->category];
                 $relation_update=AgentCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
-                if($relation_update==1)
-                {
+               
                     return response()->json(['error' => false ,'message'=>'Agent Category Updated'],200);
-                }
+                
             }
             else{
                 return response()->json(['error' => true ,'message'=>'Record Not Found']);

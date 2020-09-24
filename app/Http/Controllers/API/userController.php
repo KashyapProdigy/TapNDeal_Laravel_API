@@ -136,7 +136,37 @@ class userController extends Controller
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
 
     }
-
+    public function mobUser($mno)
+    {
+        $user=User::join('user_type','user_type.id','users.type_id')
+        ->join('citys','users.city_id','citys.id')
+        ->join('states','states.id','users.state_id')
+        ->select('users.id as uid','users.*','user_type.*','citys.city_name','states.state_name')
+        ->where('users.mobile',$mno)->first();
+        if($user!=null)
+        {
+            return response()->json(['error' => false ,'data'=>$user],200);
+        }
+        return response()->json(['error' => true ,'message'=>'User not found'],400);
+    }
+    public function updatePass(Request $req)
+    {
+        $validator = Validator::make($req->all(), [
+            'uid' => 'required',
+            'password'=>'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $usr=User::find($req->uid);
+        if($usr)
+        {
+            $usr->password=$req->password;
+            $usr->save();
+            return response()->json(['error' => false ,'message'=>'Password updated..!'],200);
+        }
+        return response()->json(['error' => true ,'message'=>'User not found..!!'],200);
+    }
     public function profileDisplay($id)
     {
         $user=User::join('user_type','user_type.id','users.type_id')
@@ -179,6 +209,14 @@ class userController extends Controller
             {
                 return response()->json(['error' => true ,'message'=>'Log already available for today..!'],200);
             }
+            $data=new ProfileViewLog;
+            $data->seller_id=$req->seller_id;
+            $data->cust_id=$req->cust_id;
+            if($data->save())
+            {
+                return response()->json(['error' => false ,'message'=>'View Logged Successfully'],200);
+            }
+            return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
         }
         if($logrecord == null)
         {
@@ -190,21 +228,6 @@ class userController extends Controller
                 return response()->json(['error' => false ,'message'=>'View Logged Successfully'],200);
             }
             return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
-        }
-
-        if($logrecord != null)
-        {
-            if($logrecord->isSeen == 0)
-            {
-                return response()->json(['error' => false ,'message'=>'This View is already logged !'],200);
-            }
-            $log_data=['isSeen'=>0];
-            $log_update=ProfileViewLog::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->update($log_data);
-            if($log_update==1)
-            {
-                return response()->json(['error' => false ,'message'=>'View Logged Successfully'],200);
-            }
-            return response()->json(['error' => true ,'message'=>'Something went wrong !'],500);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
     }
@@ -233,9 +256,9 @@ class userController extends Controller
 
             if($records != null)
             {
-                $log_data=['isSeen'=>1];
+                $log_data=['isSeen'=>1]; 
                 $log_update=\DB::table('profile_view_logs')->whereIn('id',$recordids)->update($log_data);
-                    return response()->json(['error' => false ,'data'=>$records],200);
+                return response()->json(['error' => false ,'data'=>$records],200);
                 
             }
             else{
