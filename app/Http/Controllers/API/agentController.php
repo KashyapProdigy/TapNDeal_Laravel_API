@@ -52,12 +52,12 @@ class agentController extends Controller
     }
     public function pastOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->where('orders.isDelivered',1)->get();
+        $o_list=Order::where('agent_reference',$ref)->select('orders.id')->join('order_status','status_id','order_status.id')->where('order_status.status_name','Dispatched')->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
         {
-            $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')
+            $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
             ->first();
             $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
@@ -70,12 +70,12 @@ class agentController extends Controller
     }
     public function ongoingOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->where('orders.isApproved',1)->where('orders.isDelivered',0)->get();
+        $o_list=Order::where('agent_reference',$ref)->select('orders.id')->join('order_status','status_id','order_status.id')->whereIn('order_status.status_name',['Accepted','Ready'])->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
         {
-            $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')
+            $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
             ->first();
             $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
@@ -88,12 +88,12 @@ class agentController extends Controller
     }
     public function newOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->where('orders.isApproved',0)->get();
+        $o_list=Order::where('agent_reference',$ref)->join('order_status','status_id','order_status.id')->select('orders.id')->where('order_status.status_name','Received')->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
         {
-            $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')
+            $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
             ->first();
             $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
