@@ -111,7 +111,7 @@ class orderController extends Controller
                 ->join('order_status','order_status.id','orders.status_id')
                 ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                 ->where('orders.seller_id',$id)
-                ->where('orders.isApproved',1)
+                ->whereIn('order_status.status_name',['Accepted','Ready'])
                 ->get()->toarray();
                 if(!empty($listreturn))
                 {
@@ -135,7 +135,7 @@ class orderController extends Controller
                             ->join('order_status','order_status.id','orders.status_id')
                             ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
-                            ->where('orders.isApproved',1)
+                            ->whereIn('order_status.status_name',['Accepted','Ready'])
                             ->get()->toarray();
 
                 if(!empty($listreturn))

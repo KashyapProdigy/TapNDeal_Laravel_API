@@ -31,10 +31,10 @@ class dashboardController extends Controller
         {
             //User is Seller
                 $dashboard=Product::where('seller_id',$id)->get()->toarray();
-
+                $banner=\DB::table('banners')->where('manu_id',$id)->get()->toarray();
                 if(!empty($dashboard))
                 {
-                    return response()->json(['error' => false ,'data'=>$dashboard],200);
+                    return response()->json(['error' => false ,'data'=>$dashboard,'banner'=>$banner],200);
                 }
                 else {
                     return response()->json(['error' => true ,'message'=>"Records Not Found"]);
@@ -61,7 +61,6 @@ class dashboardController extends Controller
 
             $dashboard['Sellers']=$seller;
             $dashboard['Customers']=$customer;
-
             if(!empty($dashboard))
             {
                 return response()->json(['error' => false ,'data'=>$dashboard],200);
