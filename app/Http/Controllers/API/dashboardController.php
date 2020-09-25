@@ -56,7 +56,7 @@ class dashboardController extends Controller
             $seller['NotConnected_Sellers']=User::where('type_id',1)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname')->where('isVerified',1)->whereNotIN('users.id',$Blocked_seller)->whereNotIN('users.id',$A_Plus_list)->whereNotIN('users.id',$A_list)->whereNotIN('users.id',$B_Plus_list)->whereNotIN('users.id',$B_list)->get()->toarray();
 
             $customer_list=CustomerAgentRelationship::select('cust_id')->where('agent_id',$id)->where('isBlocked',0)->get()->toarray();
-            dd($customer_list);
+            
             $customer=User::whereIn('id',$customer_list)->where('isVerified',1)->get()->toarray();
 
             $dashboard['Sellers']=$seller;

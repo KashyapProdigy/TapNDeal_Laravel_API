@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\EmployeeSellerRelationship;
+use App\emp_sel_rel;
 use App\User;
 use Validator;
 
@@ -95,13 +95,21 @@ class employeeSellerRelationshipController extends Controller
 
         public function show($id)
         {
-            $relations=EmployeeSellerRelationship::where('seller_id',$id)->get()->toarray()  ;
+            $relations=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->join('citys','citys.id','users.city_id')->join('states','states.id','users.state_id')->where('seller_id',$id)->select('users.*','citys.city_name','states.state_name')->get()->toarray()  ;
             if(!empty($relations))
             {
                 return response()->json(['error' => false ,'data'=>$relations],200);
             }
             else{
-                return response()->json(['error' => true ,'message'=>'Relations not available']);
+                return response()->json(['error' => true ,'message'=>'Relations not available'],400);
             }
+        }
+        public function delete($id)
+        {
+            $emp=User::find($id);
+            if($emp->delete())
+                if($rel=emp_sel_rel::where('emp_id',$id)->delete())
+                    return response()->json(['error' => false ,'message'=>'Employee deleted successfully..!'],200);
+            return response()->json(['error' => true ,'message'=>'somthing Wents wrong..!!'],500);
         }
 }

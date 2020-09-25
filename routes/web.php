@@ -67,6 +67,7 @@ Route::middleware([manufacture::class])->group(function () {
 
 Route::get('product/{name}', 'ImagesController@productPicture');
 Route::get('Banner/{name}', 'ImagesController@bannerPicture');
+Route::get('profile/{name}', 'ImagesController@profilePicture');
 Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
 route::get('/f',function(){
     return view('firebase');

@@ -20,6 +20,18 @@ class ImagesController extends Controller
 
 
     }
+    public function profilePicture($name)
+    {
+        $storagePath = public_path().'/userProfile/'.$name;
+
+        if(file_exists($storagePath))
+        {
+            return response()->file($storagePath);
+        }
+        else {
+            return view('welcome');
+        }
+    }
     public function bannerPicture($name)
     {
         $storagePath = public_path().'/BannerImages/'.$name;

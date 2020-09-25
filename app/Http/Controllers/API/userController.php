@@ -11,6 +11,7 @@ use Validator;
 use App\com_info;
 use App\emp_sel_rel;
 use App\custome_agent;
+use Illuminate\Support\Facades\Storage;
 use File;
 class userController extends Controller
 {
@@ -373,7 +374,7 @@ class userController extends Controller
     public function updatePic(Request $request,$id)
     {
         $validator = Validator::make($request->all(), [
-        'image'=>'required|mimes:jpeg,jpg,png,gif',
+        'image'=>'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
@@ -385,13 +386,14 @@ class userController extends Controller
             if(File::exists($image_path)) {
                 File::delete($image_path);
             }
-            $file = $request->file('image');
-            $fname=time().".".$file->getClientOriginalExtension();
-            $destinationPath = public_path().'/userProfile/';
-            $file->move($destinationPath,$fname);
-            $usr->profile_picture=$fname;
-            $usr->save();
-            return response()->json(['error' => false, 'data' => 'Profile photo updated successfully'], 200);
+            $file = base64_decode($request->image);
+            $fname=time()."."."png";
+            Storage::disk('profile')->put($fname, $file);
+            if(Storage::disk('profile')->exists($fname))
+            {
+                return response()->json(['error' => false, 'data' => 'Profile photo updated successfully'], 200);
+            }
+            
         }
         return response()->json(['error' => true ,'message'=>'User not found'], 200);
     }

@@ -64,6 +64,7 @@ Route::get('user/relation/show/agentcustomer/{id}','API\custAgentRelationshipCon
 Route::post('user/seller/new/employee','API\employeeSellerRelationshipController@createEmployee');
 Route::post('user/seller/block/employee/{id}','API\employeeSellerRelationshipController@block');
 Route::get('user/seller/show/employee/{id}','API\employeeSellerRelationshipController@show');
+Route::get('user/seller/delete/employee/{id}','API\employeeSellerRelationshipController@delete');
 
 Route::get('user/product/showPro/{id}','API\productController@showPro');
 Route::post('user/product/new','API\productController@create');

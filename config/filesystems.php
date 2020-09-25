@@ -55,6 +55,13 @@ return [
             'visibility' => 'public',
         ],
 
+        'profile' => [
+            'driver' => 'local',
+            'root' => public_path('userProfile'),
+            'url' => env('APP_URL').'/userProfile',
+            'visibility' => 'public',
+        ],
+
         'product' => [
             'driver' => 'local',
             'root' => public_path('productPhotos'),
