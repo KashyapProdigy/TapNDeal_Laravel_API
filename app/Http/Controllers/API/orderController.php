@@ -23,7 +23,7 @@ class orderController extends Controller
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
 
-        $cartrecord = Cart::select('seller_id')->where('cust_id',$req->cust_id)->first();
+        $cartrecord = Cart::select('seller_id','col_wise_qty')->where('cust_id',$req->cust_id)->first();
 
         if($cartrecord == null)
         {
@@ -35,7 +35,7 @@ class orderController extends Controller
             $order_amount = 0;
             $cartProducts = DB::table('carts')
                             ->join('products','products.id','carts.product_id')
-                            ->select('products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','products.price as product_price')
+                            ->select('products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','carts.col_wise_qty','products.price as product_price')
                             ->where('carts.cust_id',$req->cust_id)
                             ->get()->toarray();
             $cartID = Cart::select('id')->where('cust_id', $req->cust_id)->get()->toarray();
@@ -67,7 +67,7 @@ class orderController extends Controller
             $orderinsert->products = json_encode($cartProducts);
             $orderinsert->total_price = $order_amount;
             $orderinsert->status_id = 1;
-
+            $orderinsert->col_wise_qty=$cartrecord->col_wise_qty;
             if($orderinsert->save())
             {
                 return response()->json(['error' => false ,'message'=>"Order Requested Successfully"], 200);
@@ -87,7 +87,7 @@ class orderController extends Controller
     {
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
-        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products')
+        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty')
         ->where('orders.seller_id',$id)
         ->where('orders.isApproved',0)
         ->get()->toarray();
@@ -123,7 +123,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                 ->join('users','users.id','orders.cust_id')
                 ->join('order_status','order_status.id','orders.status_id')
-                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                 ->where('orders.seller_id',$id)
                 ->whereIn('order_status.status_name',['Accepted','Ready'])
                 ->get()->toarray();
@@ -147,7 +147,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->whereIn('order_status.status_name',['Accepted','Ready'])
                             ->get()->toarray();
@@ -186,7 +186,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.cust_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                             ->where('orders.seller_id',$id)
                             ->where('order_status.status_name','Dispatched')
                             ->get()->toarray();
@@ -210,7 +210,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->where('order_status.status_name','Dispatched')
                             ->get()->toarray();

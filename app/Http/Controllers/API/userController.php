@@ -78,10 +78,15 @@ class userController extends Controller
         $user->ref_code=$ref;
         if($request->sel_ref!="")
         {
-            $seller=User::where([['ref_code',$request->sel_ref],['type_id',1]])->select('id')->first();
+            $seller=User::where([['ref_code',$request->sel_ref],['type_id',1]])->select('id','acc_allow')->first();
             if($seller == null)
             {
                 return response()->json(['error' => true ,'message'=>'invalid Reference code..!'],400);
+            }
+            $e_count=emp_sel_rel::where('seller_id',$seller->id)->count();
+            if($e_count>=$seller['acc_allow'])
+            {
+                return response()->json(['error' => true ,'message'=>'This seller already used his all account'],401);
             }
         }
         if($user->save())

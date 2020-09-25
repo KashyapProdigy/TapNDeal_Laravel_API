@@ -18,7 +18,7 @@ class cartController extends Controller
         $cart = DB::table('carts')
             ->join('products','products.id','carts.product_id')
             ->join('users','users.id','carts.seller_id')
-            ->select('carts.seller_id','carts.id as cart_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','products.price as product_price','carts.created_at as cart_add_time')
+            ->select('carts.seller_id','carts.id as cart_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','products.price as product_price','carts.created_at as cart_add_time','carts.col_wise_qty')
             ->where('carts.cust_id',$id)
             ->get()->toarray();
             if($cart != null)
@@ -44,6 +44,7 @@ class cartController extends Controller
             'product_id' => 'required',
             'cust_id' => 'required',
             'qty'=>'required',
+            'col_qty'=>'required',
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
@@ -73,7 +74,7 @@ class cartController extends Controller
             $cart->cust_id=$req->cust_id;
             $cart->seller_id=$product->seller_id;
             $cart->qty=$req->qty;
-
+            $cart->col_wise_qty=$req->col_qty;
             if($cart->save())
             {
                 return response()->json(['error' => false ,'message'=>' Cart Record Inserted Successfully'],200);
