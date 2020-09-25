@@ -96,6 +96,7 @@ Route::get('user/order/request/show/{id}','API\orderController@showRequest');
 Route::post('user/order/request/accept/{id}','API\orderController@acceptRequest');
 Route::post('user/order/request/reject/{id}','API\orderController@rejectRequest');
 Route::get('user/order/show/{id}','API\orderController@showOrders');
+Route::get('user/order/cust/new/{id}','API\orderController@custNewOrder');
 Route::get('user/order/show/past/{id}','API\orderController@showPastOrders');
 Route::get('order/status/all','API\orderController@allStatus');
 Route::get('order/status/{oid}','API\orderController@orderStatus');

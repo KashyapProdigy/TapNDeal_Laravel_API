@@ -90,6 +90,7 @@ class orderController extends Controller
         ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty')
         ->where('orders.seller_id',$id)
         ->where('orders.isApproved',0)
+        ->orderby('orders.created_at','desc')
         ->get()->toarray();
 
         if(!empty($listreturn))
@@ -108,7 +109,35 @@ class orderController extends Controller
         else{return response()->json(['error' => false ,'data'=> null],200);}
         return response()->json(['error' => true ,'message'=>'Something went wrong']);
     }
+    public function custNewOrder($cid)
+    {
+        $listreturn = DB::table('orders')
+                            ->join('users','users.id','orders.seller_id')
+                            ->join('order_status','order_status.id','orders.status_id')
+                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
+                            ->where('orders.cust_id',$cid)
+                            ->where('order_status.status_name','Received')
+                            ->orderby('orders.created_at','desc')
+                            ->get()->toarray();
 
+                if(!empty($listreturn))
+                {
+                    foreach($listreturn as $record){
+                        $count = 0;
+                        $record->products = json_decode($record->products);
+                        foreach($record->products as $temp)
+                        {
+                            $count ++;
+                        }
+                        $record->no_of_products = $count;
+                    }
+
+                    return response()->json(['error' => false ,'data'=>$listreturn],200);
+                }
+                else{
+                    return response()->json(['error' => false ,'data'=> null],200);
+                }
+    }
     public function showOrders($id)
     {
         $User=User::find($id);
@@ -126,6 +155,7 @@ class orderController extends Controller
                 ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                 ->where('orders.seller_id',$id)
                 ->whereIn('order_status.status_name',['Accepted','Ready'])
+                ->orderby('orders.created_at','desc')
                 ->get()->toarray();
                 if(!empty($listreturn))
                 {
@@ -150,6 +180,7 @@ class orderController extends Controller
                             ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->whereIn('order_status.status_name',['Accepted','Ready'])
+                            ->orderby('orders.created_at','desc')
                             ->get()->toarray();
 
                 if(!empty($listreturn))
@@ -189,6 +220,7 @@ class orderController extends Controller
                             ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                             ->where('orders.seller_id',$id)
                             ->where('order_status.status_name','Dispatched')
+                            ->orderby('orders.created_at','desc')
                             ->get()->toarray();
                 if(!empty($listreturn))
                 {
@@ -213,6 +245,7 @@ class orderController extends Controller
                             ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->where('order_status.status_name','Dispatched')
+                            ->orderby('orders.created_at','desc')
                             ->get()->toarray();
 
                 if(!empty($listreturn))

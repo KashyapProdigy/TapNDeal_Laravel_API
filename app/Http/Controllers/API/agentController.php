@@ -35,7 +35,7 @@ class agentController extends Controller
     }
     public function orderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->get();
+        $o_list=Order::where('agent_reference',$ref)->orderby('orders.created_at','desc')->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
@@ -52,7 +52,12 @@ class agentController extends Controller
     }
     public function pastOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->select('orders.id')->join('order_status','status_id','order_status.id')->where('order_status.status_name','Dispatched')->get();
+        $o_list=Order::where('agent_reference',$ref)
+        ->select('orders.id')
+        ->join('order_status','status_id','order_status.id')
+        ->where('order_status.status_name','Dispatched')
+        ->orderby('orders.created_at','desc')
+        ->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
@@ -70,7 +75,7 @@ class agentController extends Controller
     }
     public function ongoingOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->select('orders.id')->join('order_status','status_id','order_status.id')->whereIn('order_status.status_name',['Accepted','Ready'])->get();
+        $o_list=Order::where('agent_reference',$ref)->select('orders.id')->join('order_status','status_id','order_status.id')->whereIn('order_status.status_name',['Accepted','Ready'])->orderby('orders.created_at','desc')->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
@@ -88,7 +93,7 @@ class agentController extends Controller
     }
     public function newOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->join('order_status','status_id','order_status.id')->select('orders.id')->where('order_status.status_name','Received')->get();
+        $o_list=Order::where('agent_reference',$ref)->join('order_status','status_id','order_status.id')->select('orders.id')->where('order_status.status_name','Received')->orderby('orders.created_at','desc')->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
