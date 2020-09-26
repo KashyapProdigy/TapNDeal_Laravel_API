@@ -153,3 +153,4 @@ Route::post('custome/agent','API\agentController@customeAgent');
 
 Route::get('get/plan/{utype}','API\subscriptionController@viewPlan');
 Route::post('plan/subscribe','API\subscriptionController@subscribe');
+Route::post('feedback','API\feedBack@create');
