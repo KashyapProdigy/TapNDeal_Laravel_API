@@ -53,7 +53,7 @@ class agentController extends Controller
     public function pastOrderList($ref)
     {
         $o_list=Order::where('agent_reference',$ref)
-        ->select('orders.id')
+        ->select('orders.id','seller_id','cust_id')
         ->join('order_status','status_id','order_status.id')
         ->whereIn('order_status.status_name',['Dispatched','Rejected'])
         ->orderby('orders.created_at','desc')
@@ -75,7 +75,7 @@ class agentController extends Controller
     }
     public function ongoingOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->select('orders.id')->join('order_status','status_id','order_status.id')->whereIn('order_status.status_name',['Accepted','Ready'])->orderby('orders.created_at','desc')->get();
+        $o_list=Order::where('agent_reference',$ref)->select('orders.id','seller_id','cust_id')->join('order_status','status_id','order_status.id')->whereIn('order_status.status_name',['Accepted','Ready'])->orderby('orders.created_at','desc')->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
@@ -93,7 +93,7 @@ class agentController extends Controller
     }
     public function newOrderList($ref)
     {
-        $o_list=Order::where('agent_reference',$ref)->join('order_status','status_id','order_status.id')->select('orders.id')->where('order_status.status_name','Received')->orderby('orders.created_at','desc')->get();
+        $o_list=Order::where('agent_reference',$ref)->join('order_status','status_id','order_status.id')->select('orders.id','seller_id','cust_id')->where('order_status.status_name','Received')->orderby('orders.created_at','desc')->get();
         $list=array();
         $order=array();
         foreach($o_list as $o)
@@ -101,6 +101,7 @@ class agentController extends Controller
             $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
             ->first();
             $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
             $order[]=$list;
         }

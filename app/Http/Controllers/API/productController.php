@@ -302,7 +302,7 @@ class productController extends Controller
     public function search(Request $req)
     {
         $srch=$req->search;
-        $products=Product::where('name','like','%'.$srch.'%')->orwhere('tags','like','%'.$srch.'%')->get();
+        $products=Product::where('name','like','%'.$srch.'%')->orwhere('tags','like','%'.$srch.'%')->orwhere('colors','like','%'.$srch.'%')->get();
         return response()->json(['error' => false ,'data'=>$products],200);
         
     }

@@ -17,7 +17,6 @@ class orderController extends Controller
         
         $validator = Validator::make($req->all(), [
             'cust_id' => 'required',
-            'agent_reference'=>'required'
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
@@ -87,9 +86,8 @@ class orderController extends Controller
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
         ->join('order_status','order_status.id','orders.status_id')
-        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products')
+        ->select('users.name as cust_name','users.id as cust_id','order_status.status_name','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products')
         ->where('orders.seller_id',$id)
-        ->where('isApproved',1)
         ->where('order_status.status_name','Received')
         ->orderby('orders.created_at','desc')
         ->get()->toarray();

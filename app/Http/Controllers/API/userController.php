@@ -37,6 +37,10 @@ class userController extends Controller
             $user = User::where('mobile',request('mobile'))->first();
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
             // $user = Auth::user();
+            $update=[
+                'firebase_token'=>request('f_token')
+            ];
+            User::where('mobile',request('mobile'))->update($update);
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
         }
         else{
@@ -78,6 +82,8 @@ class userController extends Controller
         $user->firebase_token=$request->f_token;
         $user->device_id=$request->d_id;
         $user->ref_code=$ref;
+        $user->business_scope=$request->b_scope;
+        $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days')); 
         if($request->sel_ref!="")
         {
             $seller=User::where([['ref_code',$request->sel_ref],['type_id',1]])->select('id','acc_allow')->first();
@@ -107,16 +113,14 @@ class userController extends Controller
                 $es->seller_id=$seller['id'];
                 $es->save();
             }
-            if($request->type_id==1)
-            { 
-                $ci=new com_info;
-                $ci->cname=$request->cname;
-                $ci->pan=$request->pan;
-                $ci->gst=$request->gst;
-                $ci->address=$request->address;
-                $ci->sid=$user->id;
-                $ci->save();
-            }
+            $ci=new com_info;
+            $ci->cname=$request->cname;
+            $ci->pan=$request->pan;
+            $ci->gst=$request->gst;
+            $ci->address=$request->address;
+            $ci->sid=$user->id;
+            $ci->save();
+            
             return response()->json(['error' => false ,'message'=>'User Added Successfully'],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
@@ -193,16 +197,12 @@ class userController extends Controller
         $states=\DB::table('states')->get();
         if($user != null)
         {
-            if($user['type_id']==1)
-            {
                 $user=User::join('company_info','company_info.sid','users.id')
                 ->join('user_type','user_type.id','users.type_id')
                 ->join('states','states.id','users.state_id')
                 ->select('users.id as uid','users.*','user_type.*','company_info.*','citys.city_name','states.state_name')
                 ->where('users.id',$id)->join('citys','users.city_id','citys.id')->first();
                 return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);    
-            }
-            return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
     }
@@ -405,6 +405,8 @@ class userController extends Controller
             Storage::disk('profile')->put($fname, $file);
             if(Storage::disk('profile')->exists($fname))
             {
+                $usr->profile_picture=$fname;
+                $usr->save();
                 return response()->json(['error' => false, 'data' => 'Profile photo updated successfully'], 200);
             }
             

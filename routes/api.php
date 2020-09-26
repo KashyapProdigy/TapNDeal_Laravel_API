@@ -140,6 +140,7 @@ Route::get('tempReq/seller/show/{sid}','API\tempReqController@sellerShow');
 Route::post('tempReq/response','API\tempReqController@responseReq');
 Route::get('tempReq/response/buyer/show/{bid}/{trid}','API\tempReqController@showResponseBuyer');
 Route::get('tempReq/response/agent/show/{aid}/{trid}','API\tempReqController@showResponseAgent');
+Route::get('tempReq/response/seller/show/{sid}/{trid}','API\tempReqController@showResponseSeller');
 
 Route::get('agent/search','API\userController@agentSearch');
 Route::get('agent/search/{cat}','API\userController@agentCatSearch');
@@ -154,3 +155,4 @@ Route::post('custome/agent','API\agentController@customeAgent');
 Route::get('get/plan/{utype}','API\subscriptionController@viewPlan');
 Route::post('plan/subscribe','API\subscriptionController@subscribe');
 Route::post('feedback','API\feedBack@create');
+Route::get('payment/history/{uid}','API\subscriptionController@history');

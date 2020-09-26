@@ -85,6 +85,15 @@ class tempReqController extends Controller
             $temp=temp_req::where('id',$t['id'])->first();
             $temp['buyer']=User::where('id',$t['req_for'])->select('id','name','mobile')->first();
             $temp['agent']=User::where('id',$t['req_by'])->select('id','name','mobile')->first();
+            $respone=temp_req_product::where([['sid',$sid],['trid',$t['id']]])->first();
+            if($respone)
+            {
+                $temp['responded']=true;    
+            }
+            else{
+                $temp['responded']=false;    
+            }
+            
             $rec[]=$temp;
         }
          if($rec != null)
@@ -187,5 +196,25 @@ class tempReqController extends Controller
             return response()->json(['error' => false ,'message'=>$li], 200);
         }
         return response()->json(['error' => true ,'message'=>'Respone of this agent not found..'], 400);
+    }
+    public function showResponseSeller($sid,$trid)
+    {
+        $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
+        ->where('req_to',$sid)
+        ->where('temp_req.id',$trid)
+        ->first();
+        $li=array();
+        $list=array();
+        $prod=array();
+        $prdct=explode(',',$data['pid']);
+        foreach($prdct as $p)
+        {
+            $prod[]=Product::where('id',$p)->get();
+        }
+        if($data)
+        {
+            return response()->json(['error' => false ,'message'=>$prod], 200);
+        }
+        return response()->json(['error' => true ,'message'=>'Respone of this buyer not found..'], 400);
     }
 }
