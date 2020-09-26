@@ -54,9 +54,10 @@ Route::get('user/relation/show/agent/{id}','API\agentRelationshipController@show
 Route::get('user/relation/show/seller/productlist/agent','API\agentRelationshipController@productlist');
 
 Route::post('user/request/new/agent','API\custAgentRequestController@create');
-Route::post('user/request/approve/agent/{id}','API\custAgentRequestController@approve');
-Route::post('user/request/reject/agent/{id}','API\custAgentRequestController@reject');
-Route::get('user/request/show/agent/{id}','API\custAgentRequestController@show');
+Route::get('user/request/approve/agent/{id}','API\custAgentRequestController@approve');
+Route::get('user/request/reject/agent/{id}','API\custAgentRequestController@reject');
+Route::get('user/request/show/cust/{id}','API\custAgentRequestController@custshow');
+Route::get('user/request/show/agent/{id}','API\custAgentRequestController@agentShow');
 
 Route::post('user/relation/block/agentcustomer/{id}','API\custAgentRelationshipController@block');
 Route::get('user/relation/show/agentcustomer/{id}','API\custAgentRelationshipController@show');
@@ -149,3 +150,6 @@ Route::post('chat/store','API\chatController@store');
 Route::get('chat/list/{uid}','API\chatController@list');
 
 Route::post('custome/agent','API\agentController@customeAgent');
+
+Route::get('get/plan/{utype}','API\subscriptionController@viewPlan');
+Route::post('plan/subscribe','API\subscriptionController@subscribe');

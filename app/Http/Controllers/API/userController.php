@@ -75,6 +75,8 @@ class userController extends Controller
         $user->city_id = $request->city_id;
         $user->state_id = $request->state_id;
         $user->isVerified = 1;
+        $user->firebase_token=$request->f_token;
+        $user->device_id=$request->d_id;
         $user->ref_code=$ref;
         if($request->sel_ref!="")
         {
@@ -83,15 +85,22 @@ class userController extends Controller
             {
                 return response()->json(['error' => true ,'message'=>'invalid Reference code..!'],400);
             }
-            $e_count=emp_sel_rel::where('seller_id',$seller->id)->count();
-            if($e_count>=$seller['acc_allow'])
+            if($request->type_id==1 || $request->type_id==2 || $request->type_id==3)
             {
-                return response()->json(['error' => true ,'message'=>'This seller already used his all account'],401);
+                $user->refered_by=$request->sel_ref;
             }
+            else{
+                $e_count=emp_sel_rel::where('seller_id',$seller->id)->count();
+                if($e_count>=$seller['acc_allow'])
+                {
+                    return response()->json(['error' => true ,'message'=>'This seller already used his all account'],401);
+                }
+            }
+            
         }
         if($user->save())
         {
-            if(isset($seller))
+            if($request->type_id==4 || $request->type_id==5 || $request->type_id==6)
             {
                 $es=new emp_sel_rel;
                 $es->emp_id=$user->id;

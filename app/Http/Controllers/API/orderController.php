@@ -67,7 +67,6 @@ class orderController extends Controller
             $orderinsert->products = json_encode($cartProducts);
             $orderinsert->total_price = $order_amount;
             $orderinsert->status_id = 1;
-            $orderinsert->col_wise_qty=$cartrecord->col_wise_qty;
             if($orderinsert->save())
             {
                 return response()->json(['error' => false ,'message'=>"Order Requested Successfully"], 200);
@@ -87,9 +86,11 @@ class orderController extends Controller
     {
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
-        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty')
+        ->join('order_status','order_status.id','orders.status_id')
+        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products')
         ->where('orders.seller_id',$id)
-        ->where('orders.isApproved',0)
+        ->where('isApproved',1)
+        ->where('order_status.status_name','Received')
         ->orderby('orders.created_at','desc')
         ->get()->toarray();
 
@@ -114,7 +115,7 @@ class orderController extends Controller
         $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$cid)
                             ->where('order_status.status_name','Received')
                             ->orderby('orders.created_at','desc')
@@ -152,7 +153,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                 ->join('users','users.id','orders.cust_id')
                 ->join('order_status','order_status.id','orders.status_id')
-                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                 ->where('orders.seller_id',$id)
                 ->whereIn('order_status.status_name',['Accepted','Ready'])
                 ->orderby('orders.created_at','desc')
@@ -177,7 +178,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as seller_name','users.id as sel_id','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
                             ->whereIn('order_status.status_name',['Accepted','Ready'])
                             ->orderby('orders.created_at','desc')
@@ -217,9 +218,9 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.cust_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.seller_id',$id)
-                            ->where('order_status.status_name','Dispatched')
+                            ->whereIn('order_status.status_name',['Dispatched','Rejected'])
                             ->orderby('orders.created_at','desc')
                             ->get()->toarray();
                 if(!empty($listreturn))
@@ -242,9 +243,9 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','orders.col_wise_qty','order_status.status_name','order_status.id as status_id')
+                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
                             ->where('orders.cust_id',$id)
-                            ->where('order_status.status_name','Dispatched')
+                            ->whereIn('order_status.status_name',['Dispatched','Rejected'])
                             ->orderby('orders.created_at','desc')
                             ->get()->toarray();
 
@@ -272,8 +273,9 @@ class orderController extends Controller
     {
         $order_data=[
             'isApproved'=>1,
+            'status_id'=>2
             ];
-            $order_update=Order::where('id',$id)->where('isApproved',0)->update($order_data);
+            $order_update=Order::where('id',$id)->update($order_data);
             if($order_update==1)
             {
                 return response()->json(['error' => false ,'message'=>' Order Accepted Successfully'],200);
@@ -287,8 +289,9 @@ class orderController extends Controller
         {
             $order_data=[
                 'isApproved'=>2,
+                'status_id'=>5
                 ];
-                $order_update=Order::where('id',$id)->where('isApproved',0)->update($order_data);
+                $order_update=Order::where('id',$id)->update($order_data);
                 if($order_update==1)
                 {
                     return response()->json(['error' => false ,'message'=>' Order Rejected Successfully'],200);
@@ -298,7 +301,7 @@ class orderController extends Controller
     }
     public function allStatus()
     {
-        $status=\DB::table('order_status')->get();
+        $status=\DB::table('order_status')->whereNotIn('status_name',['Received','Rejected'])->get();
         return response()->json(['error' => false ,'status'=>$status],200);
     }
     public function orderStatus($id)

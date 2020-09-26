@@ -55,7 +55,7 @@ class agentController extends Controller
         $o_list=Order::where('agent_reference',$ref)
         ->select('orders.id')
         ->join('order_status','status_id','order_status.id')
-        ->where('order_status.status_name','Dispatched')
+        ->whereIn('order_status.status_name',['Dispatched','Rejected'])
         ->orderby('orders.created_at','desc')
         ->get();
         $list=array();
