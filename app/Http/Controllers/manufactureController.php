@@ -122,7 +122,7 @@ class manufactureController extends Controller
         $op=Order::where([['isApproved',0],['seller_id',session()->get('uid')]])->count();
         $od=Order::where([['isDelivered',1],['seller_id',session()->get('uid')]])->count();
         $odi=Order::where([['status_id',1],['seller_id',session()->get('uid')]])->count();
-        return view('manufacture.index',['used'=>$used_acc+1,'torder'=>$orders,'ern'=>$ern,'op'=>$op,'od'=>$od,'odi'=>$odi]);
+        return view('manufacture.index',['used'=>$used_acc,'torder'=>$orders,'ern'=>$ern,'op'=>$op,'od'=>$od,'odi'=>$odi]);
     }
     public function logout()
     {
@@ -153,8 +153,7 @@ class manufactureController extends Controller
     public function Products()
     {
         $product=Product::where('seller_id',session()->get('uid'))
-        ->join('users','products.agents_id','users.id')
-        ->select('products.*','products.id as pid','users.name as aname')
+        ->select('products.*','products.id as pid')
         ->get();
         return view('manufacture.products',['products'=>$product]);
     }

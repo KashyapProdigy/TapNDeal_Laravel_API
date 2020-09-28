@@ -28,7 +28,7 @@ class accounts extends Controller
 
         $acc=emp_sel_rel::where('seller_id',session()->get('uid'))->count();
         $alw_acc=User::where('id',session()->get('uid'))->select('acc_allow')->first();
-        if(++$acc >= $alw_acc['acc_allow'])
+        if($acc >= $alw_acc['acc_allow'])
         {
             return redirect()->back()->with('error','You alredy used your all allowed accounts, you need to purchase more account for add account..!!');
         }

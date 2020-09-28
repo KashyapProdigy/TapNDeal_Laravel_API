@@ -40,7 +40,12 @@
         Products Data
     </div>
     <div>
-        <!-- <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller"></button> -->
+    <div class="row d-flex justify-content-right col-12">
+        <div class="col-md-10"></div>
+        <div class="col-md-2">
+            <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Multiple products</button>
+        </div>
+    </div>
     </div>
     <div class="card-body">
         @if(count($products)==0)
@@ -87,7 +92,12 @@
                         <td>{{$prdct->tags}}</td>
                         <td>{{$prdct->stock}}</td>
                         <td>{{$prdct->colors}}</td>
-                        <td>{{$prdct->aname}}</td>
+                        @php $a=\DB::table('users')->select('name')->where('id',$prdct->agents_id)->first(); @endphp
+                        @if($a)
+                            <td>{{$a->name}}</td>
+                        @else
+                            <td>-</td>
+                        @endif
                         <td class="@if($prdct->isDisabled==1) text-danger @else text-info @endif">@if($prdct->isDisabled==1)
                                 Disable
                             @else   
@@ -95,8 +105,8 @@
                             @endif
                             </td>
                         <td>
-                        <a class="btn btn-sm btn-primary text-white" data-toggle="tooltip" title="Enable/Disable" @if($prdct->isDisabled==0) href="{{url('manufacture/Products/disable')}}/{{$prdct->id}} @else href="{{url('manufacture/Products/enable')}}/{{$prdct->id}} @endif"><i class="fas @if($prdct->isDisabled==1)fa-eye-slash @else fa-eye @endif"></i></a>
-                        <a data-toggle="tooltip" title="Delete" class="btn btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('manufacture/Products/delete')}}/{{$prdct->id}}"><i class="far fa-trash-alt"></i></a>
+                        <a class="btn btn-sm btn-primary text-white m-1" data-toggle="tooltip" title="Enable/Disable" @if($prdct->isDisabled==0) href="{{url('manufacture/Products/disable')}}/{{$prdct->id}} @else href="{{url('manufacture/Products/enable')}}/{{$prdct->id}} @endif"><i class="fas @if($prdct->isDisabled==1)fa-eye-slash @else fa-eye @endif"></i></a>
+                        <a data-toggle="tooltip" title="Delete" class="btn m-1 btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('manufacture/Products/delete')}}/{{$prdct->id}}"><i class="far fa-trash-alt"></i></a>
                         </td>
                    </tr>
                 @endforeach             
@@ -107,7 +117,34 @@
         @endif
     </div>
 </div>            
-
+<form action="{{url('manufacture/products/add')}}" method="post" enctype="multipart/form-data">
+<div class="modal fade bd-example-modal-lg" tabindex="-1" id="AddSeller" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+@csrf
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Products</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-row">
+            <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+        </div>
+      </div>
+      <div class="text-danger m-3">*file must be excel or csv file</div>
+      <div class="modal-footer">
+        
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">+Add</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+</form>
 @stop
 @section('scripts')
 <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>

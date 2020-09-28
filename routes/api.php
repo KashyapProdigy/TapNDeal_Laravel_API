@@ -146,6 +146,7 @@ Route::get('agent/search','API\userController@agentSearch');
 Route::get('agent/search/{cat}','API\userController@agentCatSearch');
 Route::get('suplier/search','API\userController@suplierSearch');
 Route::get('regInfo','API\userController@regInfo');
+Route::get('user/firm/search','API\userController@firmSearch');
 
 Route::post('chat/store','API\chatController@store');
 Route::get('chat/list/{uid}','API\chatController@list');
@@ -156,3 +157,5 @@ Route::get('get/plan/{utype}','API\subscriptionController@viewPlan');
 Route::post('plan/subscribe','API\subscriptionController@subscribe');
 Route::post('feedback','API\feedBack@create');
 Route::get('payment/history/{uid}','API\subscriptionController@history');
+
+Route::post('seller/folder/new','API\folderController@create');   

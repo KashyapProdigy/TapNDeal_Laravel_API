@@ -54,7 +54,7 @@
                         <th>Agent name</th>
                         <th>Order status</th>
                         <th>Approved</th>
-                        <th>Delivered</th>
+                        
                         <th>Total Price</th>
                         <th>View Details</th>
                     </tr>
@@ -66,7 +66,6 @@
                     <th>Agent name</th>
                     <th>Order status</th>
                     <th>Approved</th>
-                    <th>Delivered</th>
                     <th>Total Price</th>
                     <th>View Details</th>
                     </tr>
@@ -78,20 +77,17 @@
                 <tr>
                     <td>{{++$i}}</td>
                     <td>{{$li->name}}</td>
-                    <td>{{$a->name}}</td>
-                    <td class= @if($li->status_id==1)text-danger @else text-success @endif>{{$li->status_name}}</td>
+                    @if($a)
+                        <td>{{$a->name}}</td>
+                    @else
+                        <td>-</td>
+                    @endif
+                    <td class="text-info">{{$li->status_name}}</td>
                     <td class="@if($li->isApproved==1)text-success @else text-danger @endif">
                         @if($li->isApproved==1)
                             Approved
                         @else
                             Not Approved
-                        @endif
-                    </td>
-                    <td class="@if($li->isDelivered==1)text-success @else text-danger @endif">
-                        @if($li->isDelivered==1)
-                           Delivered
-                        @else
-                          Not Delivered
                         @endif
                     </td>
                     <td class="text-right">

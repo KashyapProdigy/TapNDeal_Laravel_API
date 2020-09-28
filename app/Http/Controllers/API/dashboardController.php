@@ -149,3 +149,4 @@ class dashboardController extends Controller
                 return response()->json(['error' => true ,'message'=>"Something Went Wrong"],500);
     }
 }
+        

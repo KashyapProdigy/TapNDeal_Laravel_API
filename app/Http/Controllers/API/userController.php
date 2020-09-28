@@ -413,4 +413,37 @@ class userController extends Controller
         }
         return response()->json(['error' => true ,'message'=>'User not found'], 200);
     }
+    public function firmSearch(Request $req)
+    {
+        if(isset($req->buyer))
+        {
+            $srch=$req->buyer;
+            $usr=com_info::join('users','company_info.sid','users.id')->where([['cname','like','%'.$srch.'%'],['type_id','3']])->get();
+            if(count($usr)>0)
+            {
+                return response()->json(['error' => true, 'data' => $usr], 200);
+            }
+            return response()->json(['error' => true, 'message' => 'Buyer not found'], 500);
+        }
+        if(isset($req->seller))
+        {
+            $srch=$req->seller;
+            $usr=com_info::join('users','company_info.sid','users.id')->where([['cname','like','%'.$srch.'%'],['type_id','1']])->get();
+            if(count($usr)>0)
+            {
+                return response()->json(['error' => true, 'data' => $usr], 200);
+            }
+            return response()->json(['error' => true, 'message' => 'seller not found'], 500);
+        }
+        if(isset($req->agent))
+        {
+            $srch=$req->agent;
+            $usr=com_info::join('users','company_info.sid','users.id')->where([['cname','like','%'.$srch.'%'],['type_id','2']])->get();
+            if(count($usr)>0)
+            {
+                return response()->json(['error' => true, 'data' => $usr], 200);
+            }
+            return response()->json(['error' => true, 'message' => 'Agent not found'], 500);
+        }
+    }
 }
