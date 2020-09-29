@@ -38,7 +38,9 @@ class userController extends Controller
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
             // $user = Auth::user();
             $update=[
-                'firebase_token'=>request('f_token')
+                'firebase_token'=>request('f_token'),
+                'login_token'=>request('l_token'),
+                'msg_token'=>request('m_token')
             ];
             User::where('mobile',request('mobile'))->update($update);
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
@@ -47,7 +49,15 @@ class userController extends Controller
             return response()->json(['error'=> true , 'message' => 'unauthorised'], 401);
         }
     }
-
+    public function tokenCheck(Request $req)
+    {
+        $record=User::where([['id',$req->uid],['login_token',$req->l_token]])->count();
+        if($record>0)
+        {
+            return response()->json(['error'=> false , 'record' => true],200 );
+        }
+        return response()->json(['error'=> true , 'record' => false],400 );
+    }
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [

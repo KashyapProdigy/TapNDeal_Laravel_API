@@ -43,7 +43,7 @@ class productController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            'image'=>'required',
+            // 'image'=>'required',
             'category'=>'required',
             'tags'=>'required',
             'colors'=>'required',
@@ -61,7 +61,7 @@ class productController extends Controller
                         $file = Storage::disk('temp')->get($value);
                         $filename= time().$uploadsCount.'-prod.png';
                         Storage::disk('product')->put($filename, $file);
-                        $file = Storage::disk('temp')->delete($value);
+                        // $file = Storage::disk('temp')->delete($value);
                         if($uploadsCount == 0){
                         $names = $names.$filename;
                         }
@@ -76,7 +76,7 @@ class productController extends Controller
                 }
             }
             else{
-                return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+                // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
 
         // $image_list = json_decode($req->image);
@@ -135,6 +135,8 @@ class productController extends Controller
         $product->colors=$req->colors;
         $product->watermark=$watermark_name;
         $product->agents_id=$req->agents_id;
+        $product->fid=$req->fid;
+        $product->isCatalog=$req->isCatalog;
         // $product->date_time=Carbon::now();
         if($product->save())
         {

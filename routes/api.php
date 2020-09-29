@@ -28,6 +28,7 @@ Route::post('user/profile/view/log/show/{id}','API\userController@showViewLog');
 Route::get('user/mobile/{mno}','API\userController@mobUser');
 Route::post('user/update/pass','API\userController@updatePass');
 Route::post('user/profilepic/update/{uid}','API\userController@updatePic');
+Route::post('user/token/check','API\userController@tokenCheck');
 
 Route::get('dashboard/{id}','API\dashboardController@getdashboard');
 Route::get('user/relation/show/seller/{id}','API\dashboardController@showSellerRelations');
@@ -159,3 +160,5 @@ Route::post('feedback','API\feedBack@create');
 Route::get('payment/history/{uid}','API\subscriptionController@history');
 
 Route::post('seller/folder/new','API\folderController@create');   
+Route::get('seller/folder/{sid}','API\folderController@show');   
+Route::get('seller/folder/product/{fid}','API\folderController@prodShow');   
