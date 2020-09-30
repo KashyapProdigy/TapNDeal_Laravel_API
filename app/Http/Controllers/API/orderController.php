@@ -9,7 +9,7 @@ use App\Order;
 use App\Cart;
 use App\User;
 use Validator;
-
+use App\Notifications\statusChange;
 class orderController extends Controller
 {
     public function createRequest(Request $req)
@@ -66,6 +66,7 @@ class orderController extends Controller
             $orderinsert->products = json_encode($cartProducts);
             $orderinsert->total_price = $order_amount;
             $orderinsert->status_id = 1;
+            $orderinsert->notes=$req->notes;
             if($orderinsert->save())
             {
                 return response()->json(['error' => false ,'message'=>"Order Requested Successfully"], 200);
@@ -322,6 +323,10 @@ class orderController extends Controller
         {
             $ordr->status_id=$req->status_id;
             $ordr->save();
+            $ostat=\DB::table('order_status')->select('status_name')->where('id',$req->status_id)->first();
+            $arr=['status'=>$ostat->status_name];
+            $usr=User::find($ordr['cust_id']);
+            \Notification::send($usr, new statusChange($arr));
             return response()->json(['error' => false ,'message'=>'Order status change'],200);
         }
         return response()->json(['error' => true ,'message'=>'Order not found'],200);

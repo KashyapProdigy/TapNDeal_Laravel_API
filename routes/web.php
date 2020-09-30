@@ -2,7 +2,7 @@
 use App\User;
 use App\Product;
 use Illuminate\Support\Facades\Route;
-
+use App\Notifications\example;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -70,6 +70,8 @@ Route::get('product/{name}', 'ImagesController@productPicture');
 Route::get('Banner/{name}', 'ImagesController@bannerPicture');
 Route::get('profile/{name}', 'ImagesController@profilePicture');
 Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
-route::get('/f',function(){
-    return view('firebase');
+Route::get('n',function(){
+    $usr=User::find(58);
+    $a=Notification::send($usr, new example('abc'));
+    dd($a);
 });

@@ -149,10 +149,10 @@
         function codeverify() {
             var code=document.getElementById('verificationCode').value;
             coderesult.confirm(code).then(function (result) {
-                document.forms["logform"].submit();
-                // alert("Successfully registered");
-                // var user=result.user;
-                // console.log(user);
+                // document.forms["logform"].submit();
+                alert("Successfully registered");
+                var user=result.user;
+                console.log(user);
             }).catch(function (error) {
                 $('#msg').html(error.message);
                 $('#msg').addClass('alert alert-danger');

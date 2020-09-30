@@ -136,6 +136,6 @@ class agentController extends Controller
         $ca->mobile=$req->mobile;
         $ca->ref_code=$ref;
         $ca->save();
-        return response()->json(['error' => true ,'message'=>$ca], 401);
+        return response()->json(['error' => true ,'message'=>$ca], 200);
     }
 }

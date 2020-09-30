@@ -43,7 +43,7 @@ class tempReqController extends Controller
     }
     public function show($bid)
     {
-        $tr=temp_req::where('req_for',$bid)->get();
+        $tr=temp_req::where('req_for',$bid)->orderBy('created_at','desc')->get();
         $temp=array();
         $rec=array();
         foreach($tr as $t)
@@ -60,7 +60,7 @@ class tempReqController extends Controller
     }
     public function agentShow($aid)
     {
-        $tr=temp_req::where('req_by',$aid)->get();
+        $tr=temp_req::where('req_by',$aid)->orderBy('created_at','desc')->get();
         $temp=array();
         $rec=array();
         foreach($tr as $t)
@@ -77,7 +77,7 @@ class tempReqController extends Controller
     }
     public function sellerShow($sid)
     {
-        $tr=temp_req::where('req_to',$sid)->get();
+        $tr=temp_req::where('req_to',$sid)->orderBy('created_at','desc')->get();
         $temp=array();
         $rec=array();
         foreach($tr as $t)

@@ -34,7 +34,7 @@ class userController extends Controller
         // $psw=Hash::make(request('password'));
         $user=User::where([['mobile',request('mobile')],['password', request('password')]])->count();
         if($user==1){
-            $user = User::where('mobile',request('mobile'))->first();
+            
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
             // $user = Auth::user();
             $update=[
@@ -43,6 +43,7 @@ class userController extends Controller
                 'msg_token'=>request('m_token')
             ];
             User::where('mobile',request('mobile'))->update($update);
+            $user = User::where('mobile',request('mobile'))->first();
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
         }
         else{

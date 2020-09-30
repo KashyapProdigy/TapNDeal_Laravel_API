@@ -29,5 +29,8 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+    'fcm' => [
+        'key' => "AAAAuoKdKqc:APA91bELxS7pQQd03c7XyNKdNyh0KMY4CQpt2tRqnBYSvx2_fIyGhL2i0MApQd13o-aWSF64gE3ilGDapTfQiM64FdcOZlDzb-B-hZIIzFCvrL_gDGLyAQaqfkThblwaCU6KpWngZby1",
+     ]
 
 ];

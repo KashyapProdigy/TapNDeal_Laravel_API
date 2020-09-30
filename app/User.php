@@ -31,4 +31,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function routeNotificationForFcm($notification)
+    {
+        // dd($this->msg_token);
+        return $this->msg_token;
+    }
 }

@@ -9,7 +9,10 @@ use App\Product;
 use Carbon\Carbon;
 use Validator;
 use File;
-
+use App\Notifications\ProductAdd;
+use App\AgentCategoryRelationship;
+use App\CustomerCategoryRelationship;
+use App\User;
 class productController extends Controller
 {
     public function show($id)
@@ -61,7 +64,7 @@ class productController extends Controller
                         $file = Storage::disk('temp')->get($value);
                         $filename= time().$uploadsCount.'-prod.png';
                         Storage::disk('product')->put($filename, $file);
-                        // $file = Storage::disk('temp')->delete($value);
+                        $file = Storage::disk('temp')->delete($value);
                         if($uploadsCount == 0){
                         $names = $names.$filename;
                         }
@@ -138,8 +141,23 @@ class productController extends Controller
         $product->fid=$req->fid;
         $product->isCatalog=$req->isCatalog;
         // $product->date_time=Carbon::now();
+
         if($product->save())
         {
+            $prdct=['name'=>$req->name];
+            $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
+            foreach($buyer as $b)
+            {   
+                
+                $usr=User::find($b['cust_id']);
+                \Notification::send($usr, new ProductAdd($prdct));
+            }
+            $agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
+            foreach($agent as $b)
+            {
+                $usr=User::find($b['agent_id']);
+                \Notification::send($usr, new ProductAdd($prdct));
+            }
             return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
         }
         else{
