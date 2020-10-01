@@ -46,7 +46,7 @@ class productController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            // 'image'=>'required',
+            'image'=>'required',
             'category'=>'required',
             'tags'=>'required',
             'colors'=>'required',
@@ -79,7 +79,7 @@ class productController extends Controller
                 }
             }
             else{
-                // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+                return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
 
         // $image_list = json_decode($req->image);
@@ -144,7 +144,8 @@ class productController extends Controller
 
         if($product->save())
         {
-            $prdct=['name'=>$req->name];
+            $sel=User::select('name')->where('id',$req->seller_id)->first();
+            $prdct=['seller'=>$sel->name];
             $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
             foreach($buyer as $b)
             {   

@@ -217,4 +217,24 @@ class tempReqController extends Controller
         }
         return response()->json(['error' => true ,'message'=>'Respone of this buyer not found..'], 400);
     }
+    public function delete($trid)
+    {
+        $tr=temp_req::find($trid);   
+        if($tr)
+        {
+            $tr->delete();
+            return response()->json(['error' => false ,'message'=>'Temporary Requirement deleted'], 200);
+        }
+        return response()->json(['error' => true ,'message'=>'Temporary Requirement not found'], 400);
+    }
+    public function showStausWise(Requset $req)
+    {
+        $user=User::find($id);   
+        if($user)
+        {
+        }
+        else{
+            return response()->json(['error' => true ,'message'=>'Invalid user id..'], 400);
+        }
+    }
 }

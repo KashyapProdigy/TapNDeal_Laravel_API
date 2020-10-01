@@ -275,8 +275,12 @@ class orderController extends Controller
             'status_id'=>2
             ];
             $order_update=Order::where('id',$id)->update($order_data);
+            $ord=Order::where('id',$id)->select('cust_id','order_name')->first();
             if($order_update==1)
             {
+                $arr=['status'=>'Accepted','name'=>$ord->order_name];
+                $usr=User::find($ord['cust_id']);
+                \Notification::send($usr, new statusChange($arr));
                 return response()->json(['error' => false ,'message'=>' Order Accepted Successfully'],200);
             }
             return response()->json(['error' => true ,'message'=>'Record not found'],500);
@@ -291,8 +295,12 @@ class orderController extends Controller
                 'status_id'=>5
                 ];
                 $order_update=Order::where('id',$id)->update($order_data);
+                $ord=Order::where('id',$id)->select('cust_id','order_name')->first();
                 if($order_update==1)
                 {
+                    $arr=['status'=>'Rejected','name'=>$ord->order_name];
+                    $usr=User::find($ord['cust_id']);
+                    \Notification::send($usr, new statusChange($arr));
                     return response()->json(['error' => false ,'message'=>' Order Rejected Successfully'],200);
                 }
                 return response()->json(['error' => true ,'message'=>'Record not found'],500);
@@ -324,11 +332,94 @@ class orderController extends Controller
             $ordr->status_id=$req->status_id;
             $ordr->save();
             $ostat=\DB::table('order_status')->select('status_name')->where('id',$req->status_id)->first();
-            $arr=['status'=>$ostat->status_name];
+            $arr=['status'=>$ostat->status_name,'name'=>$ordr->order_name];
             $usr=User::find($ordr['cust_id']);
             \Notification::send($usr, new statusChange($arr));
             return response()->json(['error' => false ,'message'=>'Order status change'],200);
         }
         return response()->json(['error' => true ,'message'=>'Order not found'],200);
+    }
+    public function orderList($id)
+    {
+        $user=User::find($id);   
+        if($user)
+        {
+            if($user->type_id==1)
+            {
+                $listreturn = DB::table('orders')
+                ->join('users','users.id','orders.cust_id')
+                ->join('order_status','order_status.id','orders.status_id')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                ->where('orders.seller_id',$id)
+                ->orderby('orders.created_at','desc')
+                ->get()->toarray();
+                if(!empty($listreturn))
+                {
+                    foreach($listreturn as $record){
+                        $count = 0;
+                        $record->products = json_decode($record->products);
+                        foreach($record->products as $temp)
+                        {
+                            $count ++;
+                        }
+                        $record->no_of_products = $count;
+                    }
+                    return response()->json(['error' => false ,'data'=>$listreturn],200);
+                }
+                else{return response()->json(['error' => false ,'data'=> null],200);}
+            }
+            if($user->type_id == 3)
+            {
+                $listreturn = DB::table('orders')
+                            ->join('users','users.id','orders.seller_id')
+                            ->join('order_status','order_status.id','orders.status_id')
+                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id')
+                            ->where('orders.cust_id',$id)
+                            ->orderby('orders.created_at','desc')
+                            ->get()->toarray();
+
+                if(!empty($listreturn))
+                {
+                    foreach($listreturn as $record){
+                        $count = 0;
+                        $record->products = json_decode($record->products);
+                        foreach($record->products as $temp)
+                        {
+                            $count ++;
+                        }
+                        $record->no_of_products = $count;
+                    }
+
+                    return response()->json(['error' => false ,'data'=>$listreturn],200);
+                }
+                else{return response()->json(['error' => false ,'data'=> null],200);}
+            }
+            if($user->type_id == 2)
+            {
+                $o_list=Order::where('agent_reference',$user->ref_code)->join('order_status','status_id','order_status.id')->select('orders.id','seller_id','cust_id')->orderby('orders.created_at','desc')->get();
+                $list=array();
+                $order=array();
+                foreach($o_list as $o)
+                {
+                    $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
+                    ->first();
+                    $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+                    
+                    $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
+                    $order[]=$list;
+                }
+                if(count($order)>0)    
+                    return response()->json(['error' => false ,'data'=>$order],200);
+                else{
+                    return response()->json(['error' => false ,'data'=>null],200);
+                }
+            }
+            else{
+                return response()->json(['error' => true ,'message'=>'Invalid user id..'],400);
+            }
+        }
+        else{
+            return response()->json(['error' => true ,'message'=>'Invalid user id..'],400);
+        }
     }
 }

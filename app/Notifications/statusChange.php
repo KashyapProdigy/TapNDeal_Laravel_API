@@ -52,7 +52,7 @@ class statusChange extends Notification implements ShouldQueue
         $message = new FcmMessage();
         $message->content([
             'title'        => 'TapAndDeal', 
-            'body'         => 'Your order is '.$this->ord['status'].'..!', 
+            'body'         => 'Order '.$this->ord['name'].' has been '.$this->ord['status'], 
         ])->priority(FcmMessage::PRIORITY_HIGH);
         
         return $message;

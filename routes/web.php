@@ -2,7 +2,7 @@
 use App\User;
 use App\Product;
 use Illuminate\Support\Facades\Route;
-use App\Notifications\example;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -73,5 +73,4 @@ Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
 Route::get('n',function(){
     $usr=User::find(58);
     $a=Notification::send($usr, new example('abc'));
-    dd($a);
 });

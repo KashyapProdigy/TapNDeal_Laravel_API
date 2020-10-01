@@ -103,6 +103,7 @@ Route::get('user/order/show/past/{id}','API\orderController@showPastOrders');
 Route::get('order/status/all','API\orderController@allStatus');
 Route::get('order/status/{oid}','API\orderController@orderStatus');
 Route::post('order/status/change/{oid}','API\orderController@changeStatus');
+Route::get('order/list/{uid}','API\orderController@orderList');
 
 Route::post('user/chat/new','API\chatController@create');
 Route::post('user/chat/update/{id}','API\chatController@update');
@@ -135,6 +136,7 @@ Route::get('Agent/orderCount/{ref}','API\agentController@orderCount');
 Route::get('buyer/orderCount/{cid}','API\buyerController@orderCount');
 
 Route::post('tempReq/new','API\tempReqController@create');
+Route::delete('tempReq/del/{trid}','API\tempReqController@delete');
 Route::get('tempReq/show/{bid}','API\tempReqController@show');
 Route::get('tempReq/agent/show/{aid}','API\tempReqController@agentShow');
 Route::get('tempReq/seller/show/{sid}','API\tempReqController@sellerShow');
@@ -142,6 +144,7 @@ Route::post('tempReq/response','API\tempReqController@responseReq');
 Route::get('tempReq/response/buyer/show/{bid}/{trid}','API\tempReqController@showResponseBuyer');
 Route::get('tempReq/response/agent/show/{aid}/{trid}','API\tempReqController@showResponseAgent');
 Route::get('tempReq/response/seller/show/{sid}/{trid}','API\tempReqController@showResponseSeller');
+Route::get('user/tempReq/show/{uid}','API\tempReqController@showStatusWise');
 
 Route::get('agent/search','API\userController@agentSearch');
 Route::get('agent/search/{cat}','API\userController@agentCatSearch');
@@ -161,4 +164,4 @@ Route::get('payment/history/{uid}','API\subscriptionController@history');
 
 Route::post('seller/folder/new','API\folderController@create');   
 Route::get('seller/folder/{sid}','API\folderController@show');   
-Route::get('seller/folder/product/{fid}','API\folderController@prodShow');   
+Route::get('seller/folder/product/{fid}','API\folderController@prodShow');    

@@ -53,7 +53,7 @@ class ProductAdd extends Notification implements ShouldQueue
         $message = new FcmMessage();
         $message->content([
             'title'        => 'TapAndDeal', 
-            'body'         => $this->product['name'].' added ..!', 
+            'body'         => 'New product has been added by '.$this->product['seller'],
         ])->data([
             'param1' => 'demo' // Optional
         ])->priority(FcmMessage::PRIORITY_HIGH); // Optional - Default is 'normal'.
