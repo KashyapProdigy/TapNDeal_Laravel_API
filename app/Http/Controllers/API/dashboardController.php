@@ -11,6 +11,8 @@ use App\AgentCategoryRelationship;
 use App\CustomerCategoryRelationship;
 use App\CustomerAgentRelationship;
 use Validator;
+use App\folderModel;
+use App\emp_sel_rel;
 
 class dashboardController extends Controller
 {
@@ -20,8 +22,13 @@ class dashboardController extends Controller
         $seller=[];
         $customer=[];
         $agent=[];
-
         $loggedInUser=User::find($id);
+        if($loggedInUser->type_id==4 || $loggedInUser->type_id==5 || $loggedInUser->type_id==6)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+            $loggedInUser=User::find($id);
+        }
         if($loggedInUser == null)
         {
             return response()->json(['error' => true ,'message'=>"No User Found"]);
@@ -30,20 +37,38 @@ class dashboardController extends Controller
         if($loggedInUser->type_id == 1)
         {
             //User is Seller
-                $dashboard=Product::where('seller_id',$id)->get()->toarray();
+            $today=date('Y-m-d H:i:s');
+            if($today > $loggedInUser->end_date)
+            {
+                $isExpired=1;
+            }
+            else{
+                $isExpired=0;
+            }
+                
+                $dashboard=Product::where([['seller_id',$id],['fid',null]])->get()->toarray();
                 $banner=\DB::table('banners')->where('manu_id',$id)->get()->toarray();
+                $folders=folderModel::select('id','fname')->where('sid',$id)->get();
                 if(!empty($dashboard))
                 {
-                    return response()->json(['error' => false ,'data'=>$dashboard,'banner'=>$banner],200);
+                    return response()->json(['error' => false ,'data'=>$dashboard,'banner'=>$banner,'folders'=>$folders,'isExpired'=>$isExpired],200);
                 }
                 else {
                     return response()->json(['error' => true ,'message'=>"Records Not Found"]);
                 }
         }
 
-        if($loggedInUser->type_id == 2)
+        if($loggedInUser->type_id == 2 || $loggedInUser->type_id == 8)
         {
             //User is Agent
+            $today=date('Y-m-d H:i:s');
+            if($today > $loggedInUser->end_date)
+            {
+                $isExpired=1;
+            }
+            else{
+                $isExpired=0;
+            }
             $A_Plus_list=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('category','=',"A+")->where('isBlocked',0)->get()->toarray();
             $A_list=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('category','=',"A")->where('isBlocked',0)->get()->toarray();
             $B_Plus_list=AgentCategoryRelationship::select('seller_id')->where('agent_id',$id)->where('category','=',"B+")->where('isBlocked',0)->get()->toarray();
@@ -55,15 +80,15 @@ class dashboardController extends Controller
             $seller['B_Sellers']=User::join('citys','citys.id','city_id')->whereIn('users.id',$B_list)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')->get()->toarray();
             $seller['NotConnected_Sellers']=User::join('citys','citys.id','city_id')->where('type_id',1)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')->where('isVerified',1)->whereNotIN('users.id',$Blocked_seller)->whereNotIN('users.id',$A_Plus_list)->whereNotIN('users.id',$A_list)->whereNotIN('users.id',$B_Plus_list)->whereNotIN('users.id',$B_list)->get()->toarray();
 
-            $customer_list=CustomerAgentRelationship::join('citys','citys.id','city_id')->select('cust_id')->where('agent_id',$id)->where('isBlocked',0)->get()->toarray();
+            $customer_list=CustomerAgentRelationship::select('cust_id')->where('agent_id',$id)->where('isBlocked',0)->get()->toarray();
             
-            $customer=User::whereIn('users.id',$customer_list)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','city_name')->where('isVerified',1)->get()->toarray();
+            $customer=User::whereIn('users.id',$customer_list)->join('citys','citys.id','city_id')->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','city_name')->where('isVerified',1)->get()->toarray();
 
             $dashboard['Sellers']=$seller;
             $dashboard['Customers']=$customer;
             if(!empty($dashboard))
             {
-                return response()->json(['error' => false ,'data'=>$dashboard],200);
+                return response()->json(['error' => false ,'data'=>$dashboard,'isExpired'=>$isExpired],200);
             }
             else {
                 return response()->json(['error' => true ,'message'=>"Records Not Found"]);
@@ -86,12 +111,12 @@ class dashboardController extends Controller
             $dashboard['B_Sellers']=User::join('citys','citys.id','city_id')->whereIn('users.id',$B_list)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')->get()->toarray();
             $dashboard['NotConnected_Sellers']=User::join('citys','citys.id','city_id')->where('type_id',1)->select('users.*','company_info.cname','citys.city_name')->where('isVerified',1)->whereNotIN('users.id',$Blocked_seller)->whereNotIN('users.id',$A_Plus_list)->whereNotIN('users.id',$A_list)->whereNotIN('users.id',$B_Plus_list)->whereNotIN('users.id',$B_list)->join('company_info','company_info.sid','users.id','citys.city_name')->get()->toarray();
             $dashboard['Agents']=User::where('type_id',2)->where('isVerified',1)->whereNotIN('users.id',$Blocked_Agent)->get()->toarray();
-            $dashboard['connected_agents']=CustomerAgentRelationship::join('users','users.id','cust_agent_rel.agent_id')->join('citys','citys.id','users.city_id')->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')
-            ->where([['cust_id',$id],['isBlocked',0]])->get();
-            $dashboard['Not_connected_agents']=User::join('citys','citys.id','city_id')->where('type_id',2)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')->where('isVerified',1)->whereNotIn('users.id',$con_ag)->get();
+            // $dashboard['connected_agents']=CustomerAgentRelationship::join('users','users.id','cust_agent_rel.agent_id')->join('citys','citys.id','city_id')->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')
+            // ->where([['cust_id',$id],['isBlocked',0]])->get();
+            // $dashboard['Not_connected_agents']=User::join('citys','citys.id','city_id')->where('type_id',2)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')->where('isVerified',1)->whereNotIn('users.id',$con_ag)->get();
             if(!empty($dashboard))
             {
-                return response()->json(['error' => false ,'data'=>$dashboard],200);
+                return response()->json(['error' => false ,'data'=>$dashboard,'isExpired'=>2],200);
             }
             else {
                 return response()->json(['error' => true ,'message'=>"Records Not Found"]);

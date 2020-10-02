@@ -9,7 +9,7 @@ use Validator;
 use App\User;
 use App\temp_req_product;
 use App\Product;
-
+use App\emp_sel_rel;
 class tempReqController extends Controller
 {
     public function create(Request $req)
@@ -21,8 +21,6 @@ class tempReqController extends Controller
             'request_for' => 'required',
             'remarks' => 'required',
             
-        ],[
-
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
@@ -203,6 +201,14 @@ class tempReqController extends Controller
         ->where('req_to',$sid)
         ->where('temp_req.id',$trid)
         ->first();
+        $end=$data['end_period'];
+        if($end<date('Y-m-d H:i:s'))
+        {
+            $expired=true;
+        }
+        else{
+            $expired=false;
+        }
         $li=array();
         $list=array();
         $prod=array();
@@ -213,7 +219,7 @@ class tempReqController extends Controller
         }
         if($data)
         {
-            return response()->json(['error' => false ,'message'=>$prod], 200);
+            return response()->json(['error' => false,'expired'=>$expired,'message'=>$prod], 200);
         }
         return response()->json(['error' => true ,'message'=>'Respone of this buyer not found..'], 400);
     }
@@ -227,11 +233,156 @@ class tempReqController extends Controller
         }
         return response()->json(['error' => true ,'message'=>'Temporary Requirement not found'], 400);
     }
-    public function showStausWise(Requset $req)
+    public function revive(Request $req,$trid)
     {
-        $user=User::find($id);   
+        $validator = Validator::make($req->all(), [
+            'sid' => 'required',
+            'time_period'=>'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        
+        $data=temp_req_product::where([['trid',$trid],['sid',$req->sid]])->first();
+        if($data)
+        {
+            $end_date=date('Y-m-d H:i:s', strtotime("+".$req->time_period." days"));
+            $data->end_period=$end_date;
+            if($data->save())
+            {
+                $tempReq=temp_req::find($trid);
+                if($tempReq)
+                {
+                    $tempReq->isRevive=1;
+                    $tempReq->save();
+                    return response()->json(['error' => false ,'message'=>'Temporary Requirement revive successfully..'], 200);
+                }
+            }
+            return response()->json(['error' => true ,'message'=>'somthing wents wrong..!'], 500);
+        }
+       
+    }
+    public function showStatusWise($uid)
+    {
+        $user=User::find($uid);   
+        if($user->type_id==4 || $user->type_id==5 || $user->type_id==6)
+        {
+            $seller=emp_sel_rel::where('emp_id',$uid)->first();
+            $uid=$seller->seller_id;
+            $user=User::find($uid);
+            
+        }
         if($user)
         {
+            if($user->type_id==1)
+            {
+                $tr=temp_req::where([['req_to',$uid],['isActive',1],['isResponded',0]])->orderBy('created_at','desc')->get();
+                $temp=array();
+                $new=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['buyer']=User::where('id',$t['req_for'])->select('id','name','mobile')->first();
+                    $temp['agent']=User::where('id',$t['req_by'])->select('id','name','mobile')->first();
+                    $new[]=$temp;
+                }
+                $today=date('Y-m-d H:i:s');
+                $tr=temp_req_product::join('temp_req','trid','temp_req.id')->where([['req_to',$uid],['end_period','>',$today],['isResponded',1]])->orderBy('temp_req.created_at','desc')->get();
+                $temp=null;
+                $active=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['buyer']=User::where('id',$t['req_for'])->select('id','name','mobile')->first();
+                    $temp['agent']=User::where('id',$t['req_by'])->select('id','name','mobile')->first();
+                    $active[]=$temp;
+                }
+
+                
+                $tr=temp_req_product::join('temp_req','trid','temp_req.id')->where([['req_to',$uid],['end_period','<',$today]])->orderBy('temp_req.created_at','desc')->get();
+                $temp=null;
+                $past=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['buyer']=User::where('id',$t['req_for'])->select('id','name','mobile')->first();
+                    $temp['agent']=User::where('id',$t['req_by'])->select('id','name','mobile')->first();
+                    $past[]=$temp;
+                }
+                return response()->json(['error' => false ,'new'=>$new ,'active'=>$active,'past'=>$past], 200);
+                
+                return response()->json(['error' => true ,'message'=>'Temporary Request not found of this Seller..'], 400);      
+            }
+            if($user->type_id==2 || $user->type_id==8)
+            {
+                $tr=temp_req::where([['req_by',$uid],['isActive',1],['isResponded',0]])->orderBy('created_at','desc')->get();
+                $temp=array();
+                $new=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
+                    $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+                    $new[]=$temp;
+                }
+                $today=date('Y-m-d H:i:s');
+                $tr=temp_req_product::join('temp_req','trid','temp_req.id')->where([['req_by',$uid],['end_period','>',$today],['isResponded',1]])->orderBy('temp_req.created_at','desc')->get();
+                $temp=array();
+                $active=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
+                    $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+                    $active[]=$temp;
+                }
+                $tr=temp_req_product::join('temp_req','trid','temp_req.id')->where([['req_by',$uid],['end_period','<',$today]])->orderBy('temp_req.created_at','desc')->get();
+                $temp=array();
+                $past=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
+                    $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+                    $past[]=$temp;
+                }
+                return response()->json(['error' => false ,'new'=>$new,'active'=>$active,'past'=>$past], 200);
+            }
+            if($user->type_id==3)
+            {
+                $tr=temp_req::where([['req_for',$uid],['isActive',1],['isResponded',0]])->orderBy('created_at','desc')->get();
+                $temp=array();
+                $new=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
+                    $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+                    $new[]=$temp;
+                }
+                $today=date('Y-m-d H:i:s');
+                $tr=temp_req_product::join('temp_req','trid','temp_req.id')->where([['req_for',$uid],['end_period','>',$today],['isResponded',1]])->orderBy('temp_req.created_at','desc')->get();
+                $temp=array();
+                $active=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
+                    $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+                    $active[]=$temp;
+                }
+                $tr=temp_req_product::join('temp_req','trid','temp_req.id')->where([['req_for',$uid],['end_period','<',$today]])->orderBy('temp_req.created_at','desc')->get();
+                $temp=array();
+                $past=array();
+                foreach($tr as $t)
+                {
+                    $temp=temp_req::where('id',$t['id'])->first();
+                    $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
+                    $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+                    $past[]=$temp;
+                }
+                return response()->json(['error' => false ,'new'=>$new,'active'=>$active,'past'=>$past], 200);
+            }
         }
         else{
             return response()->json(['error' => true ,'message'=>'Invalid user id..'], 400);

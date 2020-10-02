@@ -124,12 +124,12 @@ class agentRelationshipController extends Controller
             }
             if($relations == null && $knock == null)
             {
-                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0'],['fid',null]])->get()->toarray();
                 return response()->json(['error' => false,'Knock'=>false,'relation'=>false ,'accepted'=>false ,'active'=>false,'data'=>$products,'banner'=>$banner],200);
             }
             else if($relations == null && $knock != null )
             {
-                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0'],['fid',null]])->get()->toarray();
                 return response()->json(['error' => false ,'Knock'=>true,'relation'=>false ,'accepted'=>$ac,'active'=>$active,'data'=>$products,'banner'=>$banner],200);
             }
             else if($relations!=null)
@@ -139,24 +139,99 @@ class agentRelationshipController extends Controller
                 {
                     if($relations->category == 'A+')
                     {
-                        $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                     if($relations->category == 'A')
                     {
                         $cat=['A','B+','B'];
-                        $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->whereIn('category',$cat)->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->whereIn('category',$cat)->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                     if($relations->category == 'B+')
                     {
                         $cat=['B+','B'];
-                        $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->whereIn('category',$cat)->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->whereIn('category',$cat)->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                     if($relations->category == 'B')
                     {
-                    $products = Product::where('seller_id',$req->seller_id)->where('isDisabled','0')->where('category',$relations->category)->get()->toarray();
+                    $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->where('category',$relations->category)->get()->toarray();
+                    return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
+                    }
+                }
+            }
+            else {
+                return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
+            }
+        }
+        public function productListFolder(Request $req)
+        {
+            $validator = Validator::make($req->all(), [
+                'seller_id' => 'required',
+                'agent_id' => 'required',
+                'fid'=>'required'
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+            }
+            $fid=$req->fid;
+            $banner=\DB::table('banners')->where('manu_id',$req->seller_id)->get()->toarray();
+            $relations=AgentCategoryRelationship::where('seller_id',$req->seller_id)->where('agent_id',$req->agent_id)->first();
+            $knock= AgentKnock::where('seller_id',$req->seller_id)->where('agent_id',$req->agent_id)->first();
+            if($knock != null)
+            {
+                if($knock['isApproved'] == 1)
+                {
+                    $ac=true;
+                }
+                else{
+                    $ac=false;
+                }
+                if($knock['isActive']==1)
+                {
+                    $active=true;
+                }
+                else
+                {
+                    $active=false;
+                }
+            }
+            if($relations == null && $knock == null)
+            {
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0'],['fid',$fid]])->get()->toarray();
+                return response()->json(['error' => false,'Knock'=>false,'relation'=>false ,'accepted'=>false ,'active'=>false,'data'=>$products,'banner'=>$banner],200);
+            }
+            else if($relations == null && $knock != null )
+            {
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0'],['fid',$fid]])->get()->toarray();
+                return response()->json(['error' => false ,'Knock'=>true,'relation'=>false ,'accepted'=>$ac,'active'=>$active,'data'=>$products,'banner'=>$banner],200);
+            }
+            else if($relations!=null)
+            {
+                if($relations->isBlocked == 1){return response()->json(['error' => true ,'message'=>'User Blocked By Seller']);}
+                if($relations->isBlocked != 1)
+                {
+                    if($relations->category == 'A+')
+                    {
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',$fid]])->get()->toarray();
+                        return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
+                    }
+                    if($relations->category == 'A')
+                    {
+                        $cat=['A','B+','B'];
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',$fid]])->whereIn('category',$cat)->get()->toarray();
+                        return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
+                    }
+                    if($relations->category == 'B+')
+                    {
+                        $cat=['B+','B'];
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',$fid]])->whereIn('category',$cat)->get()->toarray();
+                        return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
+                    }
+                    if($relations->category == 'B')
+                    {
+                    $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',$fid]])->where('category',$relations->category)->get()->toarray();
                     return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                 }

@@ -46,7 +46,7 @@ class productController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            'image'=>'required',
+            // 'image'=>'required',
             'category'=>'required',
             'tags'=>'required',
             'colors'=>'required',
@@ -79,7 +79,7 @@ class productController extends Controller
                 }
             }
             else{
-                return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+                // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
 
         // $image_list = json_decode($req->image);
@@ -139,7 +139,11 @@ class productController extends Controller
         $product->watermark=$watermark_name;
         $product->agents_id=$req->agents_id;
         $product->fid=$req->fid;
-        $product->isCatalog=$req->isCatalog;
+        if($req->isCatalog)
+        {
+            $product->isCatalog=$req->isCatalog;
+        }
+        
         // $product->date_time=Carbon::now();
 
         if($product->save())
@@ -247,7 +251,7 @@ class productController extends Controller
                     'watermark'=>$watermark_name,
                     'colors'=>$req->colors,
                     'agents_id'=>$req->agents_id,
-                    // 'date_time'=>$date_time,
+                    'fid'=>$req->fid
                 ];
                 $product_update=Product::where('id',$id)->update($product_data);
                 if($product_update==1)
@@ -355,5 +359,14 @@ class productController extends Controller
             return response()->json(['error' => true ,'message'=>'image not found'],400);
         }
         return response()->json(['error' => true ,'message'=>'Product not found'],400);
+    }
+    public function sellerPro($id)
+    {
+        $products=Product::where('seller_id',$id)->get()->toarray();
+        if($products)
+        {
+            return response()->json(['error' => false ,'data'=>$products],200);
+        }
+        return response()->json(['error' => true ,'products'=>'Products not found'],400);
     }
 }

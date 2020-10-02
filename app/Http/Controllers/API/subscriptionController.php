@@ -82,7 +82,8 @@ class subscriptionController extends Controller
             $payment=Payment::where('user_id',$uid)->get()->toarray();
             $subscription=subscribe_user::where('uid',$uid)->get()->toarray();
             $expire_date=$user->end_date;
-            return response()->json(['error' => false ,'payment'=>$payment,'subscription'=>$subscription,'expire_date'=>$expire_date],200);
+            $plan=subscribe_user::select('plan_name')->join('subscription_plan','subscription_plan.id','sub_user.plan_id')->where('uid',$uid)->orderby('subscription_date','desc')->first();
+            return response()->json(['error' => false ,'payment'=>$payment,'subscription'=>$subscription,'expire_date'=>$expire_date,'current_plan_name'=>$plan->plan_name],200);
         }
         return response()->json(['error' => true ,'message'=>'User not found..!'],400);
     }

@@ -41,7 +41,7 @@ Route::post('user/relation/update/customer/{id}','API\customerRelationshipContro
 Route::post('user/relation/block/customer/{id}','API\customerRelationshipController@block');
 Route::get('user/relation/show/customer/{id}','API\customerRelationshipController@show');
 Route::get('user/relation/show/seller/productlist/customer','API\customerRelationshipController@productlist');
-
+Route::get('user/customer/folder/productlist','API\customerRelationshipController@productListFolder');
 
 Route::post('user/knock/new/agent/{id}','API\agentKnockController@create');
 Route::post('user/knock/approve/agent/{id}','API\agentKnockController@approve');
@@ -53,6 +53,7 @@ Route::post('user/relation/update/agent/{id}','API\agentRelationshipController@u
 Route::post('user/relation/block/agent/{id}','API\agentRelationshipController@block');
 Route::get('user/relation/show/agent/{id}','API\agentRelationshipController@show');
 Route::get('user/relation/show/seller/productlist/agent','API\agentRelationshipController@productlist');
+Route::get('user/agent/folder/productlist','API\agentRelationshipController@productListFolder');
 
 Route::post('user/request/new/agent','API\custAgentRequestController@create');
 Route::get('user/request/approve/agent/{id}','API\custAgentRequestController@approve');
@@ -71,6 +72,7 @@ Route::get('user/seller/delete/employee/{id}','API\employeeSellerRelationshipCon
 Route::get('user/product/showPro/{id}','API\productController@showPro');
 Route::post('user/product/new','API\productController@create');
 Route::post('user/product/upload','API\productController@upload');
+Route::get('seller/product/list/{sid}','API\productController@sellerPro');
 Route::post('user/product/update/{id}','API\productController@update');
 Route::get('user/product/show/{sid}','API\productController@show');
 Route::delete('user/product/delete/{id}','API\productController@delete');
@@ -145,6 +147,7 @@ Route::get('tempReq/response/buyer/show/{bid}/{trid}','API\tempReqController@sho
 Route::get('tempReq/response/agent/show/{aid}/{trid}','API\tempReqController@showResponseAgent');
 Route::get('tempReq/response/seller/show/{sid}/{trid}','API\tempReqController@showResponseSeller');
 Route::get('user/tempReq/show/{uid}','API\tempReqController@showStatusWise');
+Route::post('tempReq/revive/{trid}','API\tempReqController@revive');
 
 Route::get('agent/search','API\userController@agentSearch');
 Route::get('agent/search/{cat}','API\userController@agentCatSearch');

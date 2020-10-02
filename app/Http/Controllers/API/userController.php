@@ -67,7 +67,7 @@ class userController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        if($request->type_id==2)
+        if($request->type_id==2 || $request->type_id==8)
         {
             $ag=custome_agent::where('mobile',$request->mobile)->first();
             if($ag!=null){
@@ -102,7 +102,7 @@ class userController extends Controller
             {
                 return response()->json(['error' => true ,'message'=>'invalid Reference code..!'],400);
             }
-            if($request->type_id==1 || $request->type_id==2 || $request->type_id==3)
+            if($request->type_id==1 || $request->type_id==2 || $request->type_id==8 || $request->type_id==3)
             {
                 $user->refered_by=$request->sel_ref;
             }
@@ -299,14 +299,15 @@ class userController extends Controller
     public function update(Request $request,$uid)
     {
         $u=User::where('id',$uid)->first();
-        if($u['type_id']==1)
+        $ids=[1,2,3];
+        if(in_array($u->type_id,$ids))
         {
             $validator = Validator::make($request->all(), [
-                'cname' => 'required',
-                'address' => 'required',
-                'name' => 'required',
-                'city_id' => 'required',
-                'email'=>'required',
+            'cname' => 'required',
+            'address' => 'required',
+            'name' => 'required',
+            'city_id' => 'required',
+            'email'=>'required',
             ]);
         }
         else{
@@ -314,7 +315,7 @@ class userController extends Controller
                 'name' => 'required',
                 'city_id' => 'required',
                 'email'=>'required',
-            ]);
+                ]);
         }
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
@@ -333,24 +334,25 @@ class userController extends Controller
         $user = User::find($uid);
         if($user)
         {
-        $user->name=$request->name;
-        $user->email = $request->email;
-        $user->city_id = $request->city_id;
-        $user->state_id=$st->state_id;
-        if($user->save())
-        {   if($u['type_id']==1)
-            {
-                $ci=com_info::where('sid',$uid)->update([
-                    'cname'=>$request->cname,
-                    'pan'=>$request->pan,
-                    'gst'=>$request->gst,
-                    'address'=>$request->address
-                ]);
+            $user->name=$request->name;
+            $user->email = $request->email;
+            $user->city_id = $request->city_id;
+            $user->state_id=$st->state_id;
+            $user->business_scope=$request->b_scope;
+            if($user->save())
+            {   
+                if(in_array($u->type_id,$ids))
+                {   
+                    $ci=com_info::where('sid',$uid)->update([
+                        'cname'=>$request->cname,
+                        'pan'=>$request->pan,
+                        'gst'=>$request->gst,
+                        'address'=>$request->address
+                    ]);
+                }
+                return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);
             }
-            
-            return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);
-        }
-        return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
+            return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
         }
         return response()->json(['error' => true ,'message'=>'User not found '],500);
 

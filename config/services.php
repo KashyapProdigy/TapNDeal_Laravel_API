@@ -30,7 +30,7 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
     'fcm' => [
-        'key' => "AAAAuoKdKqc:APA91bELxS7pQQd03c7XyNKdNyh0KMY4CQpt2tRqnBYSvx2_fIyGhL2i0MApQd13o-aWSF64gE3ilGDapTfQiM64FdcOZlDzb-B-hZIIzFCvrL_gDGLyAQaqfkThblwaCU6KpWngZby1",
+        'key' => "AAAAcSABORQ:APA91bEcpHpirWHaTtoQFkrlqxxAPmuSDyPEAVFe-IsTImCMV3-shB6sE_8wilM_4Wm2Y3nWptBz7E_FKyCa44ksgLClyjaH8stiDQcG04JPX0j2onlPymrjkFjiuyPjiefL6NEAUOdg",
      ]
 
 ];
