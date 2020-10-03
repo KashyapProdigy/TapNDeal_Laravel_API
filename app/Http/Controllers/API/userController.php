@@ -32,7 +32,7 @@ class userController extends Controller
     public function login()
     {
         // $psw=Hash::make(request('password'));
-        $user=User::where([['mobile',request('mobile')],['password', request('password')]])->count();
+        $user=User::where([['mobile',request('mobile')],['password', request('password')],['isDeleted',0]])->count();
         if($user==1){
             
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
@@ -42,8 +42,8 @@ class userController extends Controller
                 'login_token'=>request('l_token'),
                 'msg_token'=>request('m_token')
             ];
-            User::where('mobile',request('mobile'))->update($update);
-            $user = User::where('mobile',request('mobile'))->first();
+            User::where([['mobile',request('mobile')],['isDeleted',0]])->update($update);
+            $user = User::where([['mobile',request('mobile')],['isDeleted',0]])->first();
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
         }
         else{
@@ -61,11 +61,17 @@ class userController extends Controller
     }
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'mobile' => 'required|unique:users,mobile',
-        ]);
-        if ($validator->fails()) {
-            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        $user=User::where('mobile',$request->mobile)->first();
+        if($user)
+        {
+            if($user->type_id!=3)
+            {
+                return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
+            }
+            else{
+                $user->isDeleted=1;
+                $user->save();
+            }
         }
         if($request->type_id==2 || $request->type_id==8)
         {
@@ -338,7 +344,7 @@ class userController extends Controller
             $user->email = $request->email;
             $user->city_id = $request->city_id;
             $user->state_id=$st->state_id;
-            $user->business_scope=$request->b_scope;
+            $user->business_scope=$request->business_scope;
             if($user->save())
             {   
                 if(in_array($u->type_id,$ids))

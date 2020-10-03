@@ -83,6 +83,7 @@ class orderController extends Controller
 
     public function showRequest($id)
     {
+        $User=User::find($id);
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
         ->join('order_status','order_status.id','orders.status_id')
@@ -96,6 +97,9 @@ class orderController extends Controller
         {
             foreach($listreturn as $record){
                 $count = 0;
+                $record->seller_name=$User->name;
+                $agent=User::where('ref_code',$record->agent_reference)->first();
+                $record->agent_name=$agent['name'];
                 $record->products = json_decode($record->products);
                 foreach($record->products as $temp)
                 {
@@ -109,7 +113,7 @@ class orderController extends Controller
         return response()->json(['error' => true ,'message'=>'Something went wrong']);
     }
     public function custNewOrder($cid)
-    {
+    {   $user=User::find($cid);
         $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
@@ -123,6 +127,9 @@ class orderController extends Controller
                 {
                     foreach($listreturn as $record){
                         $count = 0;
+                        $agent=User::where('ref_code',$record->agent_reference)->first();
+                        $record->agent_name=$agent['name'];
+                        $record->cust_name=$user->name;
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
                         {
@@ -160,6 +167,9 @@ class orderController extends Controller
                 {
                     foreach($listreturn as $record){
                         $count = 0;
+                        $record->seller_name=$User->name;
+                        $agent=User::where('ref_code',$record->agent_reference)->first();
+                        $record->agent_name=$agent['name'];
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
                         {
@@ -186,6 +196,9 @@ class orderController extends Controller
                 {
                     foreach($listreturn as $record){
                         $count = 0;
+                        $agent=User::where('ref_code',$record->agent_reference)->first();
+                        $record->agent_name=$agent['name'];
+                        $record->cust_name=$user->name;
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
                         {
@@ -225,6 +238,9 @@ class orderController extends Controller
                 {
                     foreach($listreturn as $record){
                         $count = 0;
+                        $record->seller_name=$User->name;
+                        $agent=User::where('ref_code',$record->agent_reference)->first();
+                        $record->agent_name=$agent['name'];
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
                         {
@@ -251,6 +267,9 @@ class orderController extends Controller
                 {
                     foreach($listreturn as $record){
                         $count = 0;
+                        $agent=User::where('ref_code',$record->agent_reference)->first();
+                        $record->agent_name=$agent['name'];
+                        $record->cust_name=$user->name;
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
                         {
@@ -346,7 +365,11 @@ class orderController extends Controller
                 {
                     foreach($listreturn as $record){
                         $count = 0;
+                        $record->seller_name=$user->name;
+                        $agent=User::where('ref_code',$record->agent_reference)->first();
+                        $record->agent_name=$agent['name'];
                         $record->products = json_decode($record->products);
+                        
                         foreach($record->products as $temp)
                         {
                             $count ++;
@@ -362,7 +385,7 @@ class orderController extends Controller
                 $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
                             ->join('order_status','order_status.id','orders.status_id')
-                            ->select('users.name as cust_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id','orders.notes')
+                            ->select('users.name as seller_name','users.mobile','orders.agent_reference','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id','orders.notes')
                             ->where('orders.cust_id',$id)
                             ->orderby('orders.created_at','desc')
                             ->get()->toarray();
@@ -372,6 +395,9 @@ class orderController extends Controller
                     foreach($listreturn as $record){
                         $count = 0;
                         $record->products = json_decode($record->products);
+                        $agent=User::where('ref_code',$record->agent_reference)->first();
+                        $record->agent_name=$agent['name'];
+                        $record->cust_name=$user->name;
                         foreach($record->products as $temp)
                         {
                             $count ++;
@@ -396,7 +422,10 @@ class orderController extends Controller
                     ->join('users','users.id','orders.cust_id')
                     ->join('order_status','status_id','order_status.id')
                     ->first();
-                    $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+                    $list['agent_name']=$user->name;
+                    $user1=User::where('id',$o['seller_id'])->select('id','name')->first();
+                    $list['seller_name']=$user1->name;
+                    
                     $order[]=$list;
                 }
                 if(count($order)>0)    

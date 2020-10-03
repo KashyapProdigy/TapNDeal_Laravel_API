@@ -41,7 +41,7 @@ class agentController extends Controller
         foreach($o_list as $o)
         {
             $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')->first();
-            $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            $list['seller']=User::where('id',$o['seller_id'])->select('id','name','mobile')->first();
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
             $order[]=$list;
         }
@@ -64,7 +64,7 @@ class agentController extends Controller
         {
             $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
             ->first();
-            $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            $list['seller']=User::where('id',$o['seller_id'])->select('id','name','mobile')->first();
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
             $order[]=$list;
         }
@@ -82,7 +82,7 @@ class agentController extends Controller
         {
             $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
             ->first();
-            $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            $list['seller']=User::where('id',$o['seller_id'])->select('id','name','mobile')->first();
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
             $order[]=$list;
         }
@@ -100,7 +100,7 @@ class agentController extends Controller
         {
             $list=Order::where('orders.id',$o['id'])->select('orders.*','order_status.status_name')->join('order_status','status_id','order_status.id')
             ->first();
-            $list['seller']=User::where('id',$o['seller_id'])->select('id','name')->first();
+            $list['seller']=User::where('id',$o['seller_id'])->select('id','name','mobile')->first();
             
             $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
             $order[]=$list;
