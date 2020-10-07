@@ -4,10 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
-class acccounts extends Controller
+use App\User;
+class accounts extends Controller
 {
-    public function new(Request $req)
+    public function new($sid)
     {
         $seller=User::find($sid);
         if($seller)
@@ -25,7 +25,10 @@ class acccounts extends Controller
             $month2 = date('m', $ts2);
 
             $diff = (($year2 - $year1) * 12) + ($month2 - $month1);
-            return response()->json(['error' => true ,'message'=>$diff], 200);
+            $gst=$diff * 100 * (0.18);
+            $amount=$diff * 100 + $gst;
+            return response()->json(['error' => false ,'months'=>$diff,'end_date'=>$end,'amount'=>$amount], 200);
         }
+        return response()->json(['error' => true ,'message'=>'Invalid seller id..'], 200);
     }
 }

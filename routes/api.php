@@ -170,3 +170,5 @@ Route::post('folder/edit/{fid}','API\folderController@edit');
 Route::delete('folder/delete/{fid}','API\folderController@delete');
 Route::get('seller/folder/{sid}','API\folderController@show');   
 Route::get('seller/folder/product/{fid}','API\folderController@prodShow');    
+
+Route::get('seller/new/acc/{sid}','API\accounts@new');
