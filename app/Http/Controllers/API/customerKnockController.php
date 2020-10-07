@@ -10,6 +10,7 @@ use App\CustomerKnock;
 use App\CustomerCategoryRelationship;
 use Validator;
 use App\emp_sel_rel;
+use App\Notifications\knockRequestSend;
 class customerKnockController extends Controller
 {
         public function create(Request $req,$id)
@@ -52,7 +53,12 @@ class customerKnockController extends Controller
                     $status=CustomerKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
-                    return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
+                        $usr=User::find($knock_seller);
+                        $cust=User::find($req->cust_id);
+                        $msg="Knock by ".$cust->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
+                        return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
                 else if($record->isActive == 0 && $record->isApproved == 0)
@@ -66,6 +72,11 @@ class customerKnockController extends Controller
                     $status=CustomerKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
+                        $usr=User::find($knock_seller);
+                        $cust=User::find($req->cust_id);
+                        $msg="Knock by ".$cust->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
                     return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
@@ -75,6 +86,11 @@ class customerKnockController extends Controller
             }
             if($knock_data->save())
             {
+                $usr=User::find($knock_seller);
+                $cust=User::find($req->cust_id);
+                $msg="Knock by ".$cust->name;
+                $arr=['msg'=>$msg];
+                \Notification::send($usr, new knockRequestSend($arr));
                 return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
             }
             else
@@ -112,6 +128,11 @@ class customerKnockController extends Controller
                         $knock_update=CustomerKnock::where('id',$knockrecord->id)->update($knock_data);
                         if($knock_update==1 && $relation_data->save())
                         {
+                            $usr=User::find($id);
+                            $seller=User::find($req->seller_id);
+                            $msg="Knock Accepted by ".$seller->name;
+                            $arr=['msg'=>$msg];
+                            \Notification::send($usr, new knockRequestSend($arr));
                         return response()->json(['error' => false ,'message'=>' Customer Approved Successfully'],200);
                         }
                         return response()->json(['error' => true ,'message'=>'Record not found'],500);
@@ -126,6 +147,11 @@ class customerKnockController extends Controller
                         {
                             $knockstatus=CustomerKnock::where('id',$knockrecord->id)->update($knock_data);
                             if($knockstatus == 1 ){
+                                $usr=User::find($id);
+                                $seller=User::find($req->seller_id);
+                                $msg="Knock Accepted by ".$seller->name;
+                                $arr=['msg'=>$msg];
+                                \Notification::send($usr, new knockRequestSend($arr));
                             return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                             }
                         }
@@ -140,6 +166,11 @@ class customerKnockController extends Controller
                         $relstatus=CustomerCategoryRelationship::where('id',$relrecord->id)->update($rel_data);
                         if($relstatus == 1 && $knockstatus == 1 )
                         {
+                            $usr=User::find($id);
+                            $seller=User::find($req->seller_id);
+                            $msg="Knock Accepted by ".$seller->name;
+                            $arr=['msg'=>$msg];
+                            \Notification::send($usr, new knockRequestSend($arr));
                         return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                         }
                         else {

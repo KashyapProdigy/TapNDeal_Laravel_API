@@ -379,6 +379,13 @@ class productController extends Controller
     }
     public function sellerPro($id)
     {
+        $User=User::find($id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+            
+        }
         $products=Product::where('seller_id',$id)->get()->toarray();
         if($products)
         {

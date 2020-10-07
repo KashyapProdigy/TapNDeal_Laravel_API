@@ -44,6 +44,14 @@ class userController extends Controller
             ];
             User::where([['mobile',request('mobile')],['isDeleted',0]])->update($update);
             $user = User::where([['mobile',request('mobile')],['isDeleted',0]])->first();
+            if($user->type_id==4 || $user->type_id==5 || $user->type_id==6 || $user->type_id==8)
+            {
+                $seller=emp_sel_rel::where('emp_id',$user->id)->first();
+                $user->seller_id=$seller->seller_id;
+            }
+            else{
+                $user->seller_id=$user->id;
+            }
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
         }
         else{
@@ -103,6 +111,10 @@ class userController extends Controller
         $user->firebase_token=$request->f_token;
         $user->device_id=$request->d_id;
         $user->ref_code=$ref;
+        if(!$request->b_scope)
+        {
+            $request->b_scope=" ";
+        }
         $user->business_scope=$request->b_scope;
         $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days')); 
         if($request->sel_ref!="")

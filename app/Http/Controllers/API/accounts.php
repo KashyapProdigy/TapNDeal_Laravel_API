@@ -29,6 +29,17 @@ class accounts extends Controller
             $amount=$diff * 100 + $gst;
             return response()->json(['error' => false ,'months'=>$diff,'end_date'=>$end,'amount'=>$amount], 200);
         }
-        return response()->json(['error' => true ,'message'=>'Invalid seller id..'], 200);
+        return response()->json(['error' => true ,'message'=>'Invalid seller id..'], 400);
+    }
+    public function add($sid)
+    {
+        $user=User::find($sid);
+        if($user)
+        {
+            $user->acc_allow=$user->acc_allow + 1;
+            $user->save();
+            return response()->json(['error' => true ,'message'=>'Account added..'], 200);
+        }
+        return response()->json(['error' => true ,'message'=>'Invalid seller id..'], 400);
     }
 }

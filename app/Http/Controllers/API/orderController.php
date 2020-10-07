@@ -119,7 +119,7 @@ class orderController extends Controller
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
         ->join('order_status','order_status.id','orders.status_id')
-        ->select('users.name as cust_name','users.id as cust_id','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','order_status.status_name','orders.created_at as order_date','orders.products','orders.notes')
+        ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','order_status.status_name','orders.created_at as order_date','orders.products','orders.notes')
         ->where('orders.seller_id',$id)
         ->where('order_status.status_name','Received')
         ->orderby('orders.created_at','desc')
@@ -136,6 +136,7 @@ class orderController extends Controller
                     $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                 }
                 $record->agent_name=$agent['name'];
+                $record->agent_mobile=$agent['mobile'];
                 $record->products = json_decode($record->products);
                 foreach($record->products as $temp)
                 {
@@ -171,6 +172,7 @@ class orderController extends Controller
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                         }
                         $record->agent_name=$agent['name'];
+                        $record->agent_mobile=$agent['mobile'];
                         $record->cust_name=$user->name;
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
@@ -224,6 +226,7 @@ class orderController extends Controller
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                         }
                         $record->agent_name=$agent['name'];
+                        $record->agent_mobile=$agent['mobile'];
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
                         {
@@ -257,6 +260,7 @@ class orderController extends Controller
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                         }
                         $record->agent_name=$agent['name'];
+                        $record->agent_mobile=$agent['mobile'];
                         $record->cust_name=$User->name;
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
@@ -314,6 +318,7 @@ class orderController extends Controller
                         }
                         
                         $record->agent_name=$agent['name'];
+                        $record->agent_mobile=$agent['mobile'];
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
                         {
@@ -347,6 +352,7 @@ class orderController extends Controller
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                         }
                         $record->agent_name=$agent['name'];
+                        $record->agent_mobile=$agent['mobile'];
                         $record->cust_name=$User->name;
                         $record->products = json_decode($record->products);
                         foreach($record->products as $temp)
@@ -474,6 +480,7 @@ class orderController extends Controller
                             $cname=null;
                         }
                         $record->agent_name=$agent['name'];
+                        $record->agent_mobile=$agent['mobile'];
                         $record->agent_cname=$cname;
                         $record->products = json_decode($record->products);
                         
@@ -511,6 +518,7 @@ class orderController extends Controller
                             $cname=null;
                         }
                         $record->agent_name=$agent['name'];
+                        $record->agent_mobile=$agent['mobile'];
                         $record->agent_cname=$cname;
                         $cmp=\DB::table('company_info')->where('sid',$id)->first();
                         $record->cust_name=$cmp->cname;

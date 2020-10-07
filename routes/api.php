@@ -172,3 +172,4 @@ Route::get('seller/folder/{sid}','API\folderController@show');
 Route::get('seller/folder/product/{fid}','API\folderController@prodShow');    
 
 Route::get('seller/new/acc/{sid}','API\accounts@new');
+Route::get('seller/add/acc/{sid}','API\accounts@add');

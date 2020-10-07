@@ -15,6 +15,12 @@ class cartController extends Controller
 {
     public function show($id)
     {
+        $User=User::find($id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+        }
         $cart_price = 0 ;
         $cart = DB::table('carts')
             ->join('products','products.id','carts.product_id')
@@ -155,6 +161,12 @@ class cartController extends Controller
     }
     public function count($id)
     {
+        $User=User::find($id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+        }
         $cart_count=Cart::join('products','products.id','carts.product_id')->where('isDisabled',0)->where('cust_id',$id)->count();
         if($cart_count != null)
         {

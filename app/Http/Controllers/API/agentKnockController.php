@@ -8,7 +8,8 @@ use App\User;
 use App\AgentKnock;
 use App\AgentCategoryRelationship;
 use Validator;
-
+use App\emp_sel_rel;
+use App\Notifications\knockRequestSend;
 class agentKnockController extends Controller
 {
     public function create(Request $req,$id)
@@ -51,7 +52,12 @@ class agentKnockController extends Controller
                     $status=AgentKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
-                    return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
+                        $usr=User::find($knock_seller);
+                        $agent=User::find($req->agent_id);
+                        $msg="Knock by ".$agent->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
+                        return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
                 else if($record->isActive == 0 && $record->isApproved == 0)
@@ -65,7 +71,12 @@ class agentKnockController extends Controller
                     $status=AgentKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
-                    return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
+                        $usr=User::find($knock_seller);
+                        $agent=User::find($req->agent_id);
+                        $msg="Knock by ".$agent->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
+                         return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
             }
@@ -74,6 +85,11 @@ class agentKnockController extends Controller
             }
             if($knock_data->save())
             {
+                $usr=User::find($knock_seller);
+                $agent=User::find($req->agent_id);
+                $msg="Knock by ".$agent->name;
+                $arr=['msg'=>$msg];
+                \Notification::send($usr, new knockRequestSend($arr));
                 return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
             }
             else
@@ -111,7 +127,12 @@ class agentKnockController extends Controller
                         $knock_update=AgentKnock::where('id',$knockrecord->id)->update($knock_data);
                         if($knock_update==1 && $relation_data->save())
                         {
-                        return response()->json(['error' => false ,'message'=>' Agent Approved Successfully'],200);
+                            $usr=User::find($id);
+                            $seller=User::find($req->seller_id);
+                            $msg="Knock Accepted by ".$seller->name;
+                            $arr=['msg'=>$msg];
+                            \Notification::send($usr, new knockRequestSend($arr));
+                            return response()->json(['error' => false ,'message'=>' Agent Approved Successfully'],200);
                         }
                         return response()->json(['error' => true ,'message'=>'Record not found'],500);
                     }
@@ -125,7 +146,12 @@ class agentKnockController extends Controller
                         {
                             $knockstatus=AgentKnock::where('id',$knockrecord->id)->update($knock_data);
                             if($knockstatus == 1 ){
-                            return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
+                                $usr=User::find($id);
+                                $seller=User::find($req->seller_id);
+                                $msg="Knock Accepted by ".$seller->name;
+                                $arr=['msg'=>$msg];
+                                \Notification::send($usr, new knockRequestSend($arr));
+                             return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                             }
                         }
 
@@ -139,7 +165,12 @@ class agentKnockController extends Controller
                         $relstatus=AgentCategoryRelationship::where('id',$relrecord->id)->update($rel_data);
                         if($relstatus == 1 && $knockstatus == 1 )
                         {
-                        return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
+                            $usr=User::find($id);
+                            $seller=User::find($req->seller_id);
+                            $msg="Knock Accepted by ".$seller->name;
+                            $arr=['msg'=>$msg];
+                            \Notification::send($usr, new knockRequestSend($arr));
+                            return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                         }
                         else {
                             return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
@@ -185,6 +216,13 @@ class agentKnockController extends Controller
 
     public function show($id)
     {
+        $User=User::find($id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+            
+        }
         $knockreturn = DB::table('agent_sel_knock_rel')
                             ->join('users','users.id','agent_sel_knock_rel.agent_id')
                             ->select('users.name','agent_sel_knock_rel.*')

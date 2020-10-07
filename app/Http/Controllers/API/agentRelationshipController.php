@@ -124,12 +124,12 @@ class agentRelationshipController extends Controller
             }
             if($relations == null && $knock == null)
             {
-                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0'],['fid',null]])->get()->toarray();
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
                 return response()->json(['error' => false,'Knock'=>false,'relation'=>false ,'accepted'=>false ,'active'=>false,'data'=>$products,'banner'=>$banner],200);
             }
             else if($relations == null && $knock != null )
             {
-                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0'],['fid',null]])->get()->toarray();
+                $products = Product::where('seller_id',$req->seller_id)->where([['category','B'],['isDisabled','0']])->get()->toarray();
                 return response()->json(['error' => false ,'Knock'=>true,'relation'=>false ,'accepted'=>$ac,'active'=>$active,'data'=>$products,'banner'=>$banner],200);
             }
             else if($relations!=null)
@@ -139,24 +139,24 @@ class agentRelationshipController extends Controller
                 {
                     if($relations->category == 'A+')
                     {
-                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0']])->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                     if($relations->category == 'A')
                     {
                         $cat=['A','B+','B'];
-                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->whereIn('category',$cat)->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0']])->whereIn('category',$cat)->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                     if($relations->category == 'B+')
                     {
                         $cat=['B+','B'];
-                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->whereIn('category',$cat)->get()->toarray();
+                        $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0']])->whereIn('category',$cat)->get()->toarray();
                         return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                     if($relations->category == 'B')
                     {
-                    $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0'],['fid',null]])->where('category',$relations->category)->get()->toarray();
+                    $products = Product::where('seller_id',$req->seller_id)->where([['isDisabled','0']])->where('category',$relations->category)->get()->toarray();
                     return response()->json(['error' => false ,'Knock'=>true,'accepted'=>$ac,'active'=>$active,'relation'=>true ,'data'=>$products,'banner'=>$banner],200);
                     }
                 }
