@@ -23,7 +23,7 @@ class dashboardController extends Controller
         $customer=[];
         $agent=[];
         $loggedInUser=User::find($id);
-        if($loggedInUser->type_id==4 || $loggedInUser->type_id==5 || $loggedInUser->type_id==6)
+        if($loggedInUser->type_id==4 || $loggedInUser->type_id==5 || $loggedInUser->type_id==6 || $loggedInUser->type_id == 8)
         {
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
@@ -58,7 +58,7 @@ class dashboardController extends Controller
                 }
         }
 
-        if($loggedInUser->type_id == 2 || $loggedInUser->type_id == 8)
+        if($loggedInUser->type_id == 2)
         {
             //User is Agent
             $today=date('Y-m-d H:i:s');
@@ -131,7 +131,13 @@ class dashboardController extends Controller
         $dashboard=[];
         $customer=[];
         $agent=[];
+        $loggedInUser=User::find($id);
+        if($loggedInUser->type_id==4 || $loggedInUser->type_id==5 || $loggedInUser->type_id==6 || $loggedInUser->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
             $loggedInUser=User::find($id);
+        }
             if($loggedInUser == null)
             {
               return response()->json(['error' => true ,'message'=>"No User Found"]);

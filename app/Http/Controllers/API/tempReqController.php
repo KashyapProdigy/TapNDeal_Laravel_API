@@ -46,9 +46,26 @@ class tempReqController extends Controller
         $rec=array();
         foreach($tr as $t)
         {
-            $temp=temp_req::where('id',$t['id'])->first();
+            $temp=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')->select('temp_req.*','temp_req_pro.end_period')->where('temp_req.id',$t['id'])->first();
+            if($temp)
+            {
+                $end=$temp['end_period'];
+                if($end<date('Y-m-d H:i:s'))
+                {
+                    $expired=true;
+                }
+                else{
+                    $expired=false;
+                }
+            }
+            else{
+                $temp=temp_req::where('id',$t['id'])->first();
+                $expired=false;
+            }
+            
             $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
             $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+            $temp['expired']=$expired;
             $rec[]=$temp;
         }
         if($rec != null)
@@ -63,9 +80,26 @@ class tempReqController extends Controller
         $rec=array();
         foreach($tr as $t)
         {
-            $temp=temp_req::where('id',$t['id'])->first();
+            $temp=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')->select('temp_req.*','temp_req_pro.end_period')->where('temp_req.id',$t['id'])->first();
+            if($temp)
+            {
+                $end=$temp['end_period'];
+                if($end<date('Y-m-d H:i:s'))
+                {
+                    $expired=true;
+                }
+                else{
+                    $expired=false;
+                }
+            }
+            else{
+                $temp=temp_req::where('id',$t['id'])->first();
+                $expired=false;
+            }
+            
             $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
             $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+            $temp['expired']=$expired;
             $rec[]=$temp;
         }
          if($rec != null)
@@ -75,14 +109,37 @@ class tempReqController extends Controller
     }
     public function sellerShow($sid)
     {
+        $user=User::find($sid);
+        if($user->type_id==4 || $user->type_id==5 || $user->type_id==6 || $user->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$sid)->first();
+            $sid=$seller->seller_id;
+        }
         $tr=temp_req::where('req_to',$sid)->orderBy('created_at','desc')->get();
         $temp=array();
         $rec=array();
         foreach($tr as $t)
         {
-            $temp=temp_req::where('id',$t['id'])->first();
+            $temp=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')->select('temp_req.*','temp_req_pro.end_period')->where('temp_req.id',$t['id'])->first();
+            if($temp)
+            {
+                $end=$temp['end_period'];
+                if($end<date('Y-m-d H:i:s'))
+                {
+                    $expired=true;
+                }
+                else{
+                    $expired=false;
+                }
+                
+            }
+            else{
+                $temp=temp_req::where('id',$t['id'])->first();
+                $expired=false;
+            }
             $temp['buyer']=User::where('id',$t['req_for'])->select('id','name','mobile')->first();
             $temp['agent']=User::where('id',$t['req_by'])->select('id','name','mobile')->first();
+            $temp['expired']=$expired;
             $respone=temp_req_product::where([['sid',$sid],['trid',$t['id']]])->first();
             if($respone)
             {

@@ -128,7 +128,7 @@ Route::post('user/banner/update/{bid}','API\bannerController@update');
 Route::post('user/banner/destroy/{bid}','API\bannerController@destroy');
 Route::post('user/banner/add/{bid}','API\bannerController@AddBanner');
 
-Route::get('Agent/list','API\agentController@List');
+Route::get('Agent/list/{uid}','API\agentController@List');
 Route::get('Agent/orderlist/{ref}','API\agentController@orderList');
 Route::get('Agent/past/orderlist/{ref}','API\agentController@pastOrderList');
 Route::get('Agent/ongoing/orderlist/{ref}','API\agentController@ongoingOrderList');
@@ -166,5 +166,7 @@ Route::post('feedback','API\feedBack@create');
 Route::get('payment/history/{uid}','API\subscriptionController@history');
 
 Route::post('seller/folder/new','API\folderController@create');   
+Route::post('folder/edit/{fid}','API\folderController@edit');
+Route::delete('folder/delete/{fid}','API\folderController@delete');
 Route::get('seller/folder/{sid}','API\folderController@show');   
 Route::get('seller/folder/product/{fid}','API\folderController@prodShow');    

@@ -13,6 +13,8 @@ use App\Notifications\ProductAdd;
 use App\AgentCategoryRelationship;
 use App\CustomerCategoryRelationship;
 use App\User;
+use App\emp_sel_rel;
+use App\folderModel;
 class productController extends Controller
 {
     public function show($id)
@@ -31,6 +33,14 @@ class productController extends Controller
         $product_list=Product::find($id);
         if(!empty($product_list))
         {
+            $folder=folderModel::find($product_list->fid);
+            if($folder)
+            {
+                $product_list->fname=$folder->fname;
+            }
+            else{
+                $product_list->fname=null;
+            }
             return response()->json(['error' => false ,'data'=>$product_list],200);
         }
         else{
@@ -39,6 +49,7 @@ class productController extends Controller
     }
     public function create(Request $req)
     {
+        
         $names="";
         $watermark_name="";
 
@@ -54,6 +65,12 @@ class productController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $User=User::find($req->seller_id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$req->seller_id)->first();
+            $req->seller_id=$seller->seller_id;
         }
             $image_list = $req->image['array'];
             if( $image_list != null)

@@ -61,16 +61,20 @@ class userController extends Controller
     }
     public function register(Request $request)
     {
-        $user=User::where('mobile',$request->mobile)->first();
-        if($user)
+        $user1=User::where([['mobile',$request->mobile],['isDeleted',0]])->first();
+        if($user1)
         {
-            if($user->type_id!=3)
+            if($user1->type_id!=3)
+            {
+                return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
+            }
+            else if($user1->type_id==3 && $request->type_id==3)
             {
                 return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
             }
             else{
-                $user->isDeleted=1;
-                $user->save();
+                $user1->isDeleted=1;
+                $user1->save();
             }
         }
         if($request->type_id==2 || $request->type_id==8)
@@ -103,33 +107,46 @@ class userController extends Controller
         $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days')); 
         if($request->sel_ref!="")
         {
-            $seller=User::where([['ref_code',$request->sel_ref],['type_id',1]])->select('id','acc_allow')->first();
+            $seller=com_info::join('users','company_info.sid','users.id')->where([['ref_code',$request->sel_ref],['type_id',1]])->select('users.id as sid','users.city_id','users.state_id','users.acc_allow','company_info.*')->first();
             if($seller == null)
             {
                 return response()->json(['error' => true ,'message'=>'invalid Reference code..!'],400);
             }
-            if($request->type_id==1 || $request->type_id==2 || $request->type_id==8 || $request->type_id==3)
+            if($request->type_id==1 || $request->type_id==2 || $request->type_id==3)
             {
                 $user->refered_by=$request->sel_ref;
             }
             else{
-                $e_count=emp_sel_rel::where('seller_id',$seller->id)->count();
+                $e_count=emp_sel_rel::where('seller_id',$seller->sid)->count();
                 if($e_count>=$seller['acc_allow'])
                 {
                     return response()->json(['error' => true ,'message'=>'This seller already used his all account'],401);
+                }
+                else{
+                    $user->city_id=$seller->city_id;
+                    $user->state_id=$seller->state_id;
                 }
             }
             
         }
         if($user->save())
         {
-            if($request->type_id==4 || $request->type_id==5 || $request->type_id==6)
+            if($request->type_id==4 || $request->type_id==5 || $request->type_id==6 || $request->type_id==8)
             {
                 $es=new emp_sel_rel;
+                
                 $es->emp_id=$user->id;
-                $es->seller_id=$seller['id'];
+                $es->seller_id=$seller->sid;
                 $es->save();
+                $ci=new com_info;
+                $ci->cname=$seller->cname;
+                $ci->pan=$seller->pan;
+                $ci->gst=$seller->gst;
+                $ci->address=$seller->address;
+                $ci->sid=$user->id;
+                $ci->save();
             }
+            else{
             $ci=new com_info;
             $ci->cname=$request->cname;
             $ci->pan=$request->pan;
@@ -137,7 +154,7 @@ class userController extends Controller
             $ci->address=$request->address;
             $ci->sid=$user->id;
             $ci->save();
-            
+            }
             return response()->json(['error' => false ,'message'=>'User Added Successfully'],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
@@ -266,6 +283,12 @@ class userController extends Controller
 
     public function showViewLog($id)
     {
+        $User=User::find($id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+        }
 
         $logrecords=ProfileViewLog::join('users','users.id','cust_id')->where('seller_id',$id)->get()->toarray();
 
@@ -280,8 +303,9 @@ class userController extends Controller
             $records = DB::table('profile_view_logs')
                 ->join('users','users.id','profile_view_logs.cust_id')
                 ->join('citys','users.city_id','citys.id')
+                ->join('company_info','sid','users.id')
                 ->join('states','users.state_id','states.id')
-                ->select('users.name as cust_name','users.id as cust_id','users.mobile','profile_view_logs.updated_at as view_date','citys.city_name','states.state_name')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','profile_view_logs.updated_at as view_date','citys.city_name','states.state_name','company_info.cname')
                 ->whereIn('profile_view_logs.id',$recordids)
                 ->orderby('profile_view_logs.updated_at','DESC')
                 ->get()->toarray();

@@ -9,7 +9,8 @@ use App\Cart;
 use App\Product;
 use Carbon\Carbon;
 use Validator;
-
+use App\User;
+use App\emp_sel_rel;
 class cartController extends Controller
 {
     public function show($id)
@@ -20,6 +21,7 @@ class cartController extends Controller
             ->join('users','users.id','carts.seller_id')
             ->select('carts.seller_id','carts.id as cart_id','users.name as seller_name','products.id as product_id','products.name as product_name','products.image as product_image','products.category','carts.qty','products.price as product_price','carts.created_at as cart_add_time','carts.col_wise_qty')
             ->where('carts.cust_id',$id)
+            ->where('isDisabled',0)
             ->get()->toarray();
             if($cart != null)
             {
@@ -49,7 +51,12 @@ class cartController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-
+        $User=User::find($req->cust_id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$req->cust_id)->first();
+            $req->cust_id=$seller->seller_id;
+        }
         $product = Product::find($req->product_id);
         $otherseller = Cart::where('cust_id',$req->cust_id)->first();
         $cartrecord = Cart::where('product_id',$req->product_id)->where('cust_id',$req->cust_id)->first();
@@ -148,7 +155,7 @@ class cartController extends Controller
     }
     public function count($id)
     {
-        $cart_count=Cart::where('cust_id',$id)->count();
+        $cart_count=Cart::join('products','products.id','carts.product_id')->where('isDisabled',0)->where('cust_id',$id)->count();
         if($cart_count != null)
         {
             return response()->json(['error' => false ,'data'=>$cart_count],200);

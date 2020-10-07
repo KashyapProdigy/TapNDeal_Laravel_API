@@ -170,7 +170,7 @@ class agentKnockController extends Controller
                     'isActive'=>0
                 ];
 
-                $knock_update=AgentKnock::where('id',$knockrecord->id)->update($knock_data);
+                $knock_update=AgentKnock::where('id',$knockrecord->id)->delete();
                 if($knock_update==1)
                 {
                     return response()->json(['error' => false ,'message'=>' Agent Rejected Successfully'],200);

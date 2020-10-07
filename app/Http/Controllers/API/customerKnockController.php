@@ -9,7 +9,7 @@ use App\User;
 use App\CustomerKnock;
 use App\CustomerCategoryRelationship;
 use Validator;
-
+use App\emp_sel_rel;
 class customerKnockController extends Controller
 {
         public function create(Request $req,$id)
@@ -186,6 +186,12 @@ class customerKnockController extends Controller
 
         public function show($id)
         {
+            $User=User::find($id);
+            if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+            {
+                $seller=emp_sel_rel::where('emp_id',$id)->first();
+                $id=$seller->seller_id;
+            }
             $knockreturn = DB::table('cust_sel_knock_rel')
                             ->join('users','users.id','cust_sel_knock_rel.cust_id')
                             ->select('users.name','cust_sel_knock_rel.*')

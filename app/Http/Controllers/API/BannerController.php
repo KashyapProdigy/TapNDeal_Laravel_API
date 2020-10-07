@@ -8,11 +8,19 @@ use App\Banners;
 use Validator;
 use File;
 use Illuminate\Support\Facades\Storage;
-
+use App\User;
+use App\emp_sel_rel;
 class BannerController extends Controller
 {
     public function show($mid)
     {
+        $user=User::find($mid);
+        if($user->type_id==4 || $user->type_id==5 || $user->type_id==6 || $user->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$mid)->first();
+            $mid=$seller->seller_id;
+            
+        }
         $banners=Banners::where('manu_id',$mid)->get();
         if(count($banners)>0)
         {
