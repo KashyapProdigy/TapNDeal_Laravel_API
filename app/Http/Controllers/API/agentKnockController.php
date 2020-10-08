@@ -107,6 +107,12 @@ class agentKnockController extends Controller
             if ($validator->fails()) {
                 return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
             }
+            $User=User::find($req->seller_id);
+            if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+            {
+                $seller=emp_sel_rel::where('emp_id',$req->seller_id)->first();
+                $req->seller_id=$seller->seller_id;
+            }
             $knockrecord=AgentKnock::where('agent_id',$id)->where('seller_id',$req->seller_id)->first();
             $relrecord=AgentCategoryRelationship::where('agent_id',$id)->where('seller_id',$req->seller_id)->first();
             $knock_data=[
@@ -190,6 +196,12 @@ class agentKnockController extends Controller
             ]);
             if ($validator->fails()) {
                 return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+            }
+            $User=User::find($req->seller_id);
+            if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+            {
+                $seller=emp_sel_rel::where('emp_id',$req->seller_id)->first();
+                $req->seller_id=$seller->seller_id;
             }
             $knockrecord=AgentKnock::where('agent_id',$id)->where('seller_id',$req->seller_id)->first();
             if($knockrecord!=null)

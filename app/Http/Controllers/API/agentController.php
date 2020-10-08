@@ -60,7 +60,7 @@ class agentController extends Controller
         {
             $list=Order::where('orders.id',$o['id'])->join('order_status','status_id','order_status.id')->first();
             $list['seller']=User::where('id',$o['seller_id'])->select('id','name','mobile')->first();
-            $list['buyer']=User::where('id',$o['cust_id'])->select('id','name')->first();
+            $list['buyer']=User::where('id',$o['cust_id'])->select('id','name','mobile')->first();
             $order[]=$list;
         }
         if(count($order)>0)    

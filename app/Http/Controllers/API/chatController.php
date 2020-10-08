@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use App\Chat;
 use Carbon\Carbon;
 use Validator;
-
+use App\Notifications\ChatNoti;
+use App\User;
 class chatController extends Controller
 {
     public function store(Request $req)
@@ -36,6 +37,11 @@ class chatController extends Controller
             $chat->date_time=date('Y-m-d H:i:s');
             if($chat->save())
             {
+                $usr=User::find($req->receiver);
+                $send=User::find($req->send_by);
+                $msg="New message by ".$send->name." ".$req->msg;
+                $arr=['msg'=>$msg];
+                \Notification::send($usr, new ChatNoti($arr));
                 return response()->json(['error' => false ,'message'=>"Message stored successfully"], 200);
             }
             return response()->json(['error' => true ,'message'=>'somthing went wrong'], 500);
@@ -45,6 +51,11 @@ class chatController extends Controller
         $chat->send_by=$req->send_by;
         $chat->date_time=date('Y-m-d H:i:s');
         $chat->save();
+        $usr=User::find($req->receiver);
+        $send=User::find($req->send_by);
+        $msg="New message by ".$send->name." ".$req->msg;
+        $arr=['msg'=>$msg];
+        \Notification::send($usr, new ChatNoti($arr));
         return response()->json(['error' => false ,'message'=>"Message stored successfully"], 200);
     }
     public function list($uid)

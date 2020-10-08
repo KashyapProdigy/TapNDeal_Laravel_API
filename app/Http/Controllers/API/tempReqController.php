@@ -10,6 +10,7 @@ use App\User;
 use App\temp_req_product;
 use App\Product;
 use App\emp_sel_rel;
+use App\Notifications\TempReq;
 class tempReqController extends Controller
 {
     public function create(Request $req)
@@ -28,6 +29,7 @@ class tempReqController extends Controller
         // $se=json_decode($req->request_to);
         $se=implode(',',$req->request_to);
         $se=explode(',',$se);
+        $agent=User::find($req->request_by);
         foreach($se as $seller)
         {
             $t=new temp_req;
@@ -36,7 +38,18 @@ class tempReqController extends Controller
             $t->req_to=$seller;
             $t->remarks=$req->remarks;
             $t->save();
+
+            $usr=User::find($seller);
+            // $cust=User::find($req->cust_id);
+            $msg="Tempprary Request has been created by ".$agent->name;
+            $arr=['msg'=>$msg];
+            \Notification::send($usr, new TempReq($arr));
         }
+        $usr=User::find($req->request_for);
+        // $cust=User::find($req->cust_id);
+        $msg="Tempprary Request has been created by ".$agent->name;
+        $arr=['msg'=>$msg];
+        \Notification::send($usr, new TempReq($arr));
         return response()->json(['error' => false ,'message'=>'Temporary Request Added..'], 200);
     }
     public function show($bid)
@@ -187,6 +200,12 @@ class tempReqController extends Controller
                     $tr->pid=$pi;
                     $tr->end_period=date('Y-m-d H:i:s', strtotime("+".$req->time_period." days"));
                     $tr->save();
+
+                    $usr=User::find($tempReq->req_for);
+                    // $cust=User::find($req->cust_id);
+                    $msg="Temp Req";
+                    $arr=['msg'=>$msg];
+                    \Notification::send($usr, new TempReq($arr));
                 
                 return response()->json(['error' => false ,'message'=>"Response Added successfully.."], 200);
             }
@@ -312,6 +331,11 @@ class tempReqController extends Controller
                 {
                     $tempReq->isRevive=1;
                     $tempReq->save();
+                    $usr=User::find($tempReq->req_for);
+                    $seller=User::find($tempReq->req_to);
+                    $msg="Temporary Requirement has once again revive by ".$seller->name;
+                    $arr=['msg'=>$msg];
+                    \Notification::send($usr, new TempReq($arr));
                     return response()->json(['error' => false ,'message'=>'Temporary Requirement revive successfully..'], 200);
                 }
             }

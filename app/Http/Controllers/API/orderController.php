@@ -13,6 +13,8 @@ use App\emp_sel_rel;
 use App\Notifications\statusChange;
 use App\Notifications\orderPlace;
 use App\custome_agent;
+use App\CustomerCategoryRelationship;
+
 class orderController extends Controller
 {
     public function createRequest(Request $req)
@@ -77,6 +79,15 @@ class orderController extends Controller
             $orderinsert->notes=$req->notes;
             if($orderinsert->save())
             {
+                $relrecord=CustomerCategoryRelationship::where('cust_id',$req->cust_id)->where('seller_id',$cartrecord->seller_id)->first();
+                if(!$relrecord)
+                {
+                    $relation_data = new CustomerCategoryRelationship;
+                    $relation_data->cust_id = $req->cust_id;
+                    $relation_data->seller_id=$cartrecord->seller_id;
+                    $relation_data->category = 'B';
+                    $relation_data->save();
+                }
                 $usr=User::find($req->cust_id);
                 $msg="Order has been placed by ".$usr->name;
                 $arr=['msg'=>$msg];

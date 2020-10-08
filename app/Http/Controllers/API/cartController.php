@@ -63,6 +63,7 @@ class cartController extends Controller
             $seller=emp_sel_rel::where('emp_id',$req->cust_id)->first();
             $req->cust_id=$seller->seller_id;
         }
+        
         $product = Product::find($req->product_id);
         $otherseller = Cart::where('cust_id',$req->cust_id)->first();
         $cartrecord = Cart::where('product_id',$req->product_id)->where('cust_id',$req->cust_id)->first();
