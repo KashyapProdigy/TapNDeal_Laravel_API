@@ -101,12 +101,12 @@ class orderController extends Controller
                 {
                     
                     
-                    $sel=User::find($cartrecord->seller_id);
+                    // $sel=User::find($cartrecord->seller_id);
                     
-                    $usr1=User::where('ref_code',$req->agent_reference)->first();
-                    $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
-                    $arr1=['msg'=>$msg1];
-                    \Notification::send($usr1, new orderPlace($arr1));
+                    // $usr1=User::where('ref_code',$req->agent_reference)->first();
+                    // $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
+                    // $arr1=['msg'=>$msg1];
+                    // \Notification::send($usr1, new orderPlace($arr1));
                 }
                 return response()->json(['error' => false ,'message'=>"Order Requested Successfully"], 200);
             }

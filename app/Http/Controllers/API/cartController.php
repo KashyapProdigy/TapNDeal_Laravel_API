@@ -127,6 +127,7 @@ class cartController extends Controller
         if($c)
         {
             $c->qty=$req->qty;
+            $c->col_wise_qty=$req->col_qty;
             $c->save();
             return response()->json(['error' => false ,'message'=>'Cart Updated successfully..'],200);
         }

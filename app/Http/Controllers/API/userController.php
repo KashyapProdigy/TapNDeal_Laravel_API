@@ -333,6 +333,7 @@ class userController extends Controller
             $data=new ProfileViewLog;
             $data->seller_id=$req->seller_id;
             $data->cust_id=$req->cust_id;
+            $data->created_at=data('Y-m-d H:i:s');
             if($data->save())
             {
                 return response()->json(['error' => false ,'message'=>'View Logged Successfully'],200);

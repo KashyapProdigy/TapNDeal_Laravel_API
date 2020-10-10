@@ -271,10 +271,9 @@ class productController extends Controller
                     'fid'=>$req->fid
                 ];
                 $product_update=Product::where('id',$id)->update($product_data);
-                if($product_update==1)
-                {
+                
                     return response()->json(['error' => false ,'message'=>'Product Updated Successfully'],200);
-                }
+                
             }
             else{
                 return response()->json(['error' => true ,'message'=>'Record not found']);
@@ -362,18 +361,27 @@ class productController extends Controller
     public function delImg($pid,$img)
     {
         $prdct=Product::find($pid);
+        
         if($prdct)
         {
             $images=explode(',',$prdct->image);
             if (($key = array_search($img, $images)) !== false) {
                 unset($images[$key]);
-                Storage::disk('temp')->delete($images);
-                Storage::disk('product')->delete($images);
+                
+                Storage::disk('product')->delete($img);
                 $prdct->image=implode(',',$images);
                 $prdct->save();
                 return response()->json(['error' => false ,'message'=>'Product Deleted successfully'],200);
             }
+            if(Storage::disk('temp')->delete($img))
+            {
+                return response()->json(['error' => false ,'message'=>'Product Deleted successfully'],200);
+            }
             return response()->json(['error' => true ,'message'=>'image not found'],400);
+        }
+        if(Storage::disk('temp')->delete($img))
+        {
+            return response()->json(['error' => false ,'message'=>'Product Deleted successfully'],200);
         }
         return response()->json(['error' => true ,'message'=>'Product not found'],400);
     }
