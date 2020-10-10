@@ -53,8 +53,15 @@ class customerKnockController extends Controller
                     $status=CustomerKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
-                        $usr=User::find($knock_seller);
+                        $usr=User::find($id);
                         $cust=User::find($req->cust_id);
+                        $msg="Knock by ".$cust->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
+
+                        
+                        $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
+                        $usr=User::find($salesman->id);
                         $msg="Knock by ".$cust->name;
                         $arr=['msg'=>$msg];
                         \Notification::send($usr, new knockRequestSend($arr));
@@ -72,8 +79,14 @@ class customerKnockController extends Controller
                     $status=CustomerKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
-                        $usr=User::find($knock_seller);
+                        $usr=User::find($id);
                         $cust=User::find($req->cust_id);
+                        $msg="Knock by ".$cust->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
+                        
+                        $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
+                        $usr=User::find($salesman->id);
                         $msg="Knock by ".$cust->name;
                         $arr=['msg'=>$msg];
                         \Notification::send($usr, new knockRequestSend($arr));
@@ -86,8 +99,14 @@ class customerKnockController extends Controller
             }
             if($knock_data->save())
             {
-                $usr=User::find($knock_seller);
+                $usr=User::find($id);
                 $cust=User::find($req->cust_id);
+                $msg="Knock by ".$cust->name;
+                $arr=['msg'=>$msg];
+                \Notification::send($usr, new knockRequestSend($arr));
+
+                $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
+                $usr=User::find($salesman->id);
                 $msg="Knock by ".$cust->name;
                 $arr=['msg'=>$msg];
                 \Notification::send($usr, new knockRequestSend($arr));

@@ -79,28 +79,32 @@ class orderController extends Controller
             $orderinsert->notes=$req->notes;
             if($orderinsert->save())
             {
-                $relrecord=CustomerCategoryRelationship::where('cust_id',$req->cust_id)->where('seller_id',$cartrecord->seller_id)->first();
-                if(!$relrecord)
+                if($req->cust_id != $cartrecord->seller_id)
                 {
-                    $relation_data = new CustomerCategoryRelationship;
-                    $relation_data->cust_id = $req->cust_id;
-                    $relation_data->seller_id=$cartrecord->seller_id;
-                    $relation_data->category = 'B';
-                    $relation_data->save();
+                    $relrecord=CustomerCategoryRelationship::where('cust_id',$req->cust_id)->where('seller_id',$cartrecord->seller_id)->first();
+                    if(!$relrecord)
+                    {
+                        $relation_data = new CustomerCategoryRelationship;
+                        $relation_data->cust_id = $req->cust_id;
+                        $relation_data->seller_id=$cartrecord->seller_id;
+                        $relation_data->category = 'B';
+                        $relation_data->save();
+                    }
                 }
-                $usr=User::find($req->cust_id);
-                $msg="Order has been placed by ".$usr->name;
-                $arr=['msg'=>$msg];
-                \Notification::send($usr, new orderPlace($arr));
-
-                if($req->agent_reference!="")
+                    $usr=User::find($cartrecord->seller_id);
+                    $cust=User::find($req->cust_id);
+                    $msg="Order has been placed by ".$cust->name;
+                    $arr=['msg'=>$msg];
+                    \Notification::send($usr, new orderPlace($arr));
+                
+                if($req->agent_reference!="Order without agent" && $req->agent_reference!=" ")
                 {
                     
                     
                     $sel=User::find($cartrecord->seller_id);
                     
                     $usr1=User::where('ref_code',$req->agent_reference)->first();
-                    $msg1="Order has been placed by ".$usr->name." to ".$sel->name;
+                    $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
                     $arr1=['msg'=>$msg1];
                     \Notification::send($usr1, new orderPlace($arr1));
                 }
@@ -146,6 +150,11 @@ class orderController extends Controller
                 {
                     $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                 }
+                if(!$agent['name'])
+                {
+                    $agent['name']=" ";
+                    $agent['mobile']=" ";
+                }
                 $record->agent_name=$agent['name'];
                 $record->agent_mobile=$agent['mobile'];
                 $record->products = json_decode($record->products);
@@ -181,6 +190,11 @@ class orderController extends Controller
                         if(!$agent)
                         {
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
+                        }
+                        if(!$agent['name'])
+                        {
+                            $agent['name']=" ";
+                            $agent['mobile']=" ";
                         }
                         $record->agent_name=$agent['name'];
                         $record->agent_mobile=$agent['mobile'];
@@ -236,6 +250,11 @@ class orderController extends Controller
                         {
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                         }
+                        if(!$agent['name'])
+                        {
+                            $agent['name']=" ";
+                            $agent['mobile']=" ";
+                        }
                         $record->agent_name=$agent['name'];
                         $record->agent_mobile=$agent['mobile'];
                         $record->products = json_decode($record->products);
@@ -269,6 +288,11 @@ class orderController extends Controller
                         if(!$agent)
                         {
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
+                        }
+                        if(!$agent['name'])
+                        {
+                            $agent['name']=" ";
+                            $agent['mobile']=" ";
                         }
                         $record->agent_name=$agent['name'];
                         $record->agent_mobile=$agent['mobile'];
@@ -327,7 +351,11 @@ class orderController extends Controller
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                             
                         }
-                        
+                        if(!$agent['name'])
+                        {
+                            $agent['name']=" ";
+                            $agent['mobile']=" ";
+                        }
                         $record->agent_name=$agent['name'];
                         $record->agent_mobile=$agent['mobile'];
                         $record->products = json_decode($record->products);
@@ -362,6 +390,11 @@ class orderController extends Controller
                         {
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
                         }
+                        if(!$agent['name'])
+                        {
+                            $agent['name']=" ";
+                            $agent['mobile']=" ";
+                        }
                         $record->agent_name=$agent['name'];
                         $record->agent_mobile=$agent['mobile'];
                         $record->cust_name=$User->name;
@@ -390,7 +423,14 @@ class orderController extends Controller
             $order_update=Order::where('id',$id)->update($order_data);
             $ord=Order::find($id);
             $usr=User::find($ord->cust_id);
-            $arr=['name'=>$ord->order_name,'status'=>'Accepted'];
+            $msg='Order '.$ord->order_name.' has been Accepted';
+            $arr=['msg'=>$msg];
+            \Notification::send($usr, new statusChange($arr));
+
+            $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',6],['seller_id',$ord->seller_id]])->first();
+            $usr=User::find($salesman->id);
+            $msg='New order '.$ord->order_name.' received please get the product ready';
+            $arr=['msg'=>$msg];
             \Notification::send($usr, new statusChange($arr));
             if($order_update==1)
             {
@@ -411,7 +451,7 @@ class orderController extends Controller
                 $ord=Order::find($id);
                 $usr=User::find($ord->cust_id);
                 $arr=['name'=>$ord->order_name,'status'=>'Rejected'];
-                \Notification::send($usr, new statusChange($arr));
+                // \Notification::send($usr, new statusChange($arr));
                 if($order_update==1)
                 {
                     return response()->json(['error' => false ,'message'=>' Order Rejected Successfully'],200);
@@ -423,6 +463,24 @@ class orderController extends Controller
     {
         $status=\DB::table('order_status')->whereNotIn('status_name',['Received','Rejected'])->get();
         return response()->json(['error' => false ,'status'=>$status],200);
+    }
+    public function status($type)
+    {
+        if($type==1 || $type==4)
+        {
+            $status=\DB::table('order_status')->whereNotIn('status_name',['Received','Rejected'])->get();
+            return response()->json(['error' => false ,'status'=>$status],200);
+        }
+        if($type==6)
+        {
+            $status=\DB::table('order_status')->where('status_name','Ready')->get();
+            return response()->json(['error' => false ,'status'=>$status],200);
+        }
+        if($type==5)
+        {
+            $status=\DB::table('order_status')->where('status_name','Dispatched')->get();
+            return response()->json(['error' => false ,'status'=>$status],200);
+        }
     }
     public function orderStatus($id)
     {
@@ -445,9 +503,18 @@ class orderController extends Controller
             $ordr->status_id=$req->status_id;
             $ordr->save();
             $ostat=\DB::table('order_status')->select('status_name')->where('id',$req->status_id)->first();
-            $arr=['name'=>$ordr->order_name,'status'=>$ostat->status_name];
+            $msg='Order '.$ordr->order_name.' has been '.$ostat->status_name;
+            $arr=['msg'=>$msg];
             $usr=User::find($ordr['cust_id']);
             \Notification::send($usr, new statusChange($arr));
+            if($req->status_id==3)
+            {
+                $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',5],['seller_id',$ordr->seller_id]])->first();
+                $usr=User::find($salesman->id);
+                $msg='Please get bill ready for '.$ordr->order_name.' it is ready to dispatch';
+                $arr=['msg'=>$msg];
+                \Notification::send($usr, new statusChange($arr));
+            }
             return response()->json(['error' => false ,'message'=>'Order status change'],200);
         }
         return response()->json(['error' => true ,'message'=>'Order not found'],200);
@@ -488,7 +555,12 @@ class orderController extends Controller
                         if(!$agent)
                         {
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
-                            $cname=null;
+                            $cname=" ";
+                        }
+                        if(!$agent['name'])
+                        {
+                            $agent['name']=" ";
+                            $agent['mobile']=" ";
                         }
                         $record->agent_name=$agent['name'];
                         $record->agent_mobile=$agent['mobile'];
@@ -526,7 +598,12 @@ class orderController extends Controller
                         if(!$agent)
                         {
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
-                            $cname=null;
+                            $cname=" ";
+                        }
+                        if(!$agent['name'])
+                        {
+                            $agent['name']=" ";
+                            $agent['mobile']=" ";
                         }
                         $record->agent_name=$agent['name'];
                         $record->agent_mobile=$agent['mobile'];

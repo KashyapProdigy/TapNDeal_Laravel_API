@@ -13,6 +13,10 @@ use App\emp_sel_rel;
 use App\custome_agent;
 use Illuminate\Support\Facades\Storage;
 use File;
+use App\Order;
+use App\temp_req;
+use App\AgentKnock;
+use App\CustomerKnock;
 class userController extends Controller
 {
 
@@ -57,6 +61,62 @@ class userController extends Controller
         else{
             return response()->json(['error'=> true , 'message' => 'unauthorised'], 401);
         }
+    }
+    public function newAccount(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email'=>'required',
+            'mobile'=>'required',
+            'pass'=>'required',
+            'sid'=>'required',
+            'type_id'=>'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $seller=com_info::join('users','company_info.sid','users.id')->where([['users.id',$request->sid],['type_id',1]])->select('company_info.*','users.*')->first();
+
+        $e_count=emp_sel_rel::where('seller_id',$request->sid)->count();
+        if($e_count>=$seller['acc_allow'])
+        {
+            return response()->json(['error' => true ,'message'=>'This seller already used his all account'],409);
+        }
+        if($seller)
+        {
+            $ref=$this->generateRefCode($request->name);
+            $user = new User;
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->password = $request->pass;
+            $user->type_id = $request->type_id;
+            $user->city_id=$seller->city_id;
+            $user->state_id=$seller->state_id;
+            $user->isVerified = 1;
+            $user->firebase_token=$request->f_token;
+            $user->device_id=$request->d_id;
+            $user->ref_code=$ref;
+            if(!$request->b_scope)
+            {
+                $request->b_scope=" ";
+            }
+            $user->business_scope=$request->b_scope;
+            $user->save();
+            $es=new emp_sel_rel;
+            $es->emp_id=$user->id;
+            $es->seller_id=$seller->sid;
+            $es->save();
+            $ci=new com_info;
+            $ci->cname=$seller->cname;
+            $ci->pan=$seller->pan;
+            $ci->gst=$seller->gst;
+            $ci->address=$seller->address;
+            $ci->sid=$user->id;
+            $ci->save();
+            return response()->json(['error' => false ,'message'=>'User Added Successfully'],200);
+        }
+        return response()->json(['error' => false ,'message'=>'Invalid seller id..'],400);
     }
     public function tokenCheck(Request $req)
     {
@@ -265,7 +325,7 @@ class userController extends Controller
 
         $logrecord=ProfileViewLog::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->first();
         if($logrecord != NULL)
-        {
+        { 
             if(date('d-m-Y',strtotime($logrecord['created_at']))==date('d-m-Y'))
             {
                 return response()->json(['error' => true ,'message'=>'Log already available for today..!'],200);
@@ -374,6 +434,7 @@ class userController extends Controller
         }
         $st=\DB::table('citys')->where('id',$request->city_id)->first();
         $user = User::find($uid);
+        $emp=emp_sel_rel::where('seller_id',$uid)->select('emp_id')->get()->toarray();
         if($user)
         {
             $user->name=$request->name;
@@ -391,6 +452,12 @@ class userController extends Controller
                         'gst'=>$request->gst,
                         'address'=>$request->address
                     ]);
+                    $ci=com_info::whereIn('sid',$emp)->update([
+                        'cname'=>$request->cname,
+                        'pan'=>$request->pan,
+                        'gst'=>$request->gst,
+                        'address'=>$request->address
+                    ]);
                 }
                 return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);
             }
@@ -403,7 +470,7 @@ class userController extends Controller
     {
         $data=array();
         $data['cities']=\DB::table('citys')->get();
-        $data['userTypes']=\DB::table('user_type')->where('user_type','!=','admin')->get();
+        $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7])->get();
         if (sizeof($data['cities']) > 0) {
             return response()->json(['error' => false, 'data' => $data], 200);
         } else {
@@ -500,5 +567,39 @@ class userController extends Controller
             }
             return response()->json(['error' => true, 'message' => 'Agent not found'], 500);
         }
+    }
+    public function count($id)
+    {
+        $user=User::find($id);
+        if($user->type_id==4 || $user->type_id==5 || $user->type_id==6 || $user->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+            $user=User::find($id);
+        }
+        if($user)
+        {
+            if($user->type_id==1)
+            {
+                $order=Order::where([['seller_id',$id],['status_id',1]])->count();
+                $tempReq=temp_req::where([['isResponded',0],['req_to',$id]])->count();
+                $ak=AgentKnock::where([['isApproved',0],['seller_id',$id]])->count();
+                $ck=CustomerKnock::where([['seller_id',$id],['isApproved',0]])->first();
+                $knock=$ak+$ck;
+                return response()->json(['error' => false, 'order' => $order,'tempReq' => $tempReq,'knock'=>$knock,'chat'=>0], 200);
+            }
+            if($user->type_id==2)
+            {
+                $order=Order::where([['agent_reference',$user->ref_code],['status_id',1]])->count();
+                $tempReq=temp_req::where([['isResponded',0],['req_by',$id]])->count();
+                return response()->json(['error' => false, 'order' => $order,'tempReq' => $tempReq,'knock'=>0,'chat'=>0], 200);
+            }
+            if($user->type_id==3)
+            {
+                return response()->json(['error' => false, 'order' => 0,'tempReq' => 0,'knock'=>0,'chat'=>0], 200);
+            }
+            return response()->json(['error' => true,'order' => 0,'tempReq' => 0,'knock'=>0,'chat'=>0], 500);
+        }
+        return response()->json(['error' => true,'order' => 0,'tempReq' => 0,'knock'=>0,'chat'=>0], 500);
     }
 }

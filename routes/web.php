@@ -46,7 +46,7 @@ route::get('/confirmMob',function(){
 Route::get('/login',function(){
     return view('login');
 });
-Route::post('/login','manufactureController@login');
+Route::post('/login1','manufactureController@login');
 Route::post('/confirmMob','manufactureController@dashboard');
 Route::get('/mobileCheck','manufactureController@mobCheck');
 

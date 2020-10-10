@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\User;
 use App\AgentKnock;
 use App\AgentCategoryRelationship;
@@ -52,8 +53,14 @@ class agentKnockController extends Controller
                     $status=AgentKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
-                        $usr=User::find($knock_seller);
+                        $usr=User::find($knock_seller->id);
                         $agent=User::find($req->agent_id);
+                        $msg="Knock by ".$agent->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
+                        
+                        $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
+                        $usr=User::find($salesman->id);
                         $msg="Knock by ".$agent->name;
                         $arr=['msg'=>$msg];
                         \Notification::send($usr, new knockRequestSend($arr));
@@ -71,8 +78,14 @@ class agentKnockController extends Controller
                     $status=AgentKnock::where('id',$record->id)->update($update_data);
                     if($status ==1)
                     {
-                        $usr=User::find($knock_seller);
+                        $usr=User::find($id);
                         $agent=User::find($req->agent_id);
+                        $msg="Knock by ".$agent->name;
+                        $arr=['msg'=>$msg];
+                        \Notification::send($usr, new knockRequestSend($arr));
+
+                        $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
+                        $usr=User::find($salesman->id);
                         $msg="Knock by ".$agent->name;
                         $arr=['msg'=>$msg];
                         \Notification::send($usr, new knockRequestSend($arr));
@@ -85,8 +98,14 @@ class agentKnockController extends Controller
             }
             if($knock_data->save())
             {
-                $usr=User::find($knock_seller);
+                $usr=User::find($id);
                 $agent=User::find($req->agent_id);
+                $msg="Knock by ".$agent->name;
+                $arr=['msg'=>$msg];
+                \Notification::send($usr, new knockRequestSend($arr));
+
+                $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
+                $usr=User::find($salesman->id);
                 $msg="Knock by ".$agent->name;
                 $arr=['msg'=>$msg];
                 \Notification::send($usr, new knockRequestSend($arr));

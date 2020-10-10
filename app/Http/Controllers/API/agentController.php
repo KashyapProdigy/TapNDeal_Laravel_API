@@ -49,7 +49,7 @@ class agentController extends Controller
         if(count($agents)>0)
             return response()->json(['error' => false ,'data'=>$agents],200);
 
-        return response()->json(['error' => true ,'messege'=>'There have no agents..!'],200);
+        return response()->json(['error' => true ,'messege'=>'There have no agents..!','data'=>[]],200);
     }
     public function orderList($ref)
     {
@@ -66,7 +66,7 @@ class agentController extends Controller
         if(count($order)>0)    
             return response()->json(['error' => false ,'data'=>$order],200);
         
-        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!'],200);
+        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!','data'=>[]],200);
     }
     public function pastOrderList($ref)
     {
@@ -90,7 +90,7 @@ class agentController extends Controller
         if(count($order)>0)    
             return response()->json(['error' => false ,'data'=>$order],200);
         
-        return response()->json(['error' => true ,'messege'=>'No past orders found for this Agent..!'],200);
+        return response()->json(['error' => true ,'messege'=>'No past orders found for this Agent..!','data'=>[]],200);
     }
     public function ongoingOrderList($ref)
     {
@@ -108,7 +108,7 @@ class agentController extends Controller
         if(count($order)>0)    
             return response()->json(['error' => false ,'data'=>$order],200);
         
-        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!'],200);
+        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!','data'=>[]],200);
     }
     public function newOrderList($ref)
     {
@@ -126,7 +126,7 @@ class agentController extends Controller
         if(count($order)>0)    
             return response()->json(['error' => false ,'data'=>$order],200);
         
-        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!'],200);
+        return response()->json(['error' => true ,'messege'=>'No orders found for this Agent..!','data'=>[]],200);
     }
     public function orderCount($ref)
     {

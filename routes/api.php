@@ -20,6 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('login', 'API\userController@login');
 Route::post('register','API\userController@register');
+Route::post('account/register','API\userController@newAccount');
 Route::post('user/reset/password/{id}','API\userController@resetPassword');
 Route::get('user/profile/display/{id}','API\userController@profileDisplay');
 Route::post('user/profile/update/{id}','API\userController@update');
@@ -81,6 +82,7 @@ Route::get('user/product/enable/{id}','API\productController@enable');
 Route::get('user/product/search','API\productController@search');
 Route::get('product/image/delete/{pid}/{pname}','API\productController@delImg');
 Route::get('user/product/search/{sid}','API\productController@searchPro');
+Route::post('user/product/change/price','API\productController@changePrice');
 
 Route::post('user/notification/new','API\notificationController@create');
 Route::post('user/notification/update/{id}','API\notificationController@update');
@@ -103,6 +105,7 @@ Route::get('user/order/show/{id}','API\orderController@showOrders');
 Route::get('user/order/cust/new/{id}','API\orderController@custNewOrder');
 Route::get('user/order/show/past/{id}','API\orderController@showPastOrders');
 Route::get('order/status/all','API\orderController@allStatus');
+Route::get('order/status/all/{type}','API\orderController@status');
 Route::get('order/status/{oid}','API\orderController@orderStatus');
 Route::post('order/status/change/{oid}','API\orderController@changeStatus');
 Route::get('order/list/{uid}','API\orderController@orderList');
@@ -122,11 +125,11 @@ Route::post('user/payment/update/{id}','API\paymentController@update');
 Route::get('user/payment/show/{id}','API\paymentController@show');
 Route::delete('user/payment/delete/{id}','API\paymentController@delete');
 
-Route::get('user/banner/show/{mid}','API\bannerController@show');
-Route::post('user/banner/new','API\bannerController@create');
-Route::post('user/banner/update/{bid}','API\bannerController@update');
-Route::post('user/banner/destroy/{bid}','API\bannerController@destroy');
-Route::post('user/banner/add/{bid}','API\bannerController@AddBanner');
+Route::get('user/banner/show/{mid}','API\BannerController@show');
+Route::post('user/banner/new','API\BannerController@create');
+Route::post('user/banner/update/{bid}','API\BannerController@update');
+Route::post('user/banner/destroy/{bid}','API\BannerController@destroy');
+Route::post('user/banner/add/{bid}','API\BannerController@AddBanner');
 
 Route::get('Agent/list/{uid}','API\agentController@List');
 Route::get('Agent/orderlist/{ref}','API\agentController@orderList');
@@ -155,7 +158,7 @@ Route::get('suplier/search','API\userController@suplierSearch');
 Route::get('regInfo','API\userController@regInfo');
 Route::get('user/firm/search','API\userController@firmSearch');
 
-Route::post('chat/store','API\chatController@store');
+Route::post('  ','API\chatController@store');
 Route::get('chat/list/{uid}','API\chatController@list');
 
 Route::post('custome/agent','API\agentController@customeAgent');
@@ -173,3 +176,4 @@ Route::get('seller/folder/product/{fid}','API\folderController@prodShow');
 
 Route::get('seller/new/acc/{sid}','API\accounts@new');
 Route::get('seller/add/acc/{sid}','API\accounts@add');
+Route::get('counts/{uid}','API\userController@count');

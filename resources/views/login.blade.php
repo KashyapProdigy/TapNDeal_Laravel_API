@@ -29,7 +29,7 @@
                                     @endif  
                                     <div id="msg"></div>
                                     <div class="card-body">
-                                        <form method="post" name="logform">
+                                        <form method="post" action="{{url('/login1')}}" name="logform">
                                         @csrf
                                             <div class="form-group" id="num">
                                                 <label class="small mb-1" for="inputEmailAddress">Mobile No.</label>

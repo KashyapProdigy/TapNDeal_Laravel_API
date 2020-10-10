@@ -44,6 +44,12 @@ class tempReqController extends Controller
             $msg="Tempprary Request has been created by ".$agent->name;
             $arr=['msg'=>$msg];
             \Notification::send($usr, new TempReq($arr));
+
+            $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$seller]])->first();
+            $usr=User::find($salesman->id);
+            $msg="Tempprary Request has been created by ".$agent->name;
+            $arr=['msg'=>$msg];
+            \Notification::send($usr, new TempReq($arr));
         }
         $usr=User::find($req->request_for);
         // $cust=User::find($req->cust_id);
@@ -76,8 +82,8 @@ class tempReqController extends Controller
                 $expired=false;
             }
             
-            $temp['agent']=User::where('id',$t['req_by'])->select('id','name')->first();
-            $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+            $temp['agent']=User::where('users.id',$t['req_by'])->join('company_info','sid','users.id')->select('users.id','company_info.cname as name','mobile')->first();
+            $temp['seller']=User::where('users.id',$t['req_to'])->join('company_info','sid','users.id')->select('users.id','company_info.cname as name','mobile')->first();
             $temp['expired']=$expired;
             $rec[]=$temp;
         }
@@ -110,8 +116,8 @@ class tempReqController extends Controller
                 $expired=false;
             }
             
-            $temp['buyer']=User::where('id',$t['req_for'])->select('id','name')->first();
-            $temp['seller']=User::where('id',$t['req_to'])->select('id','name')->first();
+            $temp['buyer']=User::where('users.id',$t['req_for'])->join('company_info','sid','users.id')->select('users.id','company_info.cname as name','mobile')->first();
+            $temp['seller']=User::where('users.id',$t['req_to'])->join('company_info','sid','users.id')->select('users.id','company_info.cname as name','mobile')->first();
             $temp['expired']=$expired;
             $rec[]=$temp;
         }
@@ -150,8 +156,8 @@ class tempReqController extends Controller
                 $temp=temp_req::where('id',$t['id'])->first();
                 $expired=false;
             }
-            $temp['buyer']=User::where('id',$t['req_for'])->select('id','name','mobile')->first();
-            $temp['agent']=User::where('id',$t['req_by'])->select('id','name','mobile')->first();
+            $temp['buyer']=User::where('users.id',$t['req_for'])->join('company_info','sid','users.id')->select('users.id','company_info.cname as name','mobile')->first();
+            $temp['agent']=User::where('users.id',$t['req_by'])->join('company_info','sid','users.id')->select('users.id','company_info.cname as name','mobile')->first();
             $temp['expired']=$expired;
             $respone=temp_req_product::where([['sid',$sid],['trid',$t['id']]])->first();
             if($respone)
@@ -185,6 +191,12 @@ class tempReqController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $User=User::find($req->sid);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$req->sid)->first();
+            $req->sid=$seller->seller_id;
         }
         $tempReq=temp_req::find($req->trid);
         if($tempReq)
@@ -273,6 +285,12 @@ class tempReqController extends Controller
     }
     public function showResponseSeller($sid,$trid)
     {
+        $User=User::find($sid);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$sid)->first();
+            $sid=$seller->seller_id;   
+        }
         $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
         ->where('req_to',$sid)
         ->where('temp_req.id',$trid)

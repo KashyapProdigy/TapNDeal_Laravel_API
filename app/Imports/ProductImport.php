@@ -25,12 +25,13 @@ class ProductImport implements ToModel
            'seller_id'  =>session()->get('uid'),
            'tags'       =>@$row[4],
            'colors'     =>@$row[5],
-           'agents_id'  =>@$row[6],
-            
+            'image'=>@$row[6],
         ]);
     }
     public function rules(): array
     {
-        
+        return [
+        '0'=>'required',
+        ];
     }
 }

@@ -243,7 +243,7 @@ class productController extends Controller
                         }
                     }
                 else{
-                    return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+                    // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
                 }
             }
 
@@ -392,5 +392,22 @@ class productController extends Controller
             return response()->json(['error' => false ,'data'=>$products],200);
         }
         return response()->json(['error' => true ,'products'=>'Products not found'],400);
+    }
+    public function changePrice(Request $req)
+    {
+        $validator = Validator::make($req->all(),[
+            'pid' => 'required',
+            'price'=>'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }   
+        $prdct=Product::find($req->pid);
+        if($prdct)
+        {
+            $prdct->price=$req->price;
+            $prdct->save();
+            return response()->json(['error' => false ,'message'=>'Price Changed..'],200);
+        }
     }
 }
