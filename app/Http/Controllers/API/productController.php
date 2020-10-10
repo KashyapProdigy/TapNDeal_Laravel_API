@@ -293,6 +293,12 @@ class productController extends Controller
         if($req->image != null && $req->name != null)
         {
                 $file = base64_decode($req->image);
+                $img = imagecreatefromstring($file);
+                //header('Content-Type: image/jpeg');
+                header('Content-Type: bitmap; charset=utf-8');
+                imagesavealpha($img, true);
+                imagejpeg($img,public_path('tempPhotos')."/".$req->file.".jpeg",100);
+                imagedestroy($img);
                 Storage::disk('temp')->put($req->name, $file);
                 if(Storage::disk('temp')->exists($req->name))
                 {

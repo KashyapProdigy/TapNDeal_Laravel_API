@@ -96,17 +96,28 @@ class orderController extends Controller
                     $msg="Order has been placed by ".$cust->name;
                     $arr=['msg'=>$msg];
                     \Notification::send($usr, new orderPlace($arr));
+
+                $salesman=emp_sel_rel::join('users','emp_sel_rel.emp_id','users.id')->where([['seller_id',$cartrecord->seller_id],['type_id',4]])->get();
+                
+                foreach($salesman as $s)
+                {
+                    $msg="Order has been placed by ".$cust->name;
+                    $arr=['msg'=>$msg];
+                    $sal=User::find($s['emp_id']);
+                    \Notification::send($sal, new orderPlace($arr));
+                }
                 
                 if($req->agent_reference!="Order without agent" && $req->agent_reference!=" ")
                 {
-                    
-                    
-                    // $sel=User::find($cartrecord->seller_id);
-                    
-                    // $usr1=User::where('ref_code',$req->agent_reference)->first();
-                    // $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
-                    // $arr1=['msg'=>$msg1];
-                    // \Notification::send($usr1, new orderPlace($arr1));
+                    $agent=User::where('ref_code',$req->agent_reference)->first();
+                    if($agent)
+                    {
+                        $sel=User::find($cartrecord->seller_id);
+                        $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
+                        $arr1=['msg'=>$msg1];
+                        \Notification::send($agent, new orderPlace($arr1));
+                    }
+                   
                 }
                 return response()->json(['error' => false ,'message'=>"Order Requested Successfully"], 200);
             }
@@ -133,8 +144,9 @@ class orderController extends Controller
         }
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
+        ->join('company_info','sid','users.id')
         ->join('order_status','order_status.id','orders.status_id')
-        ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','order_status.status_name','orders.created_at as order_date','orders.products','orders.notes')
+        ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','order_status.status_name','orders.created_at as order_date','orders.products','orders.notes','cname as cust_name')
         ->where('orders.seller_id',$id)
         ->where('order_status.status_name','Received')
         ->orderby('orders.created_at','desc')
@@ -235,7 +247,7 @@ class orderController extends Controller
                 ->join('users','users.id','orders.cust_id')
                 ->join('company_info','sid','users.id')
                 ->join('order_status','order_status.id','orders.status_id')
-                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id','orders.notes','cname')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id','orders.notes','cname as cust_name')
                 ->where('orders.seller_id',$id)
                 ->whereIn('order_status.status_name',['Accepted','Ready'])
                 ->orderby('orders.created_at','desc')
@@ -335,7 +347,7 @@ class orderController extends Controller
                             ->join('users','users.id','orders.cust_id')
                             ->join('order_status','order_status.id','orders.status_id')
                             ->join('company_info','sid','users.id')
-                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id','orders.notes','cname')
+                            ->select('users.name as cust_name' ,'users.id as cust_id','users.mobile','orders.agent_reference','orders.id as order_id','orders.order_name','orders.total_price as order_price','orders.created_at as order_date','orders.products','order_status.status_name','order_status.id as status_id','orders.notes','cname as cust_name')
                             ->where('orders.seller_id',$id)
                             ->whereIn('order_status.status_name',['Dispatched','Rejected'])
                             ->orderby('orders.created_at','desc')
@@ -422,16 +434,30 @@ class orderController extends Controller
             ];
             $order_update=Order::where('id',$id)->update($order_data);
             $ord=Order::find($id);
-            $usr=User::find($ord->cust_id);
+            $seller=User::find($ord->seller_id);
+            $cust=User::find($ord->cust_id);
             $msg='Order '.$ord->order_name.' has been Accepted';
             $arr=['msg'=>$msg];
-            \Notification::send($usr, new statusChange($arr));
+            \Notification::send($cust, new statusChange($arr));
 
             $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',6],['seller_id',$ord->seller_id]])->first();
-            $usr=User::find($salesman->id);
-            $msg='New order '.$ord->order_name.' received please get the product ready';
-            $arr=['msg'=>$msg];
-            \Notification::send($usr, new statusChange($arr));
+            if($salesman)
+            {
+                $usr=User::find($salesman->id);
+                $msg='New order '.$ord->order_name.' received please get the product ready';
+                $arr=['msg'=>$msg];
+                \Notification::send($usr, new statusChange($arr));
+            }
+            if($ord->agent_reference)
+            {
+                $agent=User::where('ref_code',$ord->agent_reference)->first();
+                if($agent)
+                {
+                    $msg='Order has been created by '.$seller->name.' of your client '.$cust->name;
+                    $arr=['msg'=>$msg];
+                    \Notification::send($agent, new statusChange($arr));
+                }
+            }
             if($order_update==1)
             {
                 return response()->json(['error' => false ,'message'=>' Order Accepted Successfully'],200);
@@ -464,7 +490,7 @@ class orderController extends Controller
         $status=\DB::table('order_status')->whereNotIn('status_name',['Received','Rejected'])->get();
         return response()->json(['error' => false ,'status'=>$status],200);
     }
-    public function status($type)
+     public function status($type)
     {
         if($type==1 || $type==4)
         {
@@ -481,6 +507,7 @@ class orderController extends Controller
             $status=\DB::table('order_status')->where('status_name','Dispatched')->get();
             return response()->json(['error' => false ,'status'=>$status],200);
         }
+        return response()->json(['error' => false ,'status'=>[]],200);
     }
     public function orderStatus($id)
     {
