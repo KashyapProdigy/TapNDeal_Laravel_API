@@ -40,8 +40,9 @@ class chatController extends Controller
                 $usr=User::find($req->receiver);
                 $send=User::find($req->send_by);
                 $msg="New message by ".$send->name." ".$req->msg;
-                $arr=['msg'=>$msg];
-                \Notification::send($usr, new ChatNoti($arr));
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
                 return response()->json(['error' => false ,'message'=>"Message stored successfully"], 200);
             }
             return response()->json(['error' => true ,'message'=>'somthing went wrong'], 500);
@@ -54,8 +55,9 @@ class chatController extends Controller
         $usr=User::find($req->receiver);
         $send=User::find($req->send_by);
         $msg="New message by ".$send->name." ".$req->msg;
-        $arr=['msg'=>$msg];
-        \Notification::send($usr, new ChatNoti($arr));
+        $data['msg']=$msg;
+        $data['id']=$usr->id;
+        \onesignal::sendNoti($data);
         return response()->json(['error' => false ,'message'=>"Message stored successfully"], 200);
     }
     public function list($uid)

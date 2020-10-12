@@ -172,13 +172,17 @@ class productController extends Controller
             {   
                 
                 $usr=User::find($b['cust_id']);
-                \Notification::send($usr, new ProductAdd($prdct));
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
             }
             $agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
             foreach($agent as $b)
             {
                 $usr=User::find($b['agent_id']);
-                \Notification::send($usr, new ProductAdd($prdct));
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
             }
             return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
         }

@@ -94,17 +94,19 @@ class orderController extends Controller
                     $usr=User::find($cartrecord->seller_id);
                     $cust=User::find($req->cust_id);
                     $msg="Order has been placed by ".$cust->name;
-                    $arr=['msg'=>$msg];
-                    \Notification::send($usr, new orderPlace($arr));
+                    $data['msg']=$msg;
+                    $data['id']=$usr->id;
+                    \onesignal::sendNoti($data);
 
                 $salesman=emp_sel_rel::join('users','emp_sel_rel.emp_id','users.id')->where([['seller_id',$cartrecord->seller_id],['type_id',4]])->get();
                 
                 foreach($salesman as $s)
                 {
                     $msg="Order has been placed by ".$cust->name;
-                    $arr=['msg'=>$msg];
                     $sal=User::find($s['emp_id']);
-                    \Notification::send($sal, new orderPlace($arr));
+                    $data['msg']=$msg;
+                    $data['id']=$sal->id;
+                    \onesignal::sendNoti($data);
                 }
                 
                 if($req->agent_reference!="Order without agent" && $req->agent_reference!=" ")
@@ -114,8 +116,9 @@ class orderController extends Controller
                     {
                         $sel=User::find($cartrecord->seller_id);
                         $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
-                        $arr1=['msg'=>$msg1];
-                        \Notification::send($agent, new orderPlace($arr1));
+                        $data['msg']=$msg1;
+                        $data['id']=$agent->id;
+                        \onesignal::sendNoti($data);
                     }
                    
                 }
@@ -437,16 +440,18 @@ class orderController extends Controller
             $seller=User::find($ord->seller_id);
             $cust=User::find($ord->cust_id);
             $msg='Order '.$ord->order_name.' has been Accepted';
-            $arr=['msg'=>$msg];
-            \Notification::send($cust, new statusChange($arr));
+            $data['msg']=$msg;
+            $data['id']=$cust->id;
+            \onesignal::sendNoti($data);
 
             $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',6],['seller_id',$ord->seller_id]])->first();
             if($salesman)
             {
                 $usr=User::find($salesman->id);
                 $msg='New order '.$ord->order_name.' received please get the product ready';
-                $arr=['msg'=>$msg];
-                \Notification::send($usr, new statusChange($arr));
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
             }
             if($ord->agent_reference)
             {
@@ -454,8 +459,9 @@ class orderController extends Controller
                 if($agent)
                 {
                     $msg='Order has been created by '.$seller->name.' of your client '.$cust->name;
-                    $arr=['msg'=>$msg];
-                    \Notification::send($agent, new statusChange($arr));
+                    $data['msg']=$msg;
+                    $data['id']=$agent->id;
+                    \onesignal::sendNoti($data);
                 }
             }
             if($order_update==1)
@@ -531,16 +537,18 @@ class orderController extends Controller
             $ordr->save();
             $ostat=\DB::table('order_status')->select('status_name')->where('id',$req->status_id)->first();
             $msg='Order '.$ordr->order_name.' has been '.$ostat->status_name;
-            $arr=['msg'=>$msg];
             $usr=User::find($ordr['cust_id']);
-            \Notification::send($usr, new statusChange($arr));
+            $data['msg']=$msg;
+            $data['id']=$usr->id;
+            \onesignal::sendNoti($data);
             if($req->status_id==3)
             {
                 $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',5],['seller_id',$ordr->seller_id]])->first();
                 $usr=User::find($salesman->id);
                 $msg='Please get bill ready for '.$ordr->order_name.' it is ready to dispatch';
-                $arr=['msg'=>$msg];
-                \Notification::send($usr, new statusChange($arr));
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
             }
             return response()->json(['error' => false ,'message'=>'Order status change'],200);
         }

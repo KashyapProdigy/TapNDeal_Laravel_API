@@ -19,7 +19,6 @@ class BannerController extends Controller
         {
             $seller=emp_sel_rel::where('emp_id',$mid)->first();
             $mid=$seller->seller_id;
-            
         }
         $banners=Banners::where('manu_id',$mid)->get();
         if(count($banners)>0)
@@ -35,6 +34,12 @@ class BannerController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $user=User::find($req->manufacturer_id);
+        if($user->type_id==4 || $user->type_id==5 || $user->type_id==6 || $user->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$req->manufacturer_id)->first();
+            $req->manufacturer_id=$seller->seller_id;   
         }
         $ban=new Banners;
         $ban->manu_id=$req->manufacturer_id;

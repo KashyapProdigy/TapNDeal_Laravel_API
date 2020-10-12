@@ -42,20 +42,23 @@ class tempReqController extends Controller
             $usr=User::find($seller);
             // $cust=User::find($req->cust_id);
             $msg="Tempprary Request has been created by ".$agent->name;
-            $arr=['msg'=>$msg];
-            \Notification::send($usr, new TempReq($arr));
+            $data['msg']=$msg;
+            $data['id']=$usr->id;
+            \onesignal::sendNoti($data);
 
             $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$seller]])->first();
             $usr=User::find($salesman->id);
             $msg="Tempprary Request has been created by ".$agent->name;
-            $arr=['msg'=>$msg];
-            \Notification::send($usr, new TempReq($arr));
+            $data['msg']=$msg;
+            $data['id']=$usr->id;
+            \onesignal::sendNoti($data);
         }
         $usr=User::find($req->request_for);
         // $cust=User::find($req->cust_id);
         $msg="Tempprary Request has been created by ".$agent->name;
-        $arr=['msg'=>$msg];
-        \Notification::send($usr, new TempReq($arr));
+        $data['msg']=$msg;
+        $data['id']=$usr->id;
+        \onesignal::sendNoti($data);
         return response()->json(['error' => false ,'message'=>'Temporary Request Added..'], 200);
     }
     public function show($bid)
@@ -214,10 +217,11 @@ class tempReqController extends Controller
                     $tr->save();
 
                     $usr=User::find($tempReq->req_for);
-                    // $cust=User::find($req->cust_id);
-                    $msg="Temp Req";
-                    $arr=['msg'=>$msg];
-                    \Notification::send($usr, new TempReq($arr));
+                    $seller=User::find($req->sid);
+                    $msg=$seller->name." respond to your temporary requirement";
+                    $data['msg']=$msg;
+                    $data['id']=$usr->id;
+                    \onesignal::sendNoti($data);
                 
                 return response()->json(['error' => false ,'message'=>"Response Added successfully.."], 200);
             }
@@ -352,8 +356,9 @@ class tempReqController extends Controller
                     $usr=User::find($tempReq->req_for);
                     $seller=User::find($tempReq->req_to);
                     $msg="Temporary Requirement has once again revive by ".$seller->name;
-                    $arr=['msg'=>$msg];
-                    \Notification::send($usr, new TempReq($arr));
+                    $data['msg']=$msg;
+                    $data['id']=$usr->id;
+                    \onesignal::sendNoti($data);
                     return response()->json(['error' => false ,'message'=>'Temporary Requirement revive successfully..'], 200);
                 }
             }

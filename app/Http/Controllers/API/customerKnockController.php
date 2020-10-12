@@ -10,6 +10,7 @@ use App\CustomerKnock;
 use App\CustomerCategoryRelationship;
 use Validator;
 use App\emp_sel_rel;
+use App\Notification;
 use App\Notifications\knockRequestSend;
 class customerKnockController extends Controller
 {
@@ -56,15 +57,30 @@ class customerKnockController extends Controller
                         $usr=User::find($id);
                         $cust=User::find($req->cust_id);
                         $msg="Knock by ".$cust->name;
-                        $arr=['msg'=>$msg];
-                        \Notification::send($usr, new knockRequestSend($arr));
+                        $data['msg']=$msg;
+                        $data['id']=$usr->id;
+                        \onesignal::sendNoti($data);
 
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->description=$msg;
+                        $n->type="Buyer Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
                         
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
                         $msg="Knock by ".$cust->name;
-                        $arr=['msg'=>$msg];
-                        \Notification::send($usr, new knockRequestSend($arr));
+                        $data['msg']=$msg;
+                        $data['id']=$usr->id;
+                        \onesignal::sendNoti($data);
+
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->description=$msg;
+                        $n->type="Buyer Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
                         return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
@@ -82,14 +98,16 @@ class customerKnockController extends Controller
                         $usr=User::find($id);
                         $cust=User::find($req->cust_id);
                         $msg="Knock by ".$cust->name;
-                        $arr=['msg'=>$msg];
-                        \Notification::send($usr, new knockRequestSend($arr));
+                        $data['msg']=$msg;
+                        $data['id']=$usr->id;
+                        \onesignal::sendNoti($data);
                         
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
                         $msg="Knock by ".$cust->name;
-                        $arr=['msg'=>$msg];
-                        \Notification::send($usr, new knockRequestSend($arr));
+                        $data['msg']=$msg;
+                        $data['id']=$usr->id;
+                        \onesignal::sendNoti($data);
                     return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
@@ -102,14 +120,16 @@ class customerKnockController extends Controller
                 $usr=User::find($id);
                 $cust=User::find($req->cust_id);
                 $msg="Knock by ".$cust->name;
-                $arr=['msg'=>$msg];
-                \Notification::send($usr, new knockRequestSend($arr));
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
 
                 $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                 $usr=User::find($salesman->id);
                 $msg="Knock by ".$cust->name;
-                $arr=['msg'=>$msg];
-                \Notification::send($usr, new knockRequestSend($arr));
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
                 return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
             }
             else
@@ -156,8 +176,9 @@ class customerKnockController extends Controller
                             $usr=User::find($id);
                             $seller=User::find($req->seller_id);
                             $msg="Knock Accepted by ".$seller->name;
-                            $arr=['msg'=>$msg];
-                            \Notification::send($usr, new knockRequestSend($arr));
+                            $data['msg']=$msg;
+                            $data['id']=$usr->id;
+                            \onesignal::sendNoti($data);
                         return response()->json(['error' => false ,'message'=>' Customer Approved Successfully'],200);
                         }
                         return response()->json(['error' => true ,'message'=>'Record not found'],500);
@@ -175,8 +196,9 @@ class customerKnockController extends Controller
                                 $usr=User::find($id);
                                 $seller=User::find($req->seller_id);
                                 $msg="Knock Accepted by ".$seller->name;
-                                $arr=['msg'=>$msg];
-                                \Notification::send($usr, new knockRequestSend($arr));
+                                $data['msg']=$msg;
+                                $data['id']=$usr->id;
+                                \onesignal::sendNoti($data);
                             return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                             }
                         }
@@ -194,8 +216,9 @@ class customerKnockController extends Controller
                             $usr=User::find($id);
                             $seller=User::find($req->seller_id);
                             $msg="Knock Accepted by ".$seller->name;
-                            $arr=['msg'=>$msg];
-                            \Notification::send($usr, new knockRequestSend($arr));
+                            $data['msg']=$msg;
+                            $data['id']=$usr->id;
+                            \onesignal::sendNoti($data);
                         return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                         }
                         else {

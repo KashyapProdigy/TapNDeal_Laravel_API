@@ -2,7 +2,7 @@
 use App\User;
 use App\Product;
 use Illuminate\Support\Facades\Route;
-
+use App\Notifications\example;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -71,6 +71,10 @@ Route::get('Banner/{name}', 'ImagesController@bannerPicture');
 Route::get('profile/{name}', 'ImagesController@profilePicture');
 Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
 Route::get('n',function(){
-    $usr=User::find(58);
-    $a=Notification::send($usr, new example('abc'));
+    $usr=User::find(12);
+    $data['id']=$usr->id;
+    $msg="hello";
+    $data['msg']=$msg;
+    \onesignal::sendNoti($data);
+    dd('abc');
 });
