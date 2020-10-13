@@ -9,6 +9,9 @@ use Carbon\Carbon;
 use Validator;
 use App\Notifications\ChatNoti;
 use App\User;
+use App\AgentCategoryRelationship;
+use App\CustomerCategoryRelationship;
+use App\CustomerAgentRelationship;
 class chatController extends Controller
 {
     public function store(Request $req)
@@ -68,6 +71,52 @@ class chatController extends Controller
             return response()->json(['error' => false ,'data'=>$list], 200);
         }
         return response()->json(['error' => true ,'message'=>"No chat found"],400);
+    }
+    public function connectedUser($uid)
+    {
+        $user=User::find($uid);
+        if($user->type_id==1)
+        {
+            $users['agents']=AgentCategoryRelationship::join('users','users.id','agent_id')
+            ->join('citys','citys.id','city_id')
+            ->join('company_info','company_info.sid','users.id')
+            ->select('users.*','company_info.cname','city_name')
+            ->where('seller_id',$uid)->get();
+            $users['buyers']=CustomerCategoryRelationship::join('users','users.id','cust_id')
+            ->join('citys','citys.id','city_id')
+            ->join('company_info','company_info.sid','users.id')
+            ->select('users.*','company_info.cname','city_name')
+            ->where('seller_id',$uid)->get();
+            return response()->json(['error' => false ,'users'=>$users], 200);
+        }
+        if($user->type_id==2)
+        {
+            $users['sellers']=AgentCategoryRelationship::join('users','users.id','seller_id')
+            ->join('citys','citys.id','city_id')
+            ->join('company_info','company_info.sid','users.id')
+            ->select('users.*','company_info.cname','city_name')
+            ->where('agent_id',$uid)->get();
+            $users['buyers']=CustomerAgentRelationship::join('users','users.id','cust_id')
+            ->join('citys','citys.id','city_id')
+            ->join('company_info','company_info.sid','users.id')
+            ->select('users.*','company_info.cname','city_name')
+            ->where('agent_id',$uid)->get();
+            return response()->json(['error' => false ,'users'=>$users], 200);
+        }
+        if($user->type_id==3)
+        {
+            $users['sellers']=CustomerCategoryRelationship::join('users','users.id','seller_id')
+            ->join('citys','citys.id','city_id')
+            ->join('company_info','company_info.sid','users.id')
+            ->select('users.*','company_info.cname','city_name')
+            ->where('cust_id',$uid)->get();
+            $users['agents']=CustomerAgentRelationship::join('users','users.id','agent_id')
+            ->join('citys','citys.id','city_id')
+            ->join('company_info','company_info.sid','users.id')
+            ->select('users.*','company_info.cname','city_name')
+            ->where('cust_id',$uid)->get();
+            return response()->json(['error' => false ,'users'=>$users], 200);
+        }
     }
     // public function show($id)
     // {

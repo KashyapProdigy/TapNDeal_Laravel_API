@@ -467,10 +467,29 @@ class userController extends Controller
         return response()->json(['error' => true ,'message'=>'User not found '],500);
 
     }
-    public function regInfo()
+    public function regInfo1($uid)
     {
         $data=array();
         $data['cities']=\DB::table('citys')->get();
+        $user=User::find($uid);
+        if($user->type_id==1)
+        {
+            $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7])->get();
+        }
+        if($user->type_id==4)
+        {
+            $data['userTypes']=\DB::table('user_type')->where('id',8)->get();
+        }
+        if (sizeof($data['cities']) > 0) {
+            return response()->json(['error' => false, 'data' => $data], 200);
+        } else {
+            return response()->json(['error' => true, 'message' => $data], 500);
+        }
+    }
+    public function regInfo()
+    {
+        $data=array();
+        $data['cities']=\DB::table('citys')->get(); 
         $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7])->get();
         if (sizeof($data['cities']) > 0) {
             return response()->json(['error' => false, 'data' => $data], 200);
@@ -572,11 +591,25 @@ class userController extends Controller
     public function count($id)
     {
         $user=User::find($id);
-        if($user->type_id==4 || $user->type_id==5 || $user->type_id==6 || $user->type_id==8)
+        if($user->type_id==4)
         {
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
             $user=User::find($id);
+            $order=Order::where([['seller_id',$id],['status_id',1]])->count();
+            $tempReq=temp_req::where([['isResponded',0],['req_to',$id]])->count();
+            $ak=AgentKnock::where([['isApproved',0],['seller_id',$id]])->count();
+            $ck=CustomerKnock::where([['seller_id',$id],['isApproved',0]])->count();
+            $knock=$ak+$ck;
+            return response()->json(['error' => false, 'order' => $order,'tempReq' => $tempReq,'knock'=>$knock,'chat'=>0], 200);
+        }
+        if($user->type_id==5 || $user->type_id==6)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+            $user=User::find($id);
+            $order=Order::where([['seller_id',$id],['status_id',1]])->count();
+            return response()->json(['error' => false, 'order' => $order,'tempReq' => 0,'knock'=>0,'chat'=>0], 200);
         }
         if($user)
         {
@@ -585,7 +618,7 @@ class userController extends Controller
                 $order=Order::where([['seller_id',$id],['status_id',1]])->count();
                 $tempReq=temp_req::where([['isResponded',0],['req_to',$id]])->count();
                 $ak=AgentKnock::where([['isApproved',0],['seller_id',$id]])->count();
-                $ck=CustomerKnock::where([['seller_id',$id],['isApproved',0]])->first();
+                $ck=CustomerKnock::where([['seller_id',$id],['isApproved',0]])->count();
                 $knock=$ak+$ck;
                 return response()->json(['error' => false, 'order' => $order,'tempReq' => $tempReq,'knock'=>$knock,'chat'=>0], 200);
             }

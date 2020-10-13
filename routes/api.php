@@ -114,6 +114,7 @@ Route::post('user/chat/new','API\chatController@create');
 Route::post('user/chat/update/{id}','API\chatController@update');
 Route::get('user/chat/show/{id}','API\chatController@show');
 Route::delete('user/chat/delete/{id}','API\chatController@delete');
+Route::get('chat/users/{uid}','API\chatController@connectedUser');
 
 Route::post('user/history/new','API\historyController@create');
 Route::post('user/history/update/{id}','API\historyController@update');
@@ -155,11 +156,13 @@ Route::post('tempReq/revive/{trid}','API\tempReqController@revive');
 Route::get('agent/search','API\userController@agentSearch');
 Route::get('agent/search/{cat}','API\userController@agentCatSearch');
 Route::get('suplier/search','API\userController@suplierSearch');
+Route::get('regInfo/{uid}','API\userController@regInfo1');
 Route::get('regInfo','API\userController@regInfo');
 Route::get('user/firm/search','API\userController@firmSearch');
 
 Route::post('  ','API\chatController@store');
 Route::get('chat/list/{uid}','API\chatController@list');
+
 
 Route::post('custome/agent','API\agentController@customeAgent');
 
