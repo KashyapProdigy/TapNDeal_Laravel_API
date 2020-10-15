@@ -14,7 +14,7 @@ use App\Notifications\statusChange;
 use App\Notifications\orderPlace;
 use App\custome_agent;
 use App\CustomerCategoryRelationship;
-
+use App\Notification;
 class orderController extends Controller
 {
     public function createRequest(Request $req)
@@ -98,6 +98,14 @@ class orderController extends Controller
                     $data['id']=$usr->id;
                     \onesignal::sendNoti($data);
 
+                    $n=new Notification;
+                    $n->receiver=$usr->id;
+                    $n->noti_for=$orderinsert->id;
+                    $n->description=$msg;
+                    $n->type="New order";
+                    $n->date_time=date('Y-m-d H:i:s');
+                    $n->save();
+
                 $salesman=emp_sel_rel::join('users','emp_sel_rel.emp_id','users.id')->where([['seller_id',$cartrecord->seller_id],['type_id',4]])->get();
                 
                 foreach($salesman as $s)
@@ -107,6 +115,14 @@ class orderController extends Controller
                     $data['msg']=$msg;
                     $data['id']=$sal->id;
                     \onesignal::sendNoti($data);
+
+                    $n=new Notification;
+                    $n->receiver=$sal->id;
+                    $n->noti_for=$orderinsert->id;
+                    $n->description=$msg;
+                    $n->type="New order";
+                    $n->date_time=date('Y-m-d H:i:s');
+                    $n->save();
                 }
                 
                 if($req->agent_reference!="Order without agent" && $req->agent_reference!=" ")
@@ -119,6 +135,14 @@ class orderController extends Controller
                         $data['msg']=$msg1;
                         $data['id']=$agent->id;
                         \onesignal::sendNoti($data);
+
+                        $n=new Notification;
+                        $n->receiver=$agent->id;
+                        $n->noti_for=$orderinsert->id;
+                        $n->description=$msg;
+                        $n->type="New order";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
                     }
                    
                 }
@@ -444,6 +468,14 @@ class orderController extends Controller
             $data['id']=$cust->id;
             \onesignal::sendNoti($data);
 
+            $n=new Notification;
+            $n->receiver=$cust->id;
+            $n->noti_for=$id;
+            $n->description=$msg;
+            $n->type="Order Accept";
+            $n->date_time=date('Y-m-d H:i:s');
+            $n->save();
+
             $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',6],['seller_id',$ord->seller_id]])->first();
             if($salesman)
             {
@@ -452,6 +484,14 @@ class orderController extends Controller
                 $data['msg']=$msg;
                 $data['id']=$usr->id;
                 \onesignal::sendNoti($data);
+
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$id;
+                $n->description=$msg;
+                $n->type="Order Accept";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
             }
             if($ord->agent_reference)
             {
@@ -462,6 +502,14 @@ class orderController extends Controller
                     $data['msg']=$msg;
                     $data['id']=$agent->id;
                     \onesignal::sendNoti($data);
+
+                    $n=new Notification;
+                    $n->receiver=$agent->id;
+                    $n->noti_for=$id;
+                    $n->description=$msg;
+                    $n->type="Order Accept";
+                    $n->date_time=date('Y-m-d H:i:s');
+                    $n->save();
                 }
             }
             if($order_update==1)
@@ -541,6 +589,14 @@ class orderController extends Controller
             $data['msg']=$msg;
             $data['id']=$usr->id;
             \onesignal::sendNoti($data);
+
+            $n=new Notification;
+            $n->receiver=$usr->id;
+            $n->noti_for=$id;
+            $n->description=$msg;
+            $n->type="Order ".$ostat->status_name;
+            $n->date_time=date('Y-m-d H:i:s');
+            $n->save();
             if($req->status_id==3)
             {
                 $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',5],['seller_id',$ordr->seller_id]])->first();
@@ -549,6 +605,14 @@ class orderController extends Controller
                 $data['msg']=$msg;
                 $data['id']=$usr->id;
                 \onesignal::sendNoti($data);
+
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$id;
+                $n->description=$msg;
+                $n->type="Order ".$ostat->status_name;
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
             }
             return response()->json(['error' => false ,'message'=>'Order status change'],200);
         }

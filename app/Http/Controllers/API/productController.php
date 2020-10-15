@@ -15,6 +15,7 @@ use App\CustomerCategoryRelationship;
 use App\User;
 use App\emp_sel_rel;
 use App\folderModel;
+use App\Notification;
 class productController extends Controller
 {
     public function show($id)
@@ -57,7 +58,7 @@ class productController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            // 'image'=>'required',
+            'image'=>'required',
             'category'=>'required',
             'tags'=>'required',
             'colors'=>'required',
@@ -96,7 +97,7 @@ class productController extends Controller
                 }
             }
             else{
-                // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+                return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
 
         // $image_list = json_decode($req->image);
@@ -170,11 +171,19 @@ class productController extends Controller
             $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
             foreach($buyer as $b)
             {   
-                
+                $msg="New product has been added by ".$sel->name;
                 $usr=User::find($b['cust_id']);
                 $data['msg']=$msg;
                 $data['id']=$usr->id;
                 \onesignal::sendNoti($data);
+
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$product->id;
+                $n->description=$msg;
+                $n->type="Product Add";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
             }
             $agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
             foreach($agent as $b)
@@ -183,6 +192,14 @@ class productController extends Controller
                 $data['msg']=$msg;
                 $data['id']=$usr->id;
                 \onesignal::sendNoti($data);
+
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$product->id;
+                $n->description=$msg;
+                $n->type="Product Add";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
             }
             return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
         }

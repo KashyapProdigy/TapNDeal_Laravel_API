@@ -29,8 +29,8 @@
                                         <form method="post">
                                         @csrf
                                             <div class="form-group">
-                                                <label class="small mb-1" for="inputEmailAddress">Mobile No.</label>
-                                                <input class="form-control py-4" name="mob" id="inputEmailAddress" type="text" placeholder="Enter Your mobile number" />
+                                                <label class="small mb-1" for="inputEmailAddress">User name</label>
+                                                <input class="form-control py-4" name="name" id="inputEmailAddress" type="text" placeholder="User name" />
                                             </div>
                                             <div class="form-group">
                                                 <label class="small mb-1" for="inputPassword">Password</label>

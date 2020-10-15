@@ -28,6 +28,7 @@ class ownersController extends Controller
         ->join('states','states.id','users.state_id')
         ->select('users.*','citys.*','states.*','users.id as uid','users.state_id as sid','company_info.*')
         ->where('user_type','Seller')
+        ->where('isDeleted',0)
         ->get();
         $city=\DB::table('citys')->get();
         $state=\DB::table('states')->get();
@@ -107,7 +108,8 @@ class ownersController extends Controller
     public function delete($uid)
     {
         $u=User::find($uid);
-        if($u->delete())
+        $u->isDeleted=1;
+        if($u->save())
             return redirect()->back()->with('success','User Deleted succesfully...');
             
         return redirect()->back()->with('error','Somthing wents wrong...');

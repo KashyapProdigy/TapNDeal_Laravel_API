@@ -41,7 +41,7 @@
     </div>
     <div class="card-body">
         @if(count($owners)==0)
-            No Seller found
+            No Customer found
         @else
         
         <div class="table-responsive">
@@ -49,21 +49,29 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Company name</th>
                         <th>email</th>
                         <th>mobile</th>
+                        <th>Address</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>PAN No</th>
+                        <th>GST No</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th>Name</th>   
+                    <th>Name</th>
+                        <th>Company name</th>
                         <th>email</th>
                         <th>mobile</th>
+                        <th>Address</th>
                         <th>City</th>
                         <th>State</th>
+                        <th>PAN No</th>
+                        <th>GST No</th>
                         <th>Varified</th>
                         <th>Action</th>
                     </tr>
@@ -72,13 +80,17 @@
                 @foreach($owners as $owner)
                     <tr>
                         <td>{{$owner->name}}</td>
+                        <td>{{$owner->cname}}</td>
                         <td>{{$owner->email}}</td>
                         <td>{{$owner->mobile}}</td>
+                        <td>{{$owner->address}}</td>
                         <td>{{$owner->city_name}}</td>
                         <td>{{$owner->state_name}}</td>
+                        <td>{{$owner->pan}}</td>
+                        <td>{{$owner->gst}}</td>
                         <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
                         <td>
-                            
+                            <!-- <a class="btn btn-sm btn-success text-white" data-toggle="tooltip" title="Accounts" href="{{url('/seller/accounts')}}/{{$owner->uid}}"><i class="fas fa-eye"></i></a> -->
                             <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>
                             <a data-toggle="tooltip" title="Delete" class="btn btn-sm btn-danger text-white" onclick="return delcon()" href="{{url('seller/delete')}}/{{$owner->uid}}"><i class="far fa-trash-alt"></i></a>
                         </td>

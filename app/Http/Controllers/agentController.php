@@ -9,15 +9,17 @@ class agentController extends Controller
 {
     public function show()
     {
-        $agents=User::join('user_type','user_type.id','users.type_id')
+        $owner=User::join('user_type','user_type.id','users.type_id')
+        ->join('company_info','company_info.sid','users.id')
         ->join('citys','citys.id','users.city_id')
         ->join('states','states.id','users.state_id')
-        ->select('users.*','citys.*','states.*','users.id as uid','users.state_id as sid')
+        ->select('users.*','citys.*','states.*','users.id as uid','users.state_id as sid','company_info.*')
         ->where('user_type','agent')
+        ->where('isDeleted',0)
         ->get();
         $city=\DB::table('citys')->get();
         $state=\DB::table('states')->get();
-        return view('Admin.agents',['owners'=>$agents,'citys'=>$city,'states'=>$state]);
+        return view('Admin.agents',['owners'=>$owner,'citys'=>$city,'states'=>$state]);
     }
     public function create(Request $req)
     {

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Chat;
 use Carbon\Carbon;
 use Validator;
+use App\Notification;
 use App\Notifications\ChatNoti;
 use App\User;
 use App\AgentCategoryRelationship;
@@ -46,6 +47,14 @@ class chatController extends Controller
                 $data['msg']=$msg;
                 $data['id']=$usr->id;
                 \onesignal::sendNoti($data);
+
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$chat->id;
+                $n->description=$msg;
+                $n->type="Chat";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
                 return response()->json(['error' => false ,'message'=>"Message stored successfully"], 200);
             }
             return response()->json(['error' => true ,'message'=>'somthing went wrong'], 500);
@@ -61,6 +70,14 @@ class chatController extends Controller
         $data['msg']=$msg;
         $data['id']=$usr->id;
         \onesignal::sendNoti($data);
+        
+        $n=new Notification;
+        $n->receiver=$usr->id;
+        $n->noti_for=$chat->id;
+        $n->description=$msg;
+        $n->type="Chat";
+        $n->date_time=date('Y-m-d H:i:s');
+        $n->save();
         return response()->json(['error' => false ,'message'=>"Message stored successfully"], 200);
     }
     public function list($uid)

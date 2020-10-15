@@ -21,6 +21,10 @@ Route::get('/admin','AdminController@admin');
 Route::post('/admin','AdminController@login');
 Route::middleware([AdminCheck::class])->group(function () {
     route::get('/logout','AdminController@logout');
+    route::get('/admin/users','AdminController@users');
+    route::get('changeType','AdminController@changeType');
+    route::get('/admin/reference','AdminController@reference');
+    route::get('/admin/refered/users/{ref}','AdminController@refUser');
     route::get('/admin/owner','ownersController@show');
     route::post('/update/seller','ownersController@update');
     route::post('/SellerAdd','ownersController@create');
@@ -33,6 +37,7 @@ Route::middleware([AdminCheck::class])->group(function () {
     route::post('/admin/agents/add','agentController@create');
     route::get('admin/orders','orderController@showAll');
     Route::get('admin/orders/show/{id}','orderController@fullorder');
+    route::get('admin/payments','AdminController@payments');
 });
 
 Route::get('/manufacture',function(){
@@ -46,7 +51,7 @@ route::get('/confirmMob',function(){
 Route::get('/login',function(){
     return view('login');
 });
-Route::post('/login1','manufactureController@login');
+Route::post('/login','manufactureController@login');
 Route::post('/confirmMob','manufactureController@dashboard');
 Route::get('/mobileCheck','manufactureController@mobCheck');
 

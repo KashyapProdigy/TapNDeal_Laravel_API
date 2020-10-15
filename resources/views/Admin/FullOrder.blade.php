@@ -39,6 +39,7 @@
     		
     	</div>
         @php $a=\DB::table('users')->where('ref_code',$ord->agent_reference)->first();@endphp
+        @if($a)
         <div class="col-6 text-right">
     				<address>
     				<h3><strong>Agent Information</strong></h3><hr><br>
@@ -48,6 +49,8 @@
     				</address>
     		
     	</div>
+		@else
+		@endif
     </div>
     
     <div class="row">

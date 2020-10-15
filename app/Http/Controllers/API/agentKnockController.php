@@ -11,6 +11,8 @@ use App\AgentCategoryRelationship;
 use Validator;
 use App\emp_sel_rel;
 use App\Notifications\knockRequestSend;
+use App\Notification;
+
 class agentKnockController extends Controller
 {
     public function create(Request $req,$id)
@@ -59,6 +61,14 @@ class agentKnockController extends Controller
                         $data['msg']=$msg;
                         $data['id']=$usr->id;
                         \onesignal::sendNoti($data);
+
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->noti_for=$record->id;
+                        $n->description=$msg;
+                        $n->type="Agent Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
                         
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
@@ -66,6 +76,14 @@ class agentKnockController extends Controller
                         $data['msg']=$msg;
                         $data['id']=$usr->id;
                         \onesignal::sendNoti($data);
+
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->noti_for=$record->id;
+                        $n->description=$msg;
+                        $n->type="Agent Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
                         return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
@@ -87,13 +105,30 @@ class agentKnockController extends Controller
                         $data['id']=$usr->id;
                         \onesignal::sendNoti($data);
 
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->noti_for=$record->id;
+                        $n->description=$msg;
+                        $n->type="Agent Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
+
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
                         $msg="Knock by ".$agent->name;
                         $data['msg']=$msg;
                         $data['id']=$usr->id;
                         \onesignal::sendNoti($data);
-                         return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
+
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->noti_for=$record->id;
+                        $n->description=$msg;
+                        $n->type="Agent Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
+
+                        return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
             }
@@ -109,12 +144,36 @@ class agentKnockController extends Controller
                 $data['id']=$usr->id;
                 \onesignal::sendNoti($data);
 
-                $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
-                $usr=User::find($salesman->id);
-                $msg="Knock by ".$agent->name;
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$knock_data->id;
+                $n->description=$msg;
+                $n->type="Agent Knock";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
+
+                $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->get()->toarray();
+                if($salesman)
+                {
+                    foreach($salesman as $s)
+                    {
+                        $usr=User::find($s->id);
+                        $msg="Knock by ".$agent->name;
+                        $data['msg']=$msg;
+                        $data['id']=$usr->id;
+                        \onesignal::sendNoti($data);
+
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->noti_for=$knock_data->id;
+                        $n->description=$msg;
+                        $n->type="Agent Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
+                    }
+                    
+                }
+                
                 return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
             }
             else
@@ -164,6 +223,14 @@ class agentKnockController extends Controller
                             $data['msg']=$msg;
                             $data['id']=$usr->id;
                             \onesignal::sendNoti($data);
+
+                            $n=new Notification;
+                            $n->receiver=$usr->id;
+                            $n->noti_for=$relation_data->id;
+                            $n->description=$msg;
+                            $n->type="Agent Approved";
+                            $n->date_time=date('Y-m-d H:i:s');
+                            $n->save();
                             return response()->json(['error' => false ,'message'=>' Agent Approved Successfully'],200);
                         }
                         return response()->json(['error' => true ,'message'=>'Record not found'],500);
@@ -184,6 +251,14 @@ class agentKnockController extends Controller
                                 $data['msg']=$msg;
                                 $data['id']=$usr->id;
                                 \onesignal::sendNoti($data);
+
+                                $n=new Notification;
+                                $n->receiver=$usr->id;
+                                $n->noti_for=$relrecord->id;
+                                $n->description=$msg;
+                                $n->type="Agent Approved";
+                                $n->date_time=date('Y-m-d H:i:s');
+                                $n->save();
                              return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                             }
                         }
@@ -204,6 +279,15 @@ class agentKnockController extends Controller
                             $data['msg']=$msg;
                             $data['id']=$usr->id;
                             \onesignal::sendNoti($data);
+
+                            $n=new Notification;
+                            $n->receiver=$usr->id;
+                            $n->noti_for=$relrecord->id;
+                            $n->description=$msg;
+                            $n->type="Agent Approved";
+                            $n->date_time=date('Y-m-d H:i:s');
+                            $n->save();
+
                             return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                         }
                         else {

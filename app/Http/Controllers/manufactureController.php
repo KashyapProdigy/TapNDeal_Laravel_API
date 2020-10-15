@@ -26,22 +26,27 @@ class manufactureController extends Controller
     }
     public function login(Request $req)
     {
-        $user=User::where('mobile',$req->mob)->select('users.*','citys.*','states.*','users.id as uid','company_info.*')
-        ->join('citys','citys.id','users.city_id')
-        ->join('company_info','sid','users.id')
-        ->join('states','states.id','users.state_id')
-        ->first();
-        session()->put('manufacture',$user['name']);
-        session()->put('name',$user['name']);
-        session()->put('email',$user['email']);
-        session()->put('mobile',$user['mobile']);
-        session()->put('city',$user['city_name']);
-        session()->put('uid',$user['uid']);
-        session()->put('gst',$user['gst']);
-        session()->put('address',$user['address']);
-        session()->put('ta',$user['acc_allow']);
-        session()->put('state',$user['state_name']);
-        return redirect('/manufacture/index');
+        $user=User::where([['mobile',request('mobile')],[\DB::raw('BINARY `password`'), request('password')],['isDeleted',0]])->count();
+        if($user==1)
+        {
+            $user=User::where('mobile',$req->mobile)->select('users.*','citys.*','states.*','users.id as uid','company_info.*')
+            ->join('citys','citys.id','users.city_id')
+            ->join('company_info','sid','users.id')
+            ->join('states','states.id','users.state_id')
+            ->first();
+            session()->put('manufacture',$user['name']);
+            session()->put('name',$user['name']);
+            session()->put('email',$user['email']);
+            session()->put('mobile',$user['mobile']);
+            session()->put('city',$user['city_name']);
+            session()->put('uid',$user['uid']);
+            session()->put('gst',$user['gst']);
+            session()->put('address',$user['address']);
+            session()->put('ta',$user['acc_allow']);
+            session()->put('state',$user['state_name']);
+            return redirect('/manufacture/index');
+        }
+       return back()->with('error','Invalid Mobile no. or password..!!');
     }
     public function register(Request $req)
     {

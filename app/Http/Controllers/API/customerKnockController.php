@@ -63,6 +63,7 @@ class customerKnockController extends Controller
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
+                        $n->noti_for=$record->id;
                         $n->description=$msg;
                         $n->type="Buyer Knock";
                         $n->date_time=date('Y-m-d H:i:s');
@@ -77,6 +78,7 @@ class customerKnockController extends Controller
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
+                        $n->noti_for=$record->id;
                         $n->description=$msg;
                         $n->type="Buyer Knock";
                         $n->date_time=date('Y-m-d H:i:s');
@@ -101,13 +103,36 @@ class customerKnockController extends Controller
                         $data['msg']=$msg;
                         $data['id']=$usr->id;
                         \onesignal::sendNoti($data);
-                        
+
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->noti_for=$record->id;
+                        $n->description=$msg;
+                        $n->type="Buyer Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
+
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
-                        $usr=User::find($salesman->id);
-                        $msg="Knock by ".$cust->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+                        if($salesman)
+                        {
+                            foreach($salesman as $s)
+                            {
+                        
+                                $usr=User::find($s->id);
+                                $msg="Knock by ".$cust->name;
+                                $data['msg']=$msg;
+                                $data['id']=$usr->id;
+                                \onesignal::sendNoti($data);
+
+                                $n=new Notification;
+                                $n->receiver=$usr->id;
+                                $n->noti_for=$record->id;
+                                $n->description=$msg;
+                                $n->type="Buyer Knock";
+                                $n->date_time=date('Y-m-d H:i:s');
+                                $n->save();
+                            }
+                        }
                     return response()->json(['error' => false ,'message'=>'Knock Successfull'],200);
                     }
                 }
@@ -124,12 +149,36 @@ class customerKnockController extends Controller
                 $data['id']=$usr->id;
                 \onesignal::sendNoti($data);
 
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$knock_data->id;
+                $n->description=$msg;
+                $n->type="Buyer Knock";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
+
                 $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
-                $usr=User::find($salesman->id);
-                $msg="Knock by ".$cust->name;
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+                if($salesman)
+                {
+                    foreach($salesman as $s)
+                    {
+                        $usr=User::find($s->id);
+                        $msg="Knock by ".$cust->name;
+                        $data['msg']=$msg;
+                        $data['id']=$usr->id;
+                        \onesignal::sendNoti($data);
+
+                        $n=new Notification;
+                        $n->receiver=$usr->id;
+                        $n->noti_for=$knock_data->id;
+                        $n->description=$msg;
+                        $n->type="Buyer Knock";
+                        $n->date_time=date('Y-m-d H:i:s');
+                        $n->save();
+                    }
+                }
+                
+
                 return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
             }
             else
@@ -179,6 +228,14 @@ class customerKnockController extends Controller
                             $data['msg']=$msg;
                             $data['id']=$usr->id;
                             \onesignal::sendNoti($data);
+
+                            $n=new Notification;
+                            $n->receiver=$usr->id;
+                            $n->noti_for=$relation_data->id;
+                            $n->description=$msg;
+                            $n->type="Buyer Approved";
+                            $n->date_time=date('Y-m-d H:i:s');
+                            $n->save();
                         return response()->json(['error' => false ,'message'=>' Customer Approved Successfully'],200);
                         }
                         return response()->json(['error' => true ,'message'=>'Record not found'],500);
@@ -199,6 +256,14 @@ class customerKnockController extends Controller
                                 $data['msg']=$msg;
                                 $data['id']=$usr->id;
                                 \onesignal::sendNoti($data);
+
+                                $n=new Notification;
+                                $n->receiver=$usr->id;
+                                $n->noti_for=$relrecord->id;
+                                $n->description=$msg;
+                                $n->type="Buyer Approved";
+                                $n->date_time=date('Y-m-d H:i:s');
+                                $n->save();
                             return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                             }
                         }
@@ -219,6 +284,14 @@ class customerKnockController extends Controller
                             $data['msg']=$msg;
                             $data['id']=$usr->id;
                             \onesignal::sendNoti($data);
+
+                            $n=new Notification;
+                            $n->receiver=$usr->id;
+                            $n->noti_for=$relrecord->id;
+                            $n->description=$msg;
+                            $n->type="Buyer Approved";
+                            $n->date_time=date('Y-m-d H:i:s');
+                            $n->save();
                         return response()->json(['error' => false ,'message'=>'Approved with new category'],200);
                         }
                         else {

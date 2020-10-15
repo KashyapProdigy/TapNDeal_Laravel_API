@@ -30,6 +30,8 @@ Route::get('user/mobile/{mno}','API\userController@mobUser');
 Route::post('user/update/pass','API\userController@updatePass');
 Route::post('user/profilepic/update/{uid}','API\userController@updatePic');
 Route::post('user/token/check','API\userController@tokenCheck');
+Route::get('user/info/count/{uid}','API\userController@infoCount');
+
 
 Route::get('dashboard/{id}','API\dashboardController@getdashboard');
 Route::get('user/relation/show/seller/{id}','API\dashboardController@showSellerRelations');
@@ -88,6 +90,7 @@ Route::post('user/notification/new','API\notificationController@create');
 Route::post('user/notification/update/{id}','API\notificationController@update');
 Route::get('user/notification/show/{id}','API\notificationController@show');
 Route::delete('user/notification/delete/{id}','API\notificationController@delete');
+Route::get('user/read/noti/{uid}','API\notificationController@read');
 
 Route::post('user/cart/new','API\cartController@create');
 Route::get('user/cart/show/{id}','API\cartController@show');

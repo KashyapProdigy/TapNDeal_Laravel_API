@@ -17,6 +17,9 @@ use App\Order;
 use App\temp_req;
 use App\AgentKnock;
 use App\CustomerKnock;
+use App\Banners;
+use App\Product;
+
 class userController extends Controller
 {
 
@@ -36,7 +39,7 @@ class userController extends Controller
     public function login()
     {
         // $psw=Hash::make(request('password'));
-        $user=User::where([['mobile',request('mobile')],['password', request('password')],['isDeleted',0]])->count();
+        $user=User::where([['mobile',request('mobile')],[DB::raw('BINARY `password`'), request('password')],['isDeleted',0]])->count();
         if($user==1){
             
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
@@ -635,5 +638,44 @@ class userController extends Controller
             return response()->json(['error' => true,'order' => 0,'tempReq' => 0,'knock'=>0,'chat'=>0], 500);
         }
         return response()->json(['error' => true,'order' => 0,'tempReq' => 0,'knock'=>0,'chat'=>0], 500);
+    }
+    public function infoCount($id)
+    {
+        $user=User::find($id);
+        if($user->type_id==4)
+        {
+            $seller=emp_sel_rel::where('emp_id',$id)->first();
+            $id=$seller->seller_id;
+            $user=User::find($id);
+        }   
+        $banner=Banners::where('manu_id',$id)->first();
+        if($user->type_id==1)
+        {
+            if($banner->img_name)
+            {
+                $ban=count(explode(',',$banner->img_name));
+            }
+            else{
+                $ban=0;
+            }
+            $product=Product::where('seller_id',$id)->count();
+            $account=emp_sel_rel::where('seller_id',$id)->count();
+            $orders=Order::where('seller_id',$id)->count();
+        }
+        if($user->type_id==2)
+        {
+            $ban=0;
+            $product=0;
+            $account=0;
+            $orders=Order::where('agent_reference',$user->ref_code)->count();
+        }
+        if($user->type_id==3)
+        {
+            $ban=0;
+            $product=0;
+            $account=0;
+            $orders=Order::where('cust_id',$id)->count();
+        }
+        return response()->json(['error' => false, 'orders' => $orders,'banners' =>$ban,'accounts'=>$account,'products'=>$product], 200);
     }
 }

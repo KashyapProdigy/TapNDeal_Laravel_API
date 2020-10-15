@@ -33,10 +33,14 @@
                 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <div class="nav">
-                            <div class="sb-sidenav-menu-heading">Core</div>
+                            <div class="sb-sidenav-menu-heading"></div>
                             <a class="nav-link" href="{{url('/admin')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
+                            </a>
+                            <a class="nav-link" href="{{url('admin/users')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                                All Users
                             </a>
                             <a class="nav-link" href="{{url('admin/owner')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
@@ -53,6 +57,14 @@
                             <a class="nav-link" href="{{url('admin/orders')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
                                 Orders
+                            </a>
+                            <a class="nav-link" href="{{url('admin/reference')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-network-wired"></i></div>
+                                Reference
+                            </a>
+                            <a class="nav-link" href="{{url('admin/payments')}}">
+                                <div class="sb-nav-link-icon"><i class="far fa-money-bill-alt"></i></div>
+                                Payments
                             </a>
                         </div>
                     </div>

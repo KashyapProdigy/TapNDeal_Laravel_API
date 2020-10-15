@@ -49,26 +49,22 @@
             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>Id</th>
                         <th>Customer name</th>
                         <th>Agent name</th>
                         <th>Seller name</th>
                         <th>Order status</th>
-                        <th>Approved</th>
-                        <th>Delivered</th>
                         <th>Total Price</th>
                         <th>View Details</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                    <th>#</th>
+                    <th>Id</th>
                     <th>Customer name</th>
                     <th>Agent name</th>
                     <th>Seller name</th>
                     <th>Order status</th>
-                    <th>Approved</th>
-                    <th>Delivered</th>
                     <th>Total Price</th>
                     <th>View Details</th>
                     </tr>
@@ -79,25 +75,16 @@
                 @php $a=\DB::table('users')->select('name')->where('ref_code',$li->agent_reference)->first();@endphp
                 @php $s=\DB::table('users')->select('name')->where('id',$li->seller_id)->first();@endphp
                 <tr>
-                    <td>{{++$i}}</td>
+                    <td>{{$li->order_name}}</td>
                     <td>{{$li->name}}</td>
-                    <td>{{$a->name}}</td>
+                    @if($a)
+                        <td>{{$a->name}}</td>
+                    @else
+                        <td>-</td>
+                    @endif
                     <td>{{$s->name}}</td>
-                    <td class= @if($li->status_id==1)text-danger @else text-success @endif>{{$li->status_name}}</td>
-                    <td class="@if($li->isApproved==1)text-success @else text-danger @endif">
-                        @if($li->isApproved==1)
-                            Approved
-                        @else
-                            Not Approved
-                        @endif
-                    </td>
-                    <td class="@if($li->isDelivered==1)text-success @else text-danger @endif">
-                        @if($li->isDelivered==1)
-                           Delivered
-                        @else
-                          Not Delivered
-                        @endif
-                    </td>
+                    <td class= @if($li->status_id==1)text-warning @elseif($li->status_id==5)text-danger @else text-success @endif>{{$li->status_name}}</td>
+                    
                     <td class="text-right">
                     &#x20b9;{{$li->total_price}}
                     </td>

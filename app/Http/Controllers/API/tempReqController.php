@@ -8,6 +8,7 @@ use App\temp_req;
 use Validator;
 use App\User;
 use App\temp_req_product;
+use App\Notification;
 use App\Product;
 use App\emp_sel_rel;
 use App\Notifications\TempReq;
@@ -41,24 +42,51 @@ class tempReqController extends Controller
 
             $usr=User::find($seller);
             // $cust=User::find($req->cust_id);
-            $msg="Tempprary Request has been created by ".$agent->name;
+            $msg="Temporary Request has been created by ".$agent->name;
             $data['msg']=$msg;
             $data['id']=$usr->id;
             \onesignal::sendNoti($data);
 
+            $n=new Notification;
+            $n->receiver=$usr->id;
+            $n->noti_for=$t->id;
+            $n->description=$msg;
+            $n->type="New Temporary Request";
+            $n->date_time=date('Y-m-d H:i:s');
+            $n->save();
+
             $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$seller]])->first();
-            $usr=User::find($salesman->id);
-            $msg="Tempprary Request has been created by ".$agent->name;
-            $data['msg']=$msg;
-            $data['id']=$usr->id;
-            \onesignal::sendNoti($data);
+            if($salesman)
+            {
+                $usr=User::find($salesman->id);
+                $msg="Temporary Request has been created by ".$agent->name;
+                $data['msg']=$msg;
+                $data['id']=$usr->id;
+                \onesignal::sendNoti($data);
+
+                $n=new Notification;
+                $n->receiver=$usr->id;
+                $n->noti_for=$t->id;
+                $n->description=$msg;
+                $n->type="New Temporary Request";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
+            }
         }
         $usr=User::find($req->request_for);
         // $cust=User::find($req->cust_id);
-        $msg="Tempprary Request has been created by ".$agent->name;
+        $msg="Temporary Request has been created by ".$agent->name;
         $data['msg']=$msg;
         $data['id']=$usr->id;
         \onesignal::sendNoti($data);
+
+        $n=new Notification;
+        $n->receiver=$usr->id;
+        $n->noti_for=$t->id;
+        $n->description=$msg;
+        $n->type="New Temporary Request";
+        $n->date_time=date('Y-m-d H:i:s');
+        $n->save();
         return response()->json(['error' => false ,'message'=>'Temporary Request Added..'], 200);
     }
     public function show($bid)
@@ -222,7 +250,14 @@ class tempReqController extends Controller
                     $data['msg']=$msg;
                     $data['id']=$usr->id;
                     \onesignal::sendNoti($data);
-                
+
+                    $n=new Notification;
+                    $n->receiver=$usr->id;
+                    $n->noti_for=$tr->id;
+                    $n->description=$msg;
+                    $n->type="Temporary Request Response";
+                    $n->date_time=date('Y-m-d H:i:s');
+                    $n->save();
                 return response()->json(['error' => false ,'message'=>"Response Added successfully.."], 200);
             }
                 
@@ -359,6 +394,14 @@ class tempReqController extends Controller
                     $data['msg']=$msg;
                     $data['id']=$usr->id;
                     \onesignal::sendNoti($data);
+
+                    $n=new Notification;
+                    $n->receiver=$usr->id;
+                    $n->noti_for=$tempReq->id;
+                    $n->description=$msg;
+                    $n->type="Temporary Request Revive";
+                    $n->date_time=date('Y-m-d H:i:s');
+                    $n->save();
                     return response()->json(['error' => false ,'message'=>'Temporary Requirement revive successfully..'], 200);
                 }
             }
