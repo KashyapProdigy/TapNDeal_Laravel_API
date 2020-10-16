@@ -159,7 +159,7 @@ class manufactureController extends Controller
     {
         $product=Product::where('seller_id',session()->get('uid'))
         ->select('products.*','products.id as pid')
-        ->get();
+        ->orderBy('created_at','desc')->get();
         return view('manufacture.products',['products'=>$product]);
     }
     public function delete($pid)

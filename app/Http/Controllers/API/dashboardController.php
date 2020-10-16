@@ -46,7 +46,7 @@ class dashboardController extends Controller
                 $isExpired=0;
             }
                 
-                $dashboard=Product::where('seller_id',$id)->get()->toarray();
+                $dashboard=Product::where('seller_id',$id)->orderBy('created_at','desc')->get()->toarray();
                 $banner=\DB::table('banners')->where('manu_id',$id)->get()->toarray();
                 $folders=folderModel::select('id','fname')->where('sid',$id)->get();
                 if(!empty($dashboard))

@@ -20,7 +20,7 @@ class productController extends Controller
 {
     public function show($id)
     {
-        $product_list=Product::where('seller_id',$id)->get();
+        $product_list=Product::where('seller_id',$id)->orderBy('created_at','desc')->get();
         if(!empty($product_list))
         {
             return response()->json(['error' => false ,'data'=>$product_list],200);
@@ -318,9 +318,9 @@ class productController extends Controller
                 //header('Content-Type: image/jpeg');
                 header('Content-Type: bitmap; charset=utf-8');
                 imagesavealpha($img, true);
-                imagejpeg($img,public_path('tempPhotos')."/".$req->file.".jpeg",100);
+                imagejpeg($img,public_path('tempPhotos')."/".$req->name,70);
                 imagedestroy($img);
-                Storage::disk('temp')->put($req->name, $file);
+                // Storage::disk('temp')->put($req->name, $file);
                 if(Storage::disk('temp')->exists($req->name))
                 {
                     return response()->json(['error' => false ,'message'=>'Image Uploaded Successfully'],200);
@@ -370,7 +370,7 @@ class productController extends Controller
     public function search(Request $req)
     {
         $srch=$req->search;
-        $products=Product::where('name','like','%'.$srch.'%')->orwhere('tags','like','%'.$srch.'%')->orwhere('colors','like','%'.$srch.'%')->get();
+        $products=Product::where('name','like','%'.$srch.'%')->orwhere('tags','like','%'.$srch.'%')->orwhere('colors','like','%'.$srch.'%')->orderBy('created_at','desc')->get();
         return response()->json(['error' => false ,'data'=>$products],200);
         
     }
@@ -421,7 +421,7 @@ class productController extends Controller
             $id=$seller->seller_id;
             
         }
-        $products=Product::where('seller_id',$id)->get()->toarray();
+        $products=Product::where('seller_id',$id)->orderBy('created_at','desc')->get()->toarray();
         if($products)
         {
             return response()->json(['error' => false ,'data'=>$products],200);

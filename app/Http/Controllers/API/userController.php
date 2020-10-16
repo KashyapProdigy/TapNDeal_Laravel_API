@@ -78,6 +78,22 @@ class userController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
+        $user1=User::where([['mobile',$request->mobile],['isDeleted',0]])->first();
+        if($user1)
+        {
+            if($user1->type_id!=3)
+            {
+                return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
+            }
+            else if($user1->type_id==3 && $request->type_id==3)
+            {
+                return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
+            }
+            else{
+                $user1->isDeleted=1;
+                $user1->save();
+            }
+        }
         $seller=com_info::join('users','company_info.sid','users.id')->where([['users.id',$request->sid],['type_id',1]])->select('company_info.*','users.*')->first();
 
         $e_count=emp_sel_rel::where('seller_id',$request->sid)->count();
@@ -470,30 +486,11 @@ class userController extends Controller
         return response()->json(['error' => true ,'message'=>'User not found '],500);
 
     }
-    public function regInfo1($uid)
-    {
-        $data=array();
-        $data['cities']=\DB::table('citys')->get();
-        $user=User::find($uid);
-        if($user->type_id==1)
-        {
-            $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7])->get();
-        }
-        if($user->type_id==4)
-        {
-            $data['userTypes']=\DB::table('user_type')->where('id',8)->get();
-        }
-        if (sizeof($data['cities']) > 0) {
-            return response()->json(['error' => false, 'data' => $data], 200);
-        } else {
-            return response()->json(['error' => true, 'message' => $data], 500);
-        }
-    }
     public function regInfo()
     {
         $data=array();
         $data['cities']=\DB::table('citys')->get(); 
-        $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7])->get();
+        $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7,8])->get();
         if (sizeof($data['cities']) > 0) {
             return response()->json(['error' => false, 'data' => $data], 200);
         } else {

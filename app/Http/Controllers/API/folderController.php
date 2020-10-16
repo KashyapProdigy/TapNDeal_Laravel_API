@@ -59,7 +59,7 @@ class folderController extends Controller
     }
     public function prodShow($fid)
     {
-        $products=Product::where('fid',$fid)->get()->toarray();
+        $products=Product::where('fid',$fid)->orderBy('created_at','desc')->get()->toarray();
         if($products)
         {
             return response()->json(['error' => false ,'foldes'=>$products], 200);
