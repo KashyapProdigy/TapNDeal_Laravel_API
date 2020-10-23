@@ -8,7 +8,7 @@ use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class ProductImport implements ToModel,WithHeadingRow
+class ProductImport implements ToModel
 {
     /**
     * @param array $row
@@ -17,21 +17,16 @@ class ProductImport implements ToModel,WithHeadingRow
     */
     public function model(array $row)
     {
+        // dd(@$row[0]);
         return new Product([
-           'name'       =>@$row['Product_name'],
-           'description'=>@$row['Description'],
-           'price'      =>@$row['Price'],
-           'category'   =>@$row['Category'],
+           'name'       =>@$row[0],
+           'description'=>@$row[1],
+           'price'      =>@$row[2],
+           'category'   =>@$row[3],
            'seller_id'  =>session()->get('uid'),
-           'tags'       =>@$row['Tags'],
-           'colors'     =>@$row['Colors'],
-            'image'=>@$row['Image'],  
+           'tags'       =>@$row[4],
+           'colors'     =>@$row[5],
+            'image'=>@$row[6],  
         ]);
-    }
-    public function rules(): array
-    {
-        return [
-        '0'=>'required',
-        ];
-    }
+    } 
 }

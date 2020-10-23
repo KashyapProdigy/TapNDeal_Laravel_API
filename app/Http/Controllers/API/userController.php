@@ -148,6 +148,12 @@ class userController extends Controller
     }
     public function register(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'mobile'=>'required|unique:users',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
         $user1=User::where([['mobile',$request->mobile],['isDeleted',0]])->first();
         if($user1)
         {
@@ -195,7 +201,8 @@ class userController extends Controller
             $request->b_scope=" ";
         }
         $user->business_scope=$request->b_scope;
-        $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days')); 
+        // $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days')); 
+        $user->end_date="2020-12-31";
         if($request->sel_ref!="")
         {
             $seller=com_info::join('users','company_info.sid','users.id')->where([['ref_code',$request->sel_ref],['type_id',1]])->select('users.id as sid','users.city_id','users.state_id','users.acc_allow','company_info.*')->first();

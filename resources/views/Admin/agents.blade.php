@@ -60,7 +60,7 @@
                         <th>State</th>
                         <th>PAN No</th>
                         <th>GST No</th>
-                        <th>Varified</th>
+                        <th>verified</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -75,7 +75,7 @@
                         <th>State</th>
                         <th>PAN No</th>
                         <th>GST No</th>
-                        <th>Varified</th>
+                        <th>verified</th>
                         <th>Action</th>
                     </tr>
                 </tfoot>
@@ -91,7 +91,7 @@
                         <td>{{$owner->state_name}}</td>
                         <td>{{$owner->pan}}</td>
                         <td>{{$owner->gst}}</td>
-                        <td>@if($owner->isVerified==1)<span class="text-success">Varified</span>@else<span class="text-danger">Unvarified</span>@endif</td>
+                        <td>@if($owner->isVerified==1)<span class="text-success">verified</span>@else<span class="text-danger">Unverified</span>@endif</td>
                         <td>
                             <!-- <a class="btn btn-sm btn-success text-white" data-toggle="tooltip" title="Accounts" href="{{url('/seller/accounts')}}/{{$owner->uid}}"><i class="fas fa-eye"></i></a> -->
                             <span data-toggle="tooltip" title="Update"><a class="btn btn-sm btn-primary text-white" data-toggle="modal" data-target="#updateSeller{{$owner->uid}}"><i class="fas fa-pen"></i></a></span>

@@ -58,7 +58,7 @@ class productController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            'image'=>'required',
+            // 'image'=>'required',
             'category'=>'required',
             'tags'=>'required',
             'colors'=>'required',
@@ -97,7 +97,7 @@ class productController extends Controller
                 }
             }
             else{
-                return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+                // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
 
         // $image_list = json_decode($req->image);
@@ -169,38 +169,48 @@ class productController extends Controller
             $sel=User::select('name')->where('id',$req->seller_id)->first();
             $prdct=['seller'=>$sel->name];
             $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
+            $msg="New product has been added by ".$sel->name;
             foreach($buyer as $b)
             {   
-                $msg="New product has been added by ".$sel->name;
-                $usr=User::find($b['cust_id']);
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+                $usr[]=$b['cust_id'];
+                // $msg="New product has been added by ".$sel->name;
+                // $usr=User::find($b['cust_id']);
+                // $data['msg']=$msg;
+                // $data['id']=$usr->id;
+                // \onesignal::sendNoti($data);
 
-                $n=new Notification;
-                $n->receiver=$usr->id;
-                $n->noti_for=$product->id;
-                $n->description=$msg;
-                $n->type="Product Add";
-                $n->date_time=date('Y-m-d H:i:s');
-                $n->save();
+                // $n=new Notification;
+                // $n->receiver=$usr->id;
+                // $n->noti_for=$product->id;
+                // $n->description=$msg;
+                // $n->type="Product Add";
+                // $n->date_time=date('Y-m-d H:i:s');
+                // $n->save();
             }
+            $data['msg']=$msg;
+            $data['id']=$usr;
+            \onesignal::sendNoti($data);
             $agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
             foreach($agent as $b)
             {
-                $usr=User::find($b['agent_id']);
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+                $usr1[]=$b['agent_id'];
+                // $usr=User::find($b['agent_id']);
+                // $data['msg']=$msg;
+                // $data['id']=$usr->id;
+                // \onesignal::sendNoti($data);
 
-                $n=new Notification;
-                $n->receiver=$usr->id;
-                $n->noti_for=$product->id;
-                $n->description=$msg;
-                $n->type="Product Add";
-                $n->date_time=date('Y-m-d H:i:s');
-                $n->save();
+                // $n=new Notification;
+                // $n->receiver=$usr->id;
+                // $n->noti_for=$product->id;
+                // $n->description=$msg;
+                // $n->type="Product Add";
+                // $n->date_time=date('Y-m-d H:i:s');
+                // $n->save();
             }
+            // dd($usr);
+            $data['msg']=$msg;
+                $data['id']=$usr1;
+                \onesignal::sendNoti($data);
             return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
         }
         else{
@@ -313,14 +323,33 @@ class productController extends Controller
 
         if($req->image != null && $req->name != null)
         {
-                $file = base64_decode($req->image);
-                $img = imagecreatefromstring($file);
-                //header('Content-Type: image/jpeg');
-                header('Content-Type: bitmap; charset=utf-8');
-                imagesavealpha($img, true);
-                imagejpeg($img,public_path('tempPhotos')."/".$req->name,70);
-                imagedestroy($img);
+                // $file = base64_decode($req->image);
+                // $img = imagecreatefromstring($file);
+                // //header('Content-Type: image/jpeg');
+                // header('Content-Type: bitmap; charset=utf-8');
+                // imagesavealpha($img, true);
+                // imagejpeg($img,public_path('tempPhotos')."/".$req->name,70);
+                // imagedestroy($img);
                 // Storage::disk('temp')->put($req->name, $file);
+
+                $percent = 0.5;
+                header('Content-Type: image/jpeg');
+
+                $data = base64_decode($req->image);
+                $im = imagecreatefromstring($data);
+                $width = imagesx($im);
+                $height = imagesy($im);
+                $newwidth = $width * $percent;
+                $newheight = $height * $percent;
+
+                $thumb = imagecreatetruecolor($newwidth, $newheight);
+
+                // Resize
+                imagecopyresized($thumb, $im, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+
+                // Output
+                imagejpeg($thumb,public_path('tempPhotos')."/".$req->name,20);
+
                 if(Storage::disk('temp')->exists($req->name))
                 {
                     return response()->json(['error' => false ,'message'=>'Image Uploaded Successfully'],200);

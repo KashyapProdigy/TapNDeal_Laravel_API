@@ -9,6 +9,12 @@
         <title>@yield('title')</title>
         <link href="{{asset('Assets/css/styles.css')}}" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+        <style>
+        a {
+            text-decoration: none !important;
+            color: inherit; 
+        }
+        </style>
     </head>
     <body>
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
