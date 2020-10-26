@@ -9,9 +9,9 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
-// HeadingRowFormatter::default('none');
+HeadingRowFormatter::default('none');
 
-class ProductImport implements ToModel,WithValidation
+class ProductImport implements ToModel,WithHeadingRow,WithValidation
 {
     /**
     * @param array $row
@@ -22,28 +22,27 @@ class ProductImport implements ToModel,WithValidation
     {
         // dd(@$row[0]);
         return new Product([
-           'name'       =>@$row[0],
-           'description'=>@$row[1],
-           'price'      =>@$row[2],
-           'category'   =>@$row[3],
+           'name'       =>@$row['Name'],
+           'description'=>@$row['Description'],
+           'price'      =>@$row['Price'],
+           'category'   =>@$row['Category'],
            'seller_id'  =>session()->get('uid'),
-           'tags'       =>@$row[4],
-           'colors'     =>@$row[5],
-            'image'     =>@$row[6],  
+           'tags'       =>@$row['Tags'],
+           'colors'     =>@$row['Colors'],
+            'image'     =>@$row['Image'],  
         ]);
     } 
     public function rules(): array
     {
         // $class=@$row[4];
         return [
-            // '*' =>'Required',
-            '0'=>'required',
-            '1'=>'required',
-            '2'=>'required|numeric',
-            '3'=>'required',
-            '4'=>'required',
-            '5'=>'required',
-            '6'=>'required',
+            'Name'=>'required',
+            'Description'=>'required',
+            'Price'=>'required|numeric',
+            'Category'=>'required|in:A,A+,B',
+            'Tags'=>'required',
+            'Colors'=>'required',
+            'Image'=>'required',
         ];
     }
 }
