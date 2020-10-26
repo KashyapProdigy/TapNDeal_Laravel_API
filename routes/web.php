@@ -69,6 +69,7 @@ Route::middleware([manufacture::class])->group(function () {
     Route::post('/manufacture/emp/edit','accounts@empEdit');
     Route::get('/manufacture/emp/delete/{id}','accounts@empDelete');
     Route::post('/manufacture/products/add','importExcel@import');
+    Route::post('/manufacture/images/add','manufactureController@addImages');
 });
 
 Route::get('product/{name}', 'ImagesController@productPicture');

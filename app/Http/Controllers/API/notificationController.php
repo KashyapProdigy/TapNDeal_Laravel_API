@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 use App\Notification;
 use Carbon\Carbon;
 use Validator;
-use App\User;
-use App\emp_sel_rel;
+
 class notificationController extends Controller
 {
     public function show($id)
@@ -86,16 +85,5 @@ class notificationController extends Controller
             return response()->json(['error' => false ,'message'=>'Notification Deleted'],200);
         }
         return response()->json(['error' => true ,'message'=>'Record not found']);
-    }
-    public function read($id)
-    {
-        $User=User::find($id);
-        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
-        {
-            $seller=emp_sel_rel::where('emp_id',$id)->first();
-            $id=$seller->seller_id;   
-        }
-        $noti=Notification::where('receiver',$id)->update(['isRead'=>1]);
-        return response()->json(['error' => false ,'message'=>'Notification Readed'],200);
     }
 }

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Imports\Productimport;
+use App\Imports\ProductImport;
 use Maatwebsite\Excel\Facades\Excel;
-
 class importExcel extends Controller
 {
     public function import(Request $req) 
@@ -17,5 +16,4 @@ class importExcel extends Controller
            
         return back();
     }
-    
 }

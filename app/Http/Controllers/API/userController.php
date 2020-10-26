@@ -22,7 +22,6 @@ use App\Product;
 
 class userController extends Controller
 {
-
     public $successStatus = 200;
     public function generateRefCode($name)
     {
@@ -81,6 +80,7 @@ class userController extends Controller
         $user1=User::where([['mobile',$request->mobile],['isDeleted',0]])->first();
         if($user1)
         {
+            return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
             if($user1->type_id!=3)
             {
                 return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
@@ -152,11 +152,23 @@ class userController extends Controller
             'mobile'=>'required|unique:users',
         ]);
         if ($validator->fails()) {
-            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 200);
         }
-        $user1=User::where([['mobile',$request->mobile],['isDeleted',0]])->first();
+        if($request->type_id==1 || $request->type_id==2 || $request->type_id==3)
+        {
+            $validator = Validator::make($request->all(), [
+                'cname'=>'required',
+                'address'=>'required',
+                'b_scope'=>'required'
+                ]);
+            if ($validator->fails()) {
+                return response()->json(['error' => true ,'message'=>$validator->errors()], 200);
+            }
+        }
+        $user1=User::where('mobile',$request->mobile)->first();
         if($user1)
         {
+            return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
             if($user1->type_id!=3)
             {
                 return response()->json(['error' => true ,'message'=>'This mobile number already registered..!'], 401);
@@ -201,8 +213,8 @@ class userController extends Controller
             $request->b_scope=" ";
         }
         $user->business_scope=$request->b_scope;
-        // $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days')); 
-        $user->end_date="2020-12-31";
+        // $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days'));
+        $user->end_date="2020-12-31"; 
         if($request->sel_ref!="")
         {
             $seller=com_info::join('users','company_info.sid','users.id')->where([['ref_code',$request->sel_ref],['type_id',1]])->select('users.id as sid','users.city_id','users.state_id','users.acc_allow','company_info.*')->first();
@@ -493,11 +505,29 @@ class userController extends Controller
         return response()->json(['error' => true ,'message'=>'User not found '],500);
 
     }
+    public function regInfo1($uid)
+    {
+        $data=array();
+        $data['cities']=\DB::table('citys')->get();
+        if($uid==1)
+        {
+            $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7,8])->get();
+        }
+        if($uid==2)
+        {
+            $data['userTypes']=\DB::table('user_type')->where('id',8)->get();
+        }
+        if (sizeof($data['cities']) > 0) {
+            return response()->json(['error' => false, 'data' => $data], 200);
+        } else {
+            return response()->json(['error' => true, 'message' => $data], 500);
+        }
+    }
     public function regInfo()
     {
         $data=array();
         $data['cities']=\DB::table('citys')->get(); 
-        $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7,8])->get();
+        $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7])->get();
         if (sizeof($data['cities']) > 0) {
             return response()->json(['error' => false, 'data' => $data], 200);
         } else {

@@ -41,9 +41,12 @@
     </div>
     <div>
     <div class="row d-flex justify-content-right col-12">
-        <div class="col-md-10"></div>
+        <div class="col-md-8"></div>
         <div class="col-md-2">
-            <button class="btn btn-sm btn-primary float-right m-3" data-toggle="modal" data-target="#AddSeller">+Add Multiple products</button>
+            <button class="btn btn-sm btn-primary float-right my-3" data-toggle="modal" data-target="#AddSeller">+Add Multiple products</button>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-sm btn-danger float-right my-3" data-toggle="modal" data-target="#AddImages">+Add Multiple images</button>
         </div>
     </div>
     </div>
@@ -134,7 +137,38 @@
             <input type="file" name="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
         </div>
       </div>
+      <a href="{{asset('tapndeal.xlsx')}}" class="mx-3">Click here for demo file</a>
       <div class="text-danger m-3">*file must be excel or csv file</div>
+      
+      <div class="modal-footer">
+        
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">+Add</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+</form>
+<form action="{{url('manufacture/images/add')}}" method="post" enctype="multipart/form-data">
+<div class="modal fade bd-example-modal-lg" tabindex="-1" id="AddImages" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+@csrf
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Images</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-row">
+            <input type="file" name="images[]" accept="image/*" multiple>
+        </div>
+      </div>
+      <div class="text-danger m-3">*file must be image</div>
+      
       <div class="modal-footer">
         
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

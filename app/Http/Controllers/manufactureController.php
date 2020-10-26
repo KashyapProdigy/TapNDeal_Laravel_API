@@ -190,4 +190,16 @@ class manufactureController extends Controller
         }
         return back()->with('danger','somthings went\'s wrong');
     }
+    public function addImages(Request $request)
+    {
+        $input=$request->all();
+        $images=array();
+        if($files=$request->file('images')){
+            foreach($files as $file){
+                $name=$file->getClientOriginalName();
+                $file->move(public_path().'/productPhotos/', $name);
+            }
+        }
+        return back()->with('success','All images uploaded..');
+    }
 }

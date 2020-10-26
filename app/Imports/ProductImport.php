@@ -7,8 +7,11 @@ use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
-class ProductImport implements ToModel
+// HeadingRowFormatter::default('none');
+
+class ProductImport implements ToModel,WithValidation
 {
     /**
     * @param array $row
@@ -26,7 +29,21 @@ class ProductImport implements ToModel
            'seller_id'  =>session()->get('uid'),
            'tags'       =>@$row[4],
            'colors'     =>@$row[5],
-            'image'=>@$row[6],  
+            'image'     =>@$row[6],  
         ]);
     } 
+    public function rules(): array
+    {
+        // $class=@$row[4];
+        return [
+            // '*' =>'Required',
+            '0'=>'required',
+            '1'=>'required',
+            '2'=>'required|numeric',
+            '3'=>'required',
+            '4'=>'required',
+            '5'=>'required',
+            '6'=>'required',
+        ];
+    }
 }

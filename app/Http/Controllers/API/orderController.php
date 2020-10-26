@@ -586,13 +586,13 @@ class orderController extends Controller
             $ostat=\DB::table('order_status')->select('status_name')->where('id',$req->status_id)->first();
             $msg='Order '.$ordr->order_name.' has been '.$ostat->status_name;
             $usr=User::find($ordr['cust_id']);
-            $data['msg']=$msg;
-            $data['id']=$usr->id;
-            \onesignal::sendNoti($data);
+            // $data['msg']=$msg;
+            // $data['id']=$usr->id;
+            // \onesignal::sendNoti($data);
 
             $n=new Notification;
             $n->receiver=$usr->id;
-            $n->noti_for=$id;
+            $n->noti_for=$oid;
             $n->description=$msg;
             $n->type="Order ".$ostat->status_name;
             $n->date_time=date('Y-m-d H:i:s');
@@ -600,19 +600,23 @@ class orderController extends Controller
             if($req->status_id==3)
             {
                 $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',5],['seller_id',$ordr->seller_id]])->first();
-                $usr=User::find($salesman->id);
-                $msg='Please get bill ready for '.$ordr->order_name.' it is ready to dispatch';
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+                if($salesman)
+                {
+                    $usr=User::find($salesman->id);
+                    $msg='Please get bill ready for '.$ordr->order_name.' it is ready to dispatch';
+                //     $data['msg']=$msg;
+                //     $data['id']=$usr->id;
+                //     \onesignal::sendNoti($data);
 
-                $n=new Notification;
-                $n->receiver=$usr->id;
-                $n->noti_for=$id;
-                $n->description=$msg;
-                $n->type="Order ".$ostat->status_name;
-                $n->date_time=date('Y-m-d H:i:s');
-                $n->save();
+                    $n=new Notification;
+                    $n->receiver=$usr->id;
+                    $n->noti_for=$oid;
+                    $n->description=$msg;
+                    $n->type="Order ".$ostat->status_name;
+                    $n->date_time=date('Y-m-d H:i:s');
+                    $n->save();
+                }
+                
             }
             return response()->json(['error' => false ,'message'=>'Order status change'],200);
         }

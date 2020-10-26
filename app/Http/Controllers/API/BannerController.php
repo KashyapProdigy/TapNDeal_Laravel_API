@@ -19,6 +19,7 @@ class BannerController extends Controller
         {
             $seller=emp_sel_rel::where('emp_id',$mid)->first();
             $mid=$seller->seller_id;
+            
         }
         $banners=Banners::where('manu_id',$mid)->get();
         if(count($banners)>0)
@@ -40,7 +41,7 @@ class BannerController extends Controller
         {
             $seller=emp_sel_rel::where('emp_id',$req->manufacturer_id)->first();
             $req->manufacturer_id=$seller->seller_id;   
-        }
+        } 
         $ban=new Banners;
         $ban->manu_id=$req->manufacturer_id;
         if($ban->save())
