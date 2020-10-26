@@ -7,7 +7,7 @@
         <meta name="description" content="" />
         <meta name="author" content="" />
         <title>Tap And Deal</title>
-        <link href="public/Assets/css/styles.css" rel="stylesheet" />
+        <link href="{{asset('Assets/css/styles.css')}}" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
     </head>
     <body class="bg-primary">
