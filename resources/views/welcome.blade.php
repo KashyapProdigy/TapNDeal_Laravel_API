@@ -68,7 +68,7 @@
                 <div class="top-right links">
                         <a href="{{ url('/admin') }}">Admin</a>
                     
-                        <a href="{{ url('/manufacture') }}">Manufacture</a>
+                        <a href="{{ url('/manufacture') }}">Manufacturer</a>
 
                 </div>
             
