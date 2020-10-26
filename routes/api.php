@@ -32,7 +32,6 @@ Route::post('user/profilepic/update/{uid}','API\userController@updatePic');
 Route::post('user/token/check','API\userController@tokenCheck');
 Route::get('user/info/count/{uid}','API\userController@infoCount');
 
-
 Route::get('dashboard/{id}','API\dashboardController@getdashboard');
 Route::get('user/relation/show/seller/{id}','API\dashboardController@showSellerRelations');
 Route::post('user/knock/new/customer/{id}','API\customerKnockController@create');
@@ -90,7 +89,6 @@ Route::post('user/notification/new','API\notificationController@create');
 Route::post('user/notification/update/{id}','API\notificationController@update');
 Route::get('user/notification/show/{id}','API\notificationController@show');
 Route::delete('user/notification/delete/{id}','API\notificationController@delete');
-Route::get('user/read/noti/{uid}','API\notificationController@read');
 
 Route::post('user/cart/new','API\cartController@create');
 Route::get('user/cart/show/{id}','API\cartController@show');
@@ -159,13 +157,12 @@ Route::post('tempReq/revive/{trid}','API\tempReqController@revive');
 Route::get('agent/search','API\userController@agentSearch');
 Route::get('agent/search/{cat}','API\userController@agentCatSearch');
 Route::get('suplier/search','API\userController@suplierSearch');
-Route::get('regInfo/{uid}','API\userController@regInfo1');
 Route::get('regInfo','API\userController@regInfo');
+Route::get('regInfo/{uid}','API\userController@regInfo1');
 Route::get('user/firm/search','API\userController@firmSearch');
 
 Route::post('  ','API\chatController@store');
 Route::get('chat/list/{uid}','API\chatController@list');
-
 
 Route::post('custome/agent','API\agentController@customeAgent');
 

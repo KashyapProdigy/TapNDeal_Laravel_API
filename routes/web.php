@@ -76,11 +76,11 @@ Route::get('product/{name}', 'ImagesController@productPicture');
 Route::get('Banner/{name}', 'ImagesController@bannerPicture');
 Route::get('profile/{name}', 'ImagesController@profilePicture');
 Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
-Route::get('n',function(){
-    $usr=User::find(12);
-    $data['id']=$usr->id;
-    $msg="hello";
-    $data['msg']=$msg;
-    \onesignal::sendNoti($data);
-    dd('abc');
-});
+// Route::get('n',function(){
+//     $usr=User::find(12);
+//     $data['id']=$usr->id;
+//     $msg="hello";
+//     $data['msg']=$msg;
+//     \onesignal::sendNoti($data);
+//     dd('abc');
+// });
