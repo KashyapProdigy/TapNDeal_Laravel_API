@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\emp_sel_rel;
 use App\com_info;
+use App\Product;
 class ownersController extends Controller
 {
     public function generateRefCode($name)
@@ -196,5 +197,40 @@ class ownersController extends Controller
         $usr->type_id=$req->etype;
         $usr->save();
         return redirect()->back()->with('success','Employee updated succesfully...');
+    }
+    public function Products()
+    {
+        $product=Product::join('users','users.id','seller_id')->select('products.*','products.id as pid','users.name as sname')
+        ->orderBy('products.created_at','desc')->get();
+        $sellers=User::where([['type_id',1],['isDeleted',0]])->get();
+        return view('Admin.products',['products'=>$product,'sellers'=>$sellers]);
+    }
+    public function deletepro($pid)
+    {
+        $del=Product::where('id',$pid);
+        if($del!=null)
+        {
+            $del->delete();
+            return back()->with('success','product deleted successfully');
+        }
+        return back()->with('danger','somthings went\'s wrong');
+    }
+    public function enable($pid)
+    {
+        $p=Product::where('id',$pid)->update(['isDisabled'=>0]);
+        if($p!=null)
+        {
+            return back()->with('success','product Enabled successfully');
+        }
+        return back()->with('danger','somthings went\'s wrong');
+    }
+    public function disable($pid)
+    {
+        $p=Product::where('id',$pid)->update(['isDisabled'=>1]);
+        if($p!=null)
+        {
+            return back()->with('success','product Disabled successfully');
+        }
+        return back()->with('danger','somthings went\'s wrong');
     }
 }

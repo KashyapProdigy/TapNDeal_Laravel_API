@@ -193,11 +193,48 @@ class manufactureController extends Controller
     public function addImages(Request $request)
     {
         $input=$request->all();
-        $images=array();
-        if($files=$request->file('images')){
-            foreach($files as $file){
+        if($files=$request->file('images'))
+        {
+            foreach($files as $file)
+            {
+                $strImage =  base64_encode(file_get_contents($file->getRealPath()));
                 $name=$file->getClientOriginalName();
-                $file->move(public_path().'/productPhotos/', $name);
+
+                $percent = 1;
+                // header('Content-Type: image/jpeg');
+
+                $data = base64_decode($strImage);
+                $im = imagecreatefromstring($data);
+                $width = imagesx($im);
+                $height = imagesy($im);
+                $newwidth = $width * $percent;
+                $newheight = $height * $percent;
+
+                $size=strlen($data)/1000;
+                if($size <= 200)
+                {
+                    $qu=90;
+                }
+                else if($size <=400)
+                {
+                    $qu=60;
+                }
+                else if($size <=1000)
+                {
+                    $qu=30;
+                }
+                else{
+                    $qu=20;
+                }
+                $thumb = imagecreatetruecolor($newwidth, $newheight);
+
+                // Resize
+                imagecopyresized($thumb, $im, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+
+                // Output
+                imagejpeg($thumb,public_path('productPhotos')."/".$name,$qu);
+
+                // $file->move(public_path().'/productPhotos/', $name);
             }
         }
         return back()->with('success','All images uploaded..');

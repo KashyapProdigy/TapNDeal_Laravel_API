@@ -26,6 +26,12 @@ Route::middleware([AdminCheck::class])->group(function () {
     route::get('/admin/reference','AdminController@reference');
     route::get('/admin/refered/users/{ref}','AdminController@refUser');
     route::get('/admin/owner','ownersController@show');
+    route::get('/admin/products','ownersController@Products');
+    Route::get('/admin/products/delete/{pid}','ownersController@deletepro');
+    Route::get('/admin/products/enable/{pid}','ownersController@enable');
+    Route::get('/admin/products/disable/{pid}','ownersController@disable');
+    Route::post('/admin/products/add','importExcel@import');
+    Route::post('/admin/images/add','manufactureController@addImages');
     route::post('/update/seller','ownersController@update');
     route::post('/SellerAdd','ownersController@create');
     route::get('/seller/delete/{uid}','ownersController@delete');

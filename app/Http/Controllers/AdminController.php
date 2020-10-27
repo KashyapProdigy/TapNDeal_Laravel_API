@@ -36,7 +36,7 @@ class AdminController extends Controller
             $tot_agt=User::where('type_id',2)->count();
             $tot_pro=Product::count();
             $to=Order::count();
-            $selling=Order::where('isDelivered',1)->sum('total_price');
+            $selling=Order::join('order_status','order_status.id','orders.status_id')->where('status_name','Dispatched')->sum('total_price');
             return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to,'sel'=>$selling]);
         }
         else{

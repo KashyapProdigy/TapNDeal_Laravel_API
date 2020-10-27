@@ -64,6 +64,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
                                 Orders
                             </a>
+                            <a class="nav-link" href="{{url('admin/products')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-box-open"></i></div>
+                                Products
+                            </a>
                             <a class="nav-link" href="{{url('admin/reference')}}">
                                 <div class="sb-nav-link-icon"><i class="fas fa-network-wired"></i></div>
                                 Reference
@@ -106,8 +110,8 @@
         </div>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="/Tapndeal/public/Assets/js/scripts.js"></script>
-        <script src="/Tapndeal/public/Assets/demo/datatables-demo.js"></script>
+        <script src="{{asset('Assets/js/scripts.js')}}"></script>
+        <script src="{{asset('Assets/demo/datatables-demo.js')}}"></script>
         <script>
         $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
