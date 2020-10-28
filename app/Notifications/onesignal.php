@@ -42,6 +42,6 @@ class example extends Notification implements ShouldQueue
         return OneSignalMessage::create()
             ->setSubject("Testing")
             ->setBody($this->msg)
-            ->setIcon('https://tapndeal.com/images/favicon.png');
+            // ->setIcon('https://tapndeal.com/images/favicon.png');
     }
 }

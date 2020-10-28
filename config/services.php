@@ -31,6 +31,9 @@ return [
     ],
     'fcm' => [
         'key' => "AAAAcSABORQ:APA91bEcpHpirWHaTtoQFkrlqxxAPmuSDyPEAVFe-IsTImCMV3-shB6sE_8wilM_4Wm2Y3nWptBz7E_FKyCa44ksgLClyjaH8stiDQcG04JPX0j2onlPymrjkFjiuyPjiefL6NEAUOdg",
-     ]
-
+    ],
+     'onesignal' => [
+        'app_id' => "ab9a9044-6eb6-41a6-bfa9-d14557532fec",
+        'rest_api_key' => "YjBhYjc0OTAtMzZiMS00MzYwLWJmZDAtZjFhMGM2MGU2MzRi"
+    ],
 ];

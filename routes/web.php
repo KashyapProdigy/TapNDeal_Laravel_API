@@ -3,6 +3,8 @@ use App\User;
 use App\Product;
 use Illuminate\Support\Facades\Route;
 use App\Notifications\example;
+use Illuminate\Notifications\Notifiable;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -82,11 +84,12 @@ Route::get('product/{name}', 'ImagesController@productPicture');
 Route::get('Banner/{name}', 'ImagesController@bannerPicture');
 Route::get('profile/{name}', 'ImagesController@profilePicture');
 Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
-// Route::get('n',function(){
-//     $usr=User::find(12);
-//     $data['id']=$usr->id;
-//     $msg="hello";
-//     $data['msg']=$msg;
-//     \onesignal::sendNoti($data);
-//     dd('abc');
-// });
+Route::get('n',function(){
+    $usr=User::whereIn('id',[11,7])->get();
+    Notification::send($usr, new example('abc'));
+    // $data['id']=$usr->id;
+    // $msg="hello";
+    // $data['msg']=$msg;
+    // \onesignal::sendNoti($data);
+    dd('abc');
+});

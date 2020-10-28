@@ -31,6 +31,10 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    public function routeNotificationForOneSignal()
+    {
+        return ['include_external_user_ids' => $this->id];
+    }
 
     public function routeNotificationForFcm($notification)
     {

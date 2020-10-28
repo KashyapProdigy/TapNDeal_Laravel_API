@@ -10,7 +10,7 @@ use App\Cart;
 use App\User;
 use Validator;
 use App\emp_sel_rel;
-use App\Notifications\statusChange;
+use App\Notifications\onesignal;
 use App\Notifications\orderPlace;
 use App\custome_agent;
 use App\CustomerCategoryRelationship;
@@ -19,7 +19,7 @@ class orderController extends Controller
 {
     public function createRequest(Request $req)
     {
-        
+
         $validator = Validator::make($req->all(), [
             'cust_id' => 'required',
         ]);
@@ -53,13 +53,13 @@ class orderController extends Controller
                 $record->total_price = $record->product_price * $record->qty;
                 $order_amount = $order_amount + $record->total_price;
             }
-            
+
             if(DB::table('carts')->whereIn('id',$cartID)->delete())
             {
                 $firm=\DB::table('company_info')->where('sid', $cartrecord->seller_id)->first();
                 $words = explode(" ",$firm->cname);
                 $fcode = "";
-        
+
                 foreach ($words as $w) {
                     $fcode .= $w[0];
                 }
@@ -67,7 +67,7 @@ class orderController extends Controller
                 do{
                     $o_name=$fcode.'-'.$i++;
                 }while(Order::where('order_name',$o_name)->first());
-                
+
             $orderinsert = new Order;
             $orderinsert->order_name=$o_name;
             $orderinsert->seller_id = $cartrecord->seller_id;
@@ -94,9 +94,7 @@ class orderController extends Controller
                     $usr=User::find($cartrecord->seller_id);
                     $cust=User::find($req->cust_id);
                     $msg="Order has been placed by ".$cust->name;
-                    $data['msg']=$msg;
-                    $data['id']=$usr->id;
-                    \onesignal::sendNoti($data);
+                    \Notification::send($usr, new onesignal($msg));
 
                     $n=new Notification;
                     $n->receiver=$usr->id;
@@ -107,14 +105,11 @@ class orderController extends Controller
                     $n->save();
 
                 $salesman=emp_sel_rel::join('users','emp_sel_rel.emp_id','users.id')->where([['seller_id',$cartrecord->seller_id],['type_id',4]])->get();
-                
+                $msg="Order has been placed by ".$cust->name;
                 foreach($salesman as $s)
                 {
-                    $msg="Order has been placed by ".$cust->name;
-                    $sal=User::find($s['emp_id']);
-                    $data['msg']=$msg;
-                    $data['id']=$sal->id;
-                    \onesignal::sendNoti($data);
+                    $usr=User::find($s['emp_id']);
+                    \Notification::send($usr, new onesignal($msg));
 
                     $n=new Notification;
                     $n->receiver=$sal->id;
@@ -124,7 +119,7 @@ class orderController extends Controller
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();
                 }
-                
+
                 if($req->agent_reference!="Order without agent" && $req->agent_reference!=" ")
                 {
                     $agent=User::where('ref_code',$req->agent_reference)->first();
@@ -132,9 +127,8 @@ class orderController extends Controller
                     {
                         $sel=User::find($cartrecord->seller_id);
                         $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
-                        $data['msg']=$msg1;
-                        $data['id']=$agent->id;
-                        \onesignal::sendNoti($data);
+
+                        \Notification::send($sel, new onesignal($msg1));
 
                         $n=new Notification;
                         $n->receiver=$agent->id;
@@ -144,7 +138,7 @@ class orderController extends Controller
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
                     }
-                   
+
                 }
                 return response()->json(['error' => false ,'message'=>"Order Requested Successfully"], 200);
             }
@@ -167,7 +161,7 @@ class orderController extends Controller
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
             $User=User::find($id);
-            
+
         }
         $listreturn = DB::table('orders')
         ->join('users','users.id','orders.cust_id')
@@ -209,7 +203,7 @@ class orderController extends Controller
         return response()->json(['error' => true ,'message'=>'Something went wrong']);
     }
     public function custNewOrder($cid)
-    {   
+    {
         $user=User::find($cid);
         $listreturn = DB::table('orders')
                             ->join('users','users.id','orders.seller_id')
@@ -260,7 +254,7 @@ class orderController extends Controller
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
             $User=User::find($id);
-            
+
         }
 
         if($User == null )
@@ -360,7 +354,7 @@ class orderController extends Controller
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
             $User=User::find($id);
-            
+
         }
 
         if($User == null )
@@ -388,7 +382,7 @@ class orderController extends Controller
                         if(!$agent)
                         {
                             $agent=custome_agent::where('ref_code',$record->agent_reference)->first();
-                            
+
                         }
                         if(!$agent['name'])
                         {
@@ -464,9 +458,8 @@ class orderController extends Controller
             $seller=User::find($ord->seller_id);
             $cust=User::find($ord->cust_id);
             $msg='Order '.$ord->order_name.' has been Accepted';
-            $data['msg']=$msg;
-            $data['id']=$cust->id;
-            \onesignal::sendNoti($data);
+
+            \Notification::send($cust, new onesignal($msg));
 
             $n=new Notification;
             $n->receiver=$cust->id;
@@ -481,9 +474,7 @@ class orderController extends Controller
             {
                 $usr=User::find($salesman->id);
                 $msg='New order '.$ord->order_name.' received please get the product ready';
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+                \Notification::send($usr, new onesignal($msg));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
@@ -499,9 +490,7 @@ class orderController extends Controller
                 if($agent)
                 {
                     $msg='Order has been created by '.$seller->name.' of your client '.$cust->name;
-                    $data['msg']=$msg;
-                    $data['id']=$agent->id;
-                    \onesignal::sendNoti($data);
+                   \Notification::send($usr, new onesignal($msg));
 
                     $n=new Notification;
                     $n->receiver=$agent->id;
@@ -586,9 +575,7 @@ class orderController extends Controller
             $ostat=\DB::table('order_status')->select('status_name')->where('id',$req->status_id)->first();
             $msg='Order '.$ordr->order_name.' has been '.$ostat->status_name;
             $usr=User::find($ordr['cust_id']);
-            // $data['msg']=$msg;
-            // $data['id']=$usr->id;
-            // \onesignal::sendNoti($data);
+            \Notification::send($usr, new onesignal($msg));
 
             $n=new Notification;
             $n->receiver=$usr->id;
@@ -604,9 +591,7 @@ class orderController extends Controller
                 {
                     $usr=User::find($salesman->id);
                     $msg='Please get bill ready for '.$ordr->order_name.' it is ready to dispatch';
-                //     $data['msg']=$msg;
-                //     $data['id']=$usr->id;
-                //     \onesignal::sendNoti($data);
+                    \Notification::send($usr, new onesignal($msg));
 
                     $n=new Notification;
                     $n->receiver=$usr->id;
@@ -616,7 +601,7 @@ class orderController extends Controller
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();
                 }
-                
+
             }
             return response()->json(['error' => false ,'message'=>'Order status change'],200);
         }
@@ -631,9 +616,9 @@ class orderController extends Controller
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
             $user=User::find($id);
-            
+
         }
-        
+
         if($user)
         {
             if($user->type_id==1)
@@ -669,7 +654,7 @@ class orderController extends Controller
                         $record->agent_mobile=$agent['mobile'];
                         $record->agent_cname=$cname;
                         $record->products = json_decode($record->products);
-                        
+
                         foreach($record->products as $temp)
                         {
                             $count ++;
@@ -728,7 +713,7 @@ class orderController extends Controller
             if($user->type_id == 2 || $user->type_id==8)
             {
                 $o_list=Order::where('agent_reference',$user->ref_code)
-                
+
                 ->join('order_status','status_id','order_status.id')->select('orders.id','seller_id','cust_id')->orderby('orders.created_at','desc')->get();
                 $list=array();
                 $order=array();
@@ -747,7 +732,7 @@ class orderController extends Controller
                     $list['seller_cname']=$cmp1->cname;
                     $order[]=$list;
                 }
-                if(count($order)>0)    
+                if(count($order)>0)
                     return response()->json(['error' => false ,'data'=>$order],200);
                 else{
                     return response()->json(['error' => false ,'data'=>null],200);
