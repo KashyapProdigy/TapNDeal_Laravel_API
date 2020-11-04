@@ -8,7 +8,7 @@ use App\Chat;
 use Carbon\Carbon;
 use Validator;
 use App\Notification;
-use App\Notifications\ChatNoti;
+use App\Notifications\onesignal;
 use App\User;
 use App\AgentCategoryRelationship;
 use App\CustomerCategoryRelationship;
@@ -44,9 +44,8 @@ class chatController extends Controller
                 $usr=User::find($req->receiver);
                 $send=User::find($req->send_by);
                 $msg="New message by ".$send->name." ".$req->msg;
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+
+                \Notification::send($usr, new onesignal($msg));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
@@ -67,10 +66,9 @@ class chatController extends Controller
         $usr=User::find($req->receiver);
         $send=User::find($req->send_by);
         $msg="New message by ".$send->name." ".$req->msg;
-        $data['msg']=$msg;
-        $data['id']=$usr->id;
-        \onesignal::sendNoti($data);
-        
+
+        \Notification::send($usr, new onesignal($msg));
+
         $n=new Notification;
         $n->receiver=$usr->id;
         $n->noti_for=$chat->id;

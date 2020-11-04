@@ -11,7 +11,7 @@ use NotificationChannels\OneSignal\OneSignalChannel;
 use NotificationChannels\OneSignal\OneSignalMessage;
 use NotificationChannels\OneSignal\OneSignalWebButton;
 
-class example extends Notification implements ShouldQueue
+class onesignal extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -40,8 +40,8 @@ class example extends Notification implements ShouldQueue
     public function toOneSignal($notifiable)
     {
         return OneSignalMessage::create()
-            ->setSubject("Testing")
-            ->setBody($this->msg)
+            ->setSubject("Tap N Deal")
+            ->setBody($this->msg);
             // ->setIcon('https://tapndeal.com/images/favicon.png');
     }
 }

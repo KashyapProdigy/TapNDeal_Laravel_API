@@ -11,7 +11,7 @@ use App\CustomerCategoryRelationship;
 use Validator;
 use App\emp_sel_rel;
 use App\Notification;
-use App\Notifications\knockRequestSend;
+use App\Notifications\onesignal;
 class customerKnockController extends Controller
 {
         public function create(Request $req,$id)
@@ -57,9 +57,8 @@ class customerKnockController extends Controller
                         $usr=User::find($id);
                         $cust=User::find($req->cust_id);
                         $msg="Knock by ".$cust->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -68,13 +67,12 @@ class customerKnockController extends Controller
                         $n->type="Buyer Knock";
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
-                        
+
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
                         $msg="Knock by ".$cust->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -100,9 +98,8 @@ class customerKnockController extends Controller
                         $usr=User::find($id);
                         $cust=User::find($req->cust_id);
                         $msg="Knock by ".$cust->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -117,12 +114,11 @@ class customerKnockController extends Controller
                         {
                             foreach($salesman as $s)
                             {
-                        
+
                                 $usr=User::find($s->id);
                                 $msg="Knock by ".$cust->name;
-                                $data['msg']=$msg;
-                                $data['id']=$usr->id;
-                                \onesignal::sendNoti($data);
+
+                                \Notification::send($usr, new onesignal($msg));
 
                                 $n=new Notification;
                                 $n->receiver=$usr->id;
@@ -145,9 +141,8 @@ class customerKnockController extends Controller
                 $usr=User::find($id);
                 $cust=User::find($req->cust_id);
                 $msg="Knock by ".$cust->name;
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+
+                \Notification::send($usr, new onesignal($msg));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
@@ -164,9 +159,8 @@ class customerKnockController extends Controller
                     {
                         $usr=User::find($s->id);
                         $msg="Knock by ".$cust->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -177,7 +171,7 @@ class customerKnockController extends Controller
                         $n->save();
                     }
                 }
-                
+
 
                 return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
             }
@@ -225,9 +219,8 @@ class customerKnockController extends Controller
                             $usr=User::find($id);
                             $seller=User::find($req->seller_id);
                             $msg="Knock Accepted by ".$seller->name;
-                            $data['msg']=$msg;
-                            $data['id']=$usr->id;
-                            \onesignal::sendNoti($data);
+
+                            \Notification::send($usr, new onesignal($msg));
 
                             $n=new Notification;
                             $n->receiver=$usr->id;
@@ -253,9 +246,8 @@ class customerKnockController extends Controller
                                 $usr=User::find($id);
                                 $seller=User::find($req->seller_id);
                                 $msg="Knock Accepted by ".$seller->name;
-                                $data['msg']=$msg;
-                                $data['id']=$usr->id;
-                                \onesignal::sendNoti($data);
+
+                                \Notification::send($usr, new onesignal($msg));
 
                                 $n=new Notification;
                                 $n->receiver=$usr->id;
@@ -281,9 +273,8 @@ class customerKnockController extends Controller
                             $usr=User::find($id);
                             $seller=User::find($req->seller_id);
                             $msg="Knock Accepted by ".$seller->name;
-                            $data['msg']=$msg;
-                            $data['id']=$usr->id;
-                            \onesignal::sendNoti($data);
+
+                            \Notification::send($usr, new onesignal($msg));
 
                             $n=new Notification;
                             $n->receiver=$usr->id;

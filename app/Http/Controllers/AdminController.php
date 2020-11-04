@@ -8,6 +8,8 @@ use App\User;
 use App\Order;
 use App\Product;
 use App\Payment;
+use App\feedbackModel;
+
 class AdminController extends Controller
 {
     public function admin()
@@ -22,7 +24,7 @@ class AdminController extends Controller
             $selling=Order::join('order_status','order_status.id','orders.status_id')->where('status_name','Dispatched')->sum('total_price');
             return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to,'sel'=>$selling]);
         }
-        return view('Admin.login');   
+        return view('Admin.login');
     }
     public function Login(Request $req)
     {
@@ -36,7 +38,7 @@ class AdminController extends Controller
             $tot_agt=User::where('type_id',2)->count();
             $tot_pro=Product::count();
             $to=Order::count();
-            $selling=Order::join('order_status','order_status.id','orders.status_id')->where('status_name','Dispatched')->sum('total_price');
+            $selling=Order::where('isDelivered',1)->sum('total_price');
             return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to,'sel'=>$selling]);
         }
         else{
@@ -88,5 +90,10 @@ class AdminController extends Controller
     {
         $payment=Payment::join('users','users.id','payments.user_id')->join('user_type','user_type.id','users.type_id')->get();
         return view('Admin.payments',['pay'=>$payment]);
+    }
+    public function feedbacks()
+    {
+        $feedbacks=feedbackModel::join('users','users.id','uid')->join('company_info','company_info.sid','users.id')->orderby('date_time','desc')->get();
+        return view('Admin.feedback',['feedbacks'=>$feedbacks]);
     }
 }

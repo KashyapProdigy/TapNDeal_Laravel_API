@@ -46,6 +46,7 @@ Route::middleware([AdminCheck::class])->group(function () {
     route::get('admin/orders','orderController@showAll');
     Route::get('admin/orders/show/{id}','orderController@fullorder');
     route::get('admin/payments','AdminController@payments');
+    route::get('admin/feedbacks','AdminController@feedbacks');
 });
 
 Route::get('/manufacture',function(){

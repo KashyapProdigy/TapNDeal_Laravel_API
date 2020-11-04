@@ -10,7 +10,7 @@ use App\AgentKnock;
 use App\AgentCategoryRelationship;
 use Validator;
 use App\emp_sel_rel;
-use App\Notifications\knockRequestSend;
+use App\Notifications\onesignal;
 use App\Notification;
 
 class agentKnockController extends Controller
@@ -58,9 +58,7 @@ class agentKnockController extends Controller
                         $usr=User::find($knock_seller->id);
                         $agent=User::find($req->agent_id);
                         $msg="Knock by ".$agent->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -69,13 +67,11 @@ class agentKnockController extends Controller
                         $n->type="Agent Knock";
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
-                        
+
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
                         $msg="Knock by ".$agent->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -101,9 +97,7 @@ class agentKnockController extends Controller
                         $usr=User::find($id);
                         $agent=User::find($req->agent_id);
                         $msg="Knock by ".$agent->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -116,9 +110,7 @@ class agentKnockController extends Controller
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
                         $msg="Knock by ".$agent->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -140,9 +132,7 @@ class agentKnockController extends Controller
                 $usr=User::find($id);
                 $agent=User::find($req->agent_id);
                 $msg="Knock by ".$agent->name;
-                $data['msg']=$msg;
-                $data['id']=$usr->id;
-                \onesignal::sendNoti($data);
+                \Notification::send($usr, new onesignal($msg));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
@@ -159,9 +149,7 @@ class agentKnockController extends Controller
                     {
                         $usr=User::find($s->id);
                         $msg="Knock by ".$agent->name;
-                        $data['msg']=$msg;
-                        $data['id']=$usr->id;
-                        \onesignal::sendNoti($data);
+                        \Notification::send($usr, new onesignal($msg));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
@@ -171,9 +159,9 @@ class agentKnockController extends Controller
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
                     }
-                    
+
                 }
-                
+
                 return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
             }
             else
@@ -220,9 +208,7 @@ class agentKnockController extends Controller
                             $usr=User::find($id);
                             $seller=User::find($req->seller_id);
                             $msg="Knock Accepted by ".$seller->name;
-                            $data['msg']=$msg;
-                            $data['id']=$usr->id;
-                            \onesignal::sendNoti($data);
+                            \Notification::send($usr, new onesignal($msg));
 
                             $n=new Notification;
                             $n->receiver=$usr->id;
@@ -248,9 +234,7 @@ class agentKnockController extends Controller
                                 $usr=User::find($id);
                                 $seller=User::find($req->seller_id);
                                 $msg="Knock Accepted by ".$seller->name;
-                                $data['msg']=$msg;
-                                $data['id']=$usr->id;
-                                \onesignal::sendNoti($data);
+                                \Notification::send($usr, new onesignal($msg));
 
                                 $n=new Notification;
                                 $n->receiver=$usr->id;
@@ -277,8 +261,7 @@ class agentKnockController extends Controller
                             $seller=User::find($req->seller_id);
                             $msg="Knock Accepted by ".$seller->name;
                             $data['msg']=$msg;
-                            $data['id']=$usr->id;
-                            \onesignal::sendNoti($data);
+                            \Notification::send($usr, new onesignal($msg));
 
                             $n=new Notification;
                             $n->receiver=$usr->id;
@@ -345,7 +328,7 @@ class agentKnockController extends Controller
         {
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
-            
+
         }
         $knockreturn = DB::table('agent_sel_knock_rel')
                             ->join('users','users.id','agent_sel_knock_rel.agent_id')

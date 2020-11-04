@@ -9,7 +9,7 @@ use App\Product;
 use Carbon\Carbon;
 use Validator;
 use File;
-use App\Notifications\ProductAdd;
+use App\Notifications\onesignal;
 use App\AgentCategoryRelationship;
 use App\CustomerCategoryRelationship;
 use App\User;
@@ -50,7 +50,7 @@ class productController extends Controller
     }
     public function create(Request $req)
     {
-        
+
         $names="";
         $watermark_name="";
 
@@ -58,7 +58,7 @@ class productController extends Controller
             'name' => 'required',
             'price' => 'required',
             'description' => 'required',
-            'image'=>'required',
+            // 'image'=>'required',
             'category'=>'required',
             'tags'=>'required',
             'colors'=>'required',
@@ -97,7 +97,7 @@ class productController extends Controller
                 }
             }
             else{
-                return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+                // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
             }
 
         // $image_list = json_decode($req->image);
@@ -161,46 +161,43 @@ class productController extends Controller
         {
             $product->isCatalog=$req->isCatalog;
         }
-        
+
         // $product->date_time=Carbon::now();
 
         if($product->save())
         {
-            // $sel=User::select('name')->where('id',$req->seller_id)->first();
-            // $prdct=['seller'=>$sel->name];
-            // $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
-            // foreach($buyer as $b)
-            // {   
-            //     $msg="New product has been added by ".$sel->name;
-            //     $usr=User::find($b['cust_id']);
-            //     $data['msg']=$msg;
-            //     $data['id']=$usr->id;
-            //     \onesignal::sendNoti($data);
+            $sel=User::select('name')->where('id',$req->seller_id)->first();
+            $prdct=['seller'=>$sel->name];
+            $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
 
-            //     $n=new Notification;
-            //     $n->receiver=$usr->id;
-            //     $n->noti_for=$product->id;
-            //     $n->description=$msg;
-            //     $n->type="Product Add";
-            //     $n->date_time=date('Y-m-d H:i:s');
-            //     $n->save();
-            // }
-            // $agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
-            // foreach($agent as $b)
-            // {
-            //     $usr=User::find($b['agent_id']);
-            //     $data['msg']=$msg;
-            //     $data['id']=$usr->id;
-            //     \onesignal::sendNoti($data);
+            $msg="New product has been added by ".$sel->name;
 
-            //     $n=new Notification;
-            //     $n->receiver=$usr->id;
-            //     $n->noti_for=$product->id;
-            //     $n->description=$msg;
-            //     $n->type="Product Add";
-            //     $n->date_time=date('Y-m-d H:i:s');
-            //     $n->save();
-            // }
+            $usr=User::whereIn('id',$buyer)->get();
+            \Notification::send($usr, new onesignal($msg));
+            foreach($buyer as $b)
+            {
+                $n=new Notification;
+                $n->receiver=$b['cust_id'];
+                $n->noti_for=$product->id;
+                $n->description=$msg;
+                $n->type="Product Add";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
+            }
+            $agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
+
+            $usr=User::whereIn('id',$agent)->get();
+            \Notification::send($usr, new onesignal($msg));
+            foreach($agent as $b)
+            {
+                $n=new Notification;
+                $n->receiver=$b['agent_id'];
+                $n->noti_for=$product->id;
+                $n->description=$msg;
+                $n->type="Product Add";
+                $n->date_time=date('Y-m-d H:i:s');
+                $n->save();
+            }
             return response()->json(['error' => false ,'message'=>'insert Successfully'],200);
         }
         else{
@@ -209,7 +206,7 @@ class productController extends Controller
     }
 
     public function update(Request $req,$id)
-    { 
+    {
             $validator = Validator::make($req->all(), [
                 'name' => 'required',
                 'price' => 'required',
@@ -237,7 +234,7 @@ class productController extends Controller
                 {
                     $names=$prdct['image'];
                 }
-                
+
                 if($req->image)
                 {
                     $image_list = $req->image['array'];
@@ -283,7 +280,7 @@ class productController extends Controller
                 else{
                     $watermark_name="";
                 }
-                
+
                 $product_data=[
                     'seller_id'=>$req->seller_id,
                     'name'=>$req->name,
@@ -298,9 +295,9 @@ class productController extends Controller
                     'fid'=>$req->fid
                 ];
                 $product_update=Product::where('id',$id)->update($product_data);
-                
+
                     return response()->json(['error' => false ,'message'=>'Product Updated Successfully'],200);
-                
+
             }
             else{
                 return response()->json(['error' => true ,'message'=>'Record not found']);
@@ -381,11 +378,11 @@ class productController extends Controller
             return response()->json(['error' => false ,'message'=>'Product Deleted'],200);
         }
         return response()->json(['error' => true ,'message'=>'Product not found']);
-    }             
+    }
     public function disable($pid)
     {
         $product=Product::find($pid);
-        
+
         if($product)
         {
             $product->isDisabled=1;
@@ -397,7 +394,7 @@ class productController extends Controller
     public function enable($pid)
     {
         $product=Product::find($pid);
-        
+
         if($product)
         {
             $product->isDisabled=0;
@@ -411,29 +408,29 @@ class productController extends Controller
         $srch=$req->search;
         $products=Product::where('name','like','%'.$srch.'%')->orwhere('tags','like','%'.$srch.'%')->orwhere('colors','like','%'.$srch.'%')->orderBy('created_at','desc')->get();
         return response()->json(['error' => false ,'data'=>$products],200);
-        
+
     }
     public function searchPro(Request $req,$sid)
     {
         $srch=$req->search;
         $product=Product::where('seller_id',$sid)->Where(function ($query) use($srch) {
-            
+
             $query->where('name','like','%'.$srch.'%')
                 ->orwhere('tags','like','%'.$srch.'%');
         })->get();
         return response()->json(['error' => false ,'data'=>$product],200);
-        
+
     }
     public function delImg($pid,$img)
     {
         $prdct=Product::find($pid);
-        
+
         if($prdct)
         {
             $images=explode(',',$prdct->image);
             if (($key = array_search($img, $images)) !== false) {
                 unset($images[$key]);
-                
+
                 Storage::disk('product')->delete($img);
                 $prdct->image=implode(',',$images);
                 $prdct->save();
@@ -458,7 +455,7 @@ class productController extends Controller
         {
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
-            
+
         }
         $products=Product::where('seller_id',$id)->orderBy('created_at','desc')->get()->toarray();
         if($products)
@@ -475,7 +472,7 @@ class productController extends Controller
         ]);
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
-        }   
+        }
         $prdct=Product::find($req->pid);
         if($prdct)
         {

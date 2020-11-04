@@ -12,7 +12,7 @@
         <style>
         a {
             text-decoration: none !important;
-            color: inherit; 
+            color: inherit;
         }
         </style>
     </head>
@@ -22,7 +22,7 @@
             <button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button>
             <!-- Navbar Search-->
             <div class="d-none d-md-inline-block text-primary form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
-              
+
             </div>
             <!-- Navbar-->
             <ul class="navbar-nav ml-auto ml-md-0">
@@ -76,6 +76,10 @@
                                 <div class="sb-nav-link-icon"><i class="far fa-money-bill-alt"></i></div>
                                 Payments
                             </a>
+                            <a class="nav-link" href="{{url('admin/feedbacks')}}">
+                                <div class="sb-nav-link-icon"><i class="fa fa-comments"></i></div>
+                                Feedbacks
+                            </a>
                         </div>
                     </div>
                     <div class="sb-sidenav-footer">
@@ -88,10 +92,10 @@
                 <main>
                     <div class="container-fluid">
                         <h1 class="mt-4">@yield('pageTitle')</h1>
-                        
+
                             @yield('path')
                             @yield('content')
-                        
+
                     </div>
                 </main>
                 <footer class="py-4 bg-light mt-auto">
@@ -110,6 +114,8 @@
         </div>
         <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script src="{{asset('Assets/js/scripts.js')}}"></script>
         <script src="{{asset('Assets/demo/datatables-demo.js')}}"></script>
         <script>
@@ -119,5 +125,5 @@
         </script>
         @yield('scripts')
     </body>
-    
+
 </html>

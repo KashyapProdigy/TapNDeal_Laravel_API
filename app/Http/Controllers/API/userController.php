@@ -40,7 +40,7 @@ class userController extends Controller
         // $psw=Hash::make(request('password'));
         $user=User::where([['mobile',request('mobile')],[DB::raw('BINARY `password`'), request('password')],['isDeleted',0]])->count();
         if($user==1){
-            
+
             // $success['token'] =  $user->createToken('MyApp')-> accessToken;
             // $user = Auth::user();
             $update=[
@@ -49,6 +49,9 @@ class userController extends Controller
                 'msg_token'=>request('m_token')
             ];
             User::where([['mobile',request('mobile')],['isDeleted',0]])->update($update);
+
+            $ir=\DB::table('appSetting')->first();
+
             $user = User::where([['mobile',request('mobile')],['isDeleted',0]])->first();
             if($user->type_id==4 || $user->type_id==5 || $user->type_id==6 || $user->type_id==8)
             {
@@ -58,6 +61,7 @@ class userController extends Controller
             else{
                 $user->seller_id=$user->id;
             }
+            $user->isReportShow=$ir->isReportShow;
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
         }
         else{
@@ -189,13 +193,13 @@ class userController extends Controller
                 $ref=$ag['ref_code'];
             }
             else{
-                $ref=$this->generateRefCode($request->name);     
+                $ref=$this->generateRefCode($request->name);
             }
         }
         else{
             $ref=$this->generateRefCode($request->name);
         }
-        
+
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
@@ -214,7 +218,7 @@ class userController extends Controller
         }
         $user->business_scope=$request->b_scope;
         // $user->end_date=date('Y-m-d H:i:s', strtotime(date('Y-m-d H:i:s'). ' + 7 days'));
-        $user->end_date="2020-12-31"; 
+        $user->end_date="2020-12-31";
         if($request->sel_ref!="")
         {
             $seller=com_info::join('users','company_info.sid','users.id')->where([['ref_code',$request->sel_ref],['type_id',1]])->select('users.id as sid','users.city_id','users.state_id','users.acc_allow','company_info.*')->first();
@@ -237,14 +241,14 @@ class userController extends Controller
                     $user->state_id=$seller->state_id;
                 }
             }
-            
+
         }
         if($user->save())
         {
             if($request->type_id==4 || $request->type_id==5 || $request->type_id==6 || $request->type_id==8)
             {
                 $es=new emp_sel_rel;
-                
+
                 $es->emp_id=$user->id;
                 $es->seller_id=$seller->sid;
                 $es->save();
@@ -346,7 +350,7 @@ class userController extends Controller
                 ->join('states','states.id','users.state_id')
                 ->select('users.id as uid','users.*','user_type.*','company_info.*','citys.city_name','states.state_name')
                 ->where('users.id',$id)->join('citys','users.city_id','citys.id')->first();
-                return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);    
+                return response()->json(['error' => false ,'data'=>$user,'cities'=>$citys,'states'=>$states],200);
         }
         return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
     }
@@ -363,7 +367,7 @@ class userController extends Controller
 
         $logrecord=ProfileViewLog::where('seller_id',$req->seller_id)->where('cust_id',$req->cust_id)->first();
         if($logrecord != NULL)
-        { 
+        {
             if(date('d-m-Y',strtotime($logrecord['created_at']))==date('d-m-Y'))
             {
                 return response()->json(['error' => true ,'message'=>'Log already available for today..!'],200);
@@ -371,7 +375,7 @@ class userController extends Controller
             $data=new ProfileViewLog;
             $data->seller_id=$req->seller_id;
             $data->cust_id=$req->cust_id;
-            $data->created_at=data('Y-m-d H:i:s');
+            $data->created_at=date('Y-m-d H:i:s');
             if($data->save())
             {
                 return response()->json(['error' => false ,'message'=>'View Logged Successfully'],200);
@@ -423,10 +427,10 @@ class userController extends Controller
 
             if($records != null)
             {
-                $log_data=['isSeen'=>1]; 
+                $log_data=['isSeen'=>1];
                 $log_update=\DB::table('profile_view_logs')->whereIn('id',$recordids)->update($log_data);
                 return response()->json(['error' => false ,'data'=>$records],200);
-                
+
             }
             else{
                 return response()->json(['error' => false ,'data'=>null],200);
@@ -461,7 +465,7 @@ class userController extends Controller
         if ($validator->fails()) {
             return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
         }
-        
+
         if($u['email']!=$request->email)
         {
             $validator = Validator::make($request->all(), [
@@ -482,9 +486,9 @@ class userController extends Controller
             $user->state_id=$st->state_id;
             $user->business_scope=$request->business_scope;
             if($user->save())
-            {   
+            {
                 if(in_array($u->type_id,$ids))
-                {   
+                {
                     $ci=com_info::where('sid',$uid)->update([
                         'cname'=>$request->cname,
                         'pan'=>$request->pan,
@@ -526,7 +530,7 @@ class userController extends Controller
     public function regInfo()
     {
         $data=array();
-        $data['cities']=\DB::table('citys')->get(); 
+        $data['cities']=\DB::table('citys')->get();
         $data['userTypes']=\DB::table('user_type')->whereNotIn('id',[1,2,3,7])->get();
         if (sizeof($data['cities']) > 0) {
             return response()->json(['error' => false, 'data' => $data], 200);
@@ -588,7 +592,7 @@ class userController extends Controller
                 $usr->save();
                 return response()->json(['error' => false, 'data' => 'Profile photo updated successfully'], 200);
             }
-            
+
         }
         return response()->json(['error' => true ,'message'=>'User not found'], 200);
     }
@@ -681,7 +685,7 @@ class userController extends Controller
             $seller=emp_sel_rel::where('emp_id',$id)->first();
             $id=$seller->seller_id;
             $user=User::find($id);
-        }   
+        }
         $banner=Banners::where('manu_id',$id)->first();
         if($user->type_id==1)
         {

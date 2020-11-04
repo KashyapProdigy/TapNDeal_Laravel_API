@@ -29,7 +29,7 @@ class customerRelationshipController extends Controller
                 $relation_data=['category'=>$req->category];
                 $relation_update=CustomerCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
                 return response()->json(['error' => false ,'message'=>'Customer Category Updated'],200);
-                
+
             }
             else{
                 return response()->json(['error' => true ,'message'=>'Record Not Found']);
@@ -70,7 +70,13 @@ class customerRelationshipController extends Controller
                 }
             }
             else{
-                return response()->json(['error' => true ,'message'=>'User not found']);
+                $rel_rec=new CustomerCategoryRelationship;
+                $rel_rec->seller_id=$req->seller_id;
+                $rel_rec->cust_id=$id;
+                $rel_rec->category='B';
+                $rel_rec->isBlocked=1;
+                $rel_rec->save();
+                return response()->json(['error' => false ,'message'=>'Relation Updated'],200);
             }
             $relation_update=CustomerCategoryRelationship::where('id',$relation_record['id'])->update($relation_data);
             if($relation_update==1)
