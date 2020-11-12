@@ -72,7 +72,6 @@ class userController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email'=>'required',
             'mobile'=>'required',
             'pass'=>'required',
             'sid'=>'required',
@@ -420,7 +419,7 @@ class userController extends Controller
                 ->join('citys','users.city_id','citys.id')
                 ->join('company_info','sid','users.id')
                 ->join('states','users.state_id','states.id')
-                ->select('users.name as cust_name','users.id as cust_id','users.mobile','profile_view_logs.updated_at as view_date','citys.city_name','states.state_name','company_info.cname')
+                ->select('users.name as cust_name','users.id as cust_id','users.mobile','profile_view_logs.updated_at as view_date','citys.city_name','states.state_name','company_info.cname','users.profile_picture')
                 ->whereIn('profile_view_logs.id',$recordids)
                 ->orderby('profile_view_logs.updated_at','DESC')
                 ->get()->toarray();

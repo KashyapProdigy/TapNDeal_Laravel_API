@@ -20,10 +20,10 @@ class onesignal extends Notification implements ShouldQueue
      *
      * @return void
      */
-    protected $msg;
-    public function __construct($msg)
+    protected $data;
+    public function __construct(array $data)
     {
-        $this->msg=$msg;
+        $this->data=$data;
     }
 
     /**
@@ -40,8 +40,8 @@ class onesignal extends Notification implements ShouldQueue
     public function toOneSignal($notifiable)
     {
         return OneSignalMessage::create()
-            ->setSubject("Tap N Deal")
-            ->setBody($this->msg);
+            ->setSubject($this->data['title'])
+            ->setBody($this->data['msg']);
             // ->setIcon('https://tapndeal.com/images/favicon.png');
     }
 }

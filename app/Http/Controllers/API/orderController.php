@@ -92,29 +92,31 @@ class orderController extends Controller
                     }
                 }
                     $usr=User::find($cartrecord->seller_id);
-                    $cust=User::find($req->cust_id);
-                    $msg="Order has been placed by ".$cust->name;
-                    \Notification::send($usr, new onesignal($msg));
+                    $cust=User::join('company_info','company_info.sid','users.id')->where('sid',$req->cust_id)->first();
+                    $data['title']='Tap N Deal';
+                    $data['msg']="Order has been placed by ".$cust->cname;
+                    \Notification::send($usr, new onesignal($data));
 
                     $n=new Notification;
                     $n->receiver=$usr->id;
                     $n->noti_for=$orderinsert->id;
-                    $n->description=$msg;
+                    $n->description=$data['msg'];
                     $n->type="New order";
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();
 
                 $salesman=emp_sel_rel::join('users','emp_sel_rel.emp_id','users.id')->where([['seller_id',$cartrecord->seller_id],['type_id',4]])->get();
-                $msg="Order has been placed by ".$cust->name;
+                $data['title']='Tap N Deal';
+                $data['msg']="Order has been placed by ".$cust->cname;
                 foreach($salesman as $s)
                 {
                     $usr=User::find($s['emp_id']);
-                    \Notification::send($usr, new onesignal($msg));
+                    \Notification::send($usr, new onesignal($data));
 
                     $n=new Notification;
                     $n->receiver=$sal->id;
                     $n->noti_for=$orderinsert->id;
-                    $n->description=$msg;
+                    $n->description=$data['msg'];
                     $n->type="New order";
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();
@@ -126,14 +128,16 @@ class orderController extends Controller
                     if($agent)
                     {
                         $sel=User::find($cartrecord->seller_id);
-                        $msg1="Order has been placed by ".$cust->name." to ".$sel->name;
+                        $selller=User::join('company_info','company_info.sid','users.id')->where('sid',$cartrecord->seller_id)->first();
+                        $data['title']='Tap N Deal';
+                        $data['msg1']="Order has been placed by ".$cust->cname." to ".$selller->cname;
 
-                        \Notification::send($sel, new onesignal($msg1));
+                        \Notification::send($sel, new onesignal($data));
 
                         $n=new Notification;
                         $n->receiver=$agent->id;
                         $n->noti_for=$orderinsert->id;
-                        $n->description=$msg;
+                        $n->description=$data['msg'];
                         $n->type="New order";
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
@@ -455,16 +459,18 @@ class orderController extends Controller
             ];
             $order_update=Order::where('id',$id)->update($order_data);
             $ord=Order::find($id);
-            $seller=User::find($ord->seller_id);
+            $seller=User::join('company_info','company_info.sid','users.id')->where('sid',$ord->seller_id)->first();
             $cust=User::find($ord->cust_id);
-            $msg='Order '.$ord->order_name.' has been Accepted';
+            $cust_comp=User::join('company_info','company_info.sid','users.id')->where('sid',$ord->cust_id)->first();
+            $data['title']='Tap N Deal';
+            $data['msg']='Order '.$ord->order_name.' has been Accepted';
 
-            \Notification::send($cust, new onesignal($msg));
+            \Notification::send($cust, new onesignal($data));
 
             $n=new Notification;
-            $n->receiver=$cust->id;
+            $n->receiver=$cust->sid;
             $n->noti_for=$id;
-            $n->description=$msg;
+            $n->description=$data['msg'];
             $n->type="Order Accept";
             $n->date_time=date('Y-m-d H:i:s');
             $n->save();
@@ -473,13 +479,14 @@ class orderController extends Controller
             if($salesman)
             {
                 $usr=User::find($salesman->id);
-                $msg='New order '.$ord->order_name.' received please get the product ready';
-                \Notification::send($usr, new onesignal($msg));
+                $data['title']='Tap N Deal';
+                $data['msg']='New order '.$ord->order_name.' received please get the product ready';
+                \Notification::send($usr, new onesignal($data));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
                 $n->noti_for=$id;
-                $n->description=$msg;
+                $n->description=$data['msg'];
                 $n->type="Order Accept";
                 $n->date_time=date('Y-m-d H:i:s');
                 $n->save();
@@ -489,13 +496,14 @@ class orderController extends Controller
                 $agent=User::where('ref_code',$ord->agent_reference)->first();
                 if($agent)
                 {
-                    $msg='Order has been created by '.$seller->name.' of your client '.$cust->name;
-                   \Notification::send($usr, new onesignal($msg));
+                    $data['title']='Tap N Deal';
+                    $data['msg']='Order has been created by '.$seller->cname.' of your client '.$cust_comp->cname;
+                   \Notification::send($usr, new onesignal($data));
 
                     $n=new Notification;
                     $n->receiver=$agent->id;
                     $n->noti_for=$id;
-                    $n->description=$msg;
+                    $n->description=$data['msg'];
                     $n->type="Order Accept";
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();
@@ -573,14 +581,15 @@ class orderController extends Controller
             $ordr->status_id=$req->status_id;
             $ordr->save();
             $ostat=\DB::table('order_status')->select('status_name')->where('id',$req->status_id)->first();
-            $msg='Order '.$ordr->order_name.' has been '.$ostat->status_name;
+            $data['title']='Tap N Deal';
+            $data['msg']='Order '.$ordr->order_name.' has been '.$ostat->status_name;
             $usr=User::find($ordr['cust_id']);
-            \Notification::send($usr, new onesignal($msg));
+            \Notification::send($usr, new onesignal($data));
 
             $n=new Notification;
             $n->receiver=$usr->id;
             $n->noti_for=$oid;
-            $n->description=$msg;
+            $n->description=$data['msg'];
             $n->type="Order ".$ostat->status_name;
             $n->date_time=date('Y-m-d H:i:s');
             $n->save();
@@ -590,13 +599,14 @@ class orderController extends Controller
                 if($salesman)
                 {
                     $usr=User::find($salesman->id);
-                    $msg='Please get bill ready for '.$ordr->order_name.' it is ready to dispatch';
-                    \Notification::send($usr, new onesignal($msg));
+                    $data['title']='Tap N Deal';
+                    $data['msg']='Please get bill ready for '.$ordr->order_name.' it is ready to dispatch';
+                    \Notification::send($usr, new onesignal($data));
 
                     $n=new Notification;
                     $n->receiver=$usr->id;
                     $n->noti_for=$oid;
-                    $n->description=$msg;
+                    $n->description=$data['msg'];
                     $n->type="Order ".$ostat->status_name;
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();

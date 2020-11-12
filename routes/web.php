@@ -2,7 +2,7 @@
 use App\User;
 use App\Product;
 use Illuminate\Support\Facades\Route;
-use App\Notifications\example;
+use App\Notifications\onesignal;
 use Illuminate\Notifications\Notifiable;
 
 /*
@@ -86,11 +86,12 @@ Route::get('Banner/{name}', 'ImagesController@bannerPicture');
 Route::get('profile/{name}', 'ImagesController@profilePicture');
 Route::get('watermark/{name}', 'ImagesController@watermarkPicture');
 Route::get('n',function(){
-    $usr=User::whereIn('id',[11,7])->get();
-    Notification::send($usr, new example('abc'));
+    $usr=User::whereIn('id',[1])->get();
+    $data['title']='Testing';
+    $data['msg']="msg";
+    Notification::send($usr, new onesignal($data));
     // $data['id']=$usr->id;
-    // $msg="hello";
-    // $data['msg']=$msg;
+    // $data['msg']="hello";
     // \onesignal::sendNoti($data);
     dd('abc');
 });

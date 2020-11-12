@@ -30,7 +30,7 @@ class tempReqController extends Controller
         // $se=json_decode($req->request_to);
         $se=implode(',',$req->request_to);
         $se=explode(',',$se);
-        $agent=User::find($req->request_by);
+        $agent=User::join('company_info','company_info.sid','users.id')->where('sid',$req->request_by)->first();
         foreach($se as $seller)
         {
             $t=new temp_req;
@@ -42,13 +42,14 @@ class tempReqController extends Controller
 
             $usr=User::find($seller);
             // $cust=User::find($req->cust_id);
-            $msg="Temporary Request has been created by ".$agent->name;
-            \Notification::send($usr, new onesignal($msg));
+            $data['title']='Tap N Deal';
+            $data['msg']="Temporary Request has been created by ".$agent->cname;
+            \Notification::send($usr, new onesignal($data));
 
             $n=new Notification;
             $n->receiver=$usr->id;
             $n->noti_for=$t->id;
-            $n->description=$msg;
+            $n->description=$data['msg'];
             $n->type="New Temporary Request";
             $n->date_time=date('Y-m-d H:i:s');
             $n->save();
@@ -57,13 +58,14 @@ class tempReqController extends Controller
             if($salesman)
             {
                 $usr=User::find($salesman->id);
-                $msg="Temporary Request has been created by ".$agent->name;
-                \Notification::send($usr, new onesignal($msg));
+                $data['title']='Tap N Deal';
+                $data['msg']="Temporary Request has been created by ".$agent->cname;
+                \Notification::send($usr, new onesignal($data));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
                 $n->noti_for=$t->id;
-                $n->description=$msg;
+                $n->description=$data['msg'];
                 $n->type="New Temporary Request";
                 $n->date_time=date('Y-m-d H:i:s');
                 $n->save();
@@ -71,13 +73,14 @@ class tempReqController extends Controller
         }
         $usr=User::find($req->request_for);
         // $cust=User::find($req->cust_id);
-        $msg="Temporary Request has been created by ".$agent->name;
-        \Notification::send($usr, new onesignal($msg));
+        $data['title']='Tap N Deal';
+        $data['msg']="Temporary Request has been created by ".$agent->cname;
+        \Notification::send($usr, new onesignal($data));
 
         $n=new Notification;
         $n->receiver=$usr->id;
         $n->noti_for=$t->id;
-        $n->description=$msg;
+        $n->description=$data['msg'];
         $n->type="New Temporary Request";
         $n->date_time=date('Y-m-d H:i:s');
         $n->save();
@@ -239,14 +242,15 @@ class tempReqController extends Controller
                     $tr->save();
 
                     $usr=User::find($tempReq->req_for);
-                    $seller=User::find($req->sid);
-                    $msg=$seller->name." respond to your temporary requirement";
-                    \Notification::send($usr, new onesignal($msg));
+                    $seller=User::join('company_info','company_info.sid','users.id')->where('sid',$req->sid)->first();
+                    $data['title']='Tap N Deal';
+                    $data['msg']=$seller->cname." respond to your temporary requirement";
+                    \Notification::send($usr, new onesignal($data));
 
                     $n=new Notification;
                     $n->receiver=$usr->id;
                     $n->noti_for=$tr->id;
-                    $n->description=$msg;
+                    $n->description=$data['msg'];
                     $n->type="Temporary Request Response";
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();
@@ -286,10 +290,11 @@ class tempReqController extends Controller
         }
         return response()->json(['error' => true ,'message'=>'Respone of this buyer not found..'], 400);
     }
-    public function showResponseAgent($aid)
+    public function showResponseAgent($aid,$trid)
     {
         $data=temp_req_product::join('temp_req','temp_req.id','temp_req_pro.trid')
         ->where('req_by',$aid)
+        ->where('temp_req.id',$trid)
         ->get();
         $li=array();
         $list=array();
@@ -300,7 +305,12 @@ class tempReqController extends Controller
             $list['seller']=User::where('id',$d['sid'])->first();
             foreach($prdct as $p)
             {
-                $prod[]=Product::where('id',$p)->get();
+                $pro=Product::where('id',$p)->get();
+                if($pro)
+                {
+                    $prod[]=Product::where('id',$p)->get();
+                }
+
             }
 
             $list['seller']['product']=$prod;
@@ -381,14 +391,15 @@ class tempReqController extends Controller
                     $tempReq->isRevive=1;
                     $tempReq->save();
                     $usr=User::find($tempReq->req_for);
-                    $seller=User::find($tempReq->req_to);
-                    $msg="Temporary Requirement has once again revive by ".$seller->name;
-                    \Notification::send($usr, new onesignal($msg));
+                    $seller=User::join('company_info','company_info.sid','users.id')->where('sid',$tempReq->req_to)->first();
+                    $data['title']='Tap N Deal';
+                    $data['msg']="Temporary Requirement has once again revive by ".$seller->cname;
+                    \Notification::send($usr, new onesignal($data));
 
                     $n=new Notification;
                     $n->receiver=$usr->id;
                     $n->noti_for=$tempReq->id;
-                    $n->description=$msg;
+                    $n->description=$data['msg'];
                     $n->type="Temporary Request Revive";
                     $n->date_time=date('Y-m-d H:i:s');
                     $n->save();

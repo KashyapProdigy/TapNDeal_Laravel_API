@@ -43,14 +43,15 @@ class chatController extends Controller
             {
                 $usr=User::find($req->receiver);
                 $send=User::find($req->send_by);
-                $msg="New message by ".$send->name." ".$req->msg;
+                $data['title']='Tap N Deal';
+                $data['msg']="New message by ".$send->name." ".$req->msg;
 
-                \Notification::send($usr, new onesignal($msg));
+                \Notification::send($usr, new onesignal($data));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
                 $n->noti_for=$chat->id;
-                $n->description=$msg;
+                $n->description=$data['msg'];
                 $n->type="Chat";
                 $n->date_time=date('Y-m-d H:i:s');
                 $n->save();
@@ -65,14 +66,15 @@ class chatController extends Controller
         $chat->save();
         $usr=User::find($req->receiver);
         $send=User::find($req->send_by);
-        $msg="New message by ".$send->name." ".$req->msg;
+        $data['title']='Tap N Deal';
+        $data['msg']="New message by ".$send->name." ".$req->msg;
 
-        \Notification::send($usr, new onesignal($msg));
+        \Notification::send($usr, new onesignal($data));
 
         $n=new Notification;
         $n->receiver=$usr->id;
         $n->noti_for=$chat->id;
-        $n->description=$msg;
+        $n->description=$data['msg'];
         $n->type="Chat";
         $n->date_time=date('Y-m-d H:i:s');
         $n->save();

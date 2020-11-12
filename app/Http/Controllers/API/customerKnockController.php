@@ -55,29 +55,31 @@ class customerKnockController extends Controller
                     if($status ==1)
                     {
                         $usr=User::find($id);
-                        $cust=User::find($req->cust_id);
-                        $msg="Knock by ".$cust->name;
+                        $cust=User::join('company_info','company_info.sid','users.id')->where('sid',$req->cust_id)->first();
+                        $data['title']='Tap N Deal';
+                        $data['msg']="Knock by ".$cust->cname;
 
-                        \Notification::send($usr, new onesignal($msg));
+                        \Notification::send($usr, new onesignal($data));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
                         $n->noti_for=$record->id;
-                        $n->description=$msg;
+                        $n->description=$data['msg'];
                         $n->type="Buyer Knock";
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
 
                         $salesman=emp_sel_rel::join('users','users.id','emp_sel_rel.emp_id')->where([['type_id',4],['seller_id',$id]])->first();
                         $usr=User::find($salesman->id);
-                        $msg="Knock by ".$cust->name;
+                        $data['title']='Tap N Deal';
+                        $data['msg']="Knock by ".$cust->cname;
 
-                        \Notification::send($usr, new onesignal($msg));
+                        \Notification::send($usr, new onesignal($data));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
                         $n->noti_for=$record->id;
-                        $n->description=$msg;
+                        $n->description=$data['msg'];
                         $n->type="Buyer Knock";
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
@@ -96,15 +98,16 @@ class customerKnockController extends Controller
                     if($status ==1)
                     {
                         $usr=User::find($id);
-                        $cust=User::find($req->cust_id);
-                        $msg="Knock by ".$cust->name;
+                        $cust=User::join('company_info','company_info.sid','users.id')->where('sid',$req->cust_id)->first();
+                        $data['title']='Tap N Deal';
+                        $data['msg']="Knock by ".$cust->cname;
 
-                        \Notification::send($usr, new onesignal($msg));
+                        \Notification::send($usr, new onesignal($data));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
                         $n->noti_for=$record->id;
-                        $n->description=$msg;
+                        $n->description=$data['msg'];
                         $n->type="Buyer Knock";
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
@@ -116,14 +119,15 @@ class customerKnockController extends Controller
                             {
 
                                 $usr=User::find($s->id);
-                                $msg="Knock by ".$cust->name;
+                                $data['title']='Tap N Deal';
+                                $data['msg']="Knock by ".$cust->cname;
 
-                                \Notification::send($usr, new onesignal($msg));
+                                \Notification::send($usr, new onesignal($data));
 
                                 $n=new Notification;
                                 $n->receiver=$usr->id;
                                 $n->noti_for=$record->id;
-                                $n->description=$msg;
+                                $n->description=$data['msg'];
                                 $n->type="Buyer Knock";
                                 $n->date_time=date('Y-m-d H:i:s');
                                 $n->save();
@@ -139,15 +143,16 @@ class customerKnockController extends Controller
             if($knock_data->save())
             {
                 $usr=User::find($id);
-                $cust=User::find($req->cust_id);
-                $msg="Knock by ".$cust->name;
+                $cust=User::join('company_info','company_info.sid','users.id')->where('sid',$req->cust_id)->first();
+                $data['title']='Tap N Deal';
+                $data['msg']="Knock by ".$cust->cname;
 
-                \Notification::send($usr, new onesignal($msg));
+                \Notification::send($usr, new onesignal($data));
 
                 $n=new Notification;
                 $n->receiver=$usr->id;
                 $n->noti_for=$knock_data->id;
-                $n->description=$msg;
+                $n->description=$data['msg'];
                 $n->type="Buyer Knock";
                 $n->date_time=date('Y-m-d H:i:s');
                 $n->save();
@@ -158,14 +163,15 @@ class customerKnockController extends Controller
                     foreach($salesman as $s)
                     {
                         $usr=User::find($s->id);
-                        $msg="Knock by ".$cust->name;
+                        $data['title']='Tap N Deal';
+                        $data['msg']="Knock by ".$cust->cname;
 
-                        \Notification::send($usr, new onesignal($msg));
+                        \Notification::send($usr, new onesignal($data));
 
                         $n=new Notification;
                         $n->receiver=$usr->id;
                         $n->noti_for=$knock_data->id;
-                        $n->description=$msg;
+                        $n->description=$data['msg'];
                         $n->type="Buyer Knock";
                         $n->date_time=date('Y-m-d H:i:s');
                         $n->save();
@@ -217,15 +223,16 @@ class customerKnockController extends Controller
                         if($knock_update==1 && $relation_data->save())
                         {
                             $usr=User::find($id);
-                            $seller=User::find($req->seller_id);
-                            $msg="Knock Accepted by ".$seller->name;
+                            $seller=User::join('company_info','company_info.sid','users.id')->where('sid',$req->seller_id)->first();
+                            $data['title']='Tap N Deal';
+                            $data['msg']="Knock Accepted by ".$seller->cname;
 
-                            \Notification::send($usr, new onesignal($msg));
+                            \Notification::send($usr, new onesignal($data));
 
                             $n=new Notification;
                             $n->receiver=$usr->id;
                             $n->noti_for=$relation_data->id;
-                            $n->description=$msg;
+                            $n->description=$data['msg'];
                             $n->type="Buyer Approved";
                             $n->date_time=date('Y-m-d H:i:s');
                             $n->save();
@@ -244,15 +251,16 @@ class customerKnockController extends Controller
                             $knockstatus=CustomerKnock::where('id',$knockrecord->id)->update($knock_data);
                             if($knockstatus == 1 ){
                                 $usr=User::find($id);
-                                $seller=User::find($req->seller_id);
-                                $msg="Knock Accepted by ".$seller->name;
+                                $seller=User::join('company_info','company_info.sid','users.id')->where('sid',$req->seller_id)->first();
+                                $data['title']='Tap N Deal';
+                                $data['msg']="Knock Accepted by ".$seller->cname;
 
-                                \Notification::send($usr, new onesignal($msg));
+                                \Notification::send($usr, new onesignal($data));
 
                                 $n=new Notification;
                                 $n->receiver=$usr->id;
                                 $n->noti_for=$relrecord->id;
-                                $n->description=$msg;
+                                $n->description=$data['msg'];
                                 $n->type="Buyer Approved";
                                 $n->date_time=date('Y-m-d H:i:s');
                                 $n->save();
@@ -271,15 +279,16 @@ class customerKnockController extends Controller
                         if($relstatus == 1 && $knockstatus == 1 )
                         {
                             $usr=User::find($id);
-                            $seller=User::find($req->seller_id);
-                            $msg="Knock Accepted by ".$seller->name;
+                            $seller=User::join('company_info','company_info.sid','users.id')->where('sid',$req->seller_id)->first();
+                            $data['title']='Tap N Deal';
+                            $data['msg']="Knock Accepted by ".$seller->cname;
 
-                            \Notification::send($usr, new onesignal($msg));
+                            \Notification::send($usr, new onesignal($data));
 
                             $n=new Notification;
                             $n->receiver=$usr->id;
                             $n->noti_for=$relrecord->id;
-                            $n->description=$msg;
+                            $n->description=$data['msg'];
                             $n->type="Buyer Approved";
                             $n->date_time=date('Y-m-d H:i:s');
                             $n->save();

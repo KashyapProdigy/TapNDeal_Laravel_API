@@ -16,6 +16,7 @@ use App\User;
 use App\emp_sel_rel;
 use App\folderModel;
 use App\Notification;
+use App\sharedProducts;
 class productController extends Controller
 {
     public function show($id)
@@ -157,6 +158,7 @@ class productController extends Controller
         $product->watermark=$watermark_name;
         $product->agents_id=$req->agents_id;
         $product->fid=$req->fid;
+        $product->stock=$req->stock;
         if($req->isCatalog)
         {
             $product->isCatalog=$req->isCatalog;
@@ -166,20 +168,20 @@ class productController extends Controller
 
         if($product->save())
         {
-            $sel=User::select('name')->where('id',$req->seller_id)->first();
+            $sel=User::join('company_info','company_info.sid','users.id')->where('sid',$req->seller_id)->first();
             $prdct=['seller'=>$sel->name];
             $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
-
-            $msg="New product has been added by ".$sel->name;
+            $data['title']='Tap N Deal';
+            $data['msg']="New product has been added by ".$sel->cname;
 
             $usr=User::whereIn('id',$buyer)->get();
-            \Notification::send($usr, new onesignal($msg));
+            \Notification::send($usr, new onesignal($data));
             foreach($buyer as $b)
             {
                 $n=new Notification;
                 $n->receiver=$b['cust_id'];
                 $n->noti_for=$product->id;
-                $n->description=$msg;
+                $n->description=$data['msg'];
                 $n->type="Product Add";
                 $n->date_time=date('Y-m-d H:i:s');
                 $n->save();
@@ -187,13 +189,13 @@ class productController extends Controller
             $agent=AgentCategoryRelationship::select('agent_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
 
             $usr=User::whereIn('id',$agent)->get();
-            \Notification::send($usr, new onesignal($msg));
+            \Notification::send($usr, new onesignal($data));
             foreach($agent as $b)
             {
                 $n=new Notification;
                 $n->receiver=$b['agent_id'];
                 $n->noti_for=$product->id;
-                $n->description=$msg;
+                $n->description=$data['msg'];
                 $n->type="Product Add";
                 $n->date_time=date('Y-m-d H:i:s');
                 $n->save();
@@ -292,7 +294,8 @@ class productController extends Controller
                     'watermark'=>$watermark_name,
                     'colors'=>$req->colors,
                     'agents_id'=>$req->agents_id,
-                    'fid'=>$req->fid
+                    'fid'=>$req->fid,
+                    'stock'=>$req->stock
                 ];
                 $product_update=Product::where('id',$id)->update($product_data);
 
@@ -479,6 +482,23 @@ class productController extends Controller
             $prdct->price=$req->price;
             $prdct->save();
             return response()->json(['error' => false ,'message'=>'Price Changed..'],200);
+        }
+    }
+    public function addShareProduct(Request $req)
+    {
+        $pro=new sharedProducts;
+        $pro->products=$req->products;
+        $pro->save();
+        return response()->json(['error' => false ,'id'=>$pro->id],200);
+    }
+    public function ViewShareProduct($sid)
+    {
+        $products=sharedProducts::find($sid);
+        if($products)
+        {
+            $pid=explode(',',$products->products);
+            $pro=Product::whereIn('id',$pid)->get();
+            return response()->json(['error' => false ,'products'=>$pro],200);
         }
     }
 }

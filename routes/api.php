@@ -171,12 +171,15 @@ Route::post('plan/subscribe','API\subscriptionController@subscribe');
 Route::post('feedback','API\feedBack@create');
 Route::get('payment/history/{uid}','API\subscriptionController@history');
 
-Route::post('seller/folder/new','API\folderController@create');   
+Route::post('seller/folder/new','API\folderController@create');
 Route::post('folder/edit/{fid}','API\folderController@edit');
 Route::delete('folder/delete/{fid}','API\folderController@delete');
-Route::get('seller/folder/{sid}','API\folderController@show');   
-Route::get('seller/folder/product/{fid}','API\folderController@prodShow');    
+Route::get('seller/folder/{sid}','API\folderController@show');
+Route::get('seller/folder/product/{fid}','API\folderController@prodShow');
 
 Route::get('seller/new/acc/{sid}','API\accounts@new');
 Route::get('seller/add/acc/{sid}','API\accounts@add');
 Route::get('counts/{uid}','API\userController@count');
+
+Route::post('share/product','API\productController@addShareProduct');
+Route::get('view/shared/product/{sid}','API\productController@ViewShareProduct');

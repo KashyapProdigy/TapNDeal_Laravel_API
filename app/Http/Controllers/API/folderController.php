@@ -48,9 +48,21 @@ class folderController extends Controller
         {
             $seller=emp_sel_rel::where('emp_id',$sid)->first();
             $sid=$seller->seller_id;
-            
+
         }
-        $foldes=folderModel::where('sid',$sid)->get()->toarray();
+        $foldes=folderModel::where('sid',$sid)->get();
+        foreach($foldes as $f)
+        {
+            $product=Product::where('fid',$f->id)->orderBy('created_at','desc')->first();
+            if($product)
+            {
+                $im=explode(',',$product->image);
+                $f->image=$im[0];
+            }
+            else{
+                $f->image="default.png";
+            }
+        }
         if($foldes)
         {
             return response()->json(['error' => false ,'foldes'=>$foldes], 200);
