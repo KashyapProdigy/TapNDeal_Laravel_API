@@ -102,18 +102,21 @@ class ownersController extends Controller
             $c->address=$req->address;
             $c->pincode=$req->pincode;
             $c->save();
-            return redirect()->back()->with('success','Seller Added succesfully...');
+            return redirect()->back()->with('success','Seller Added successfully...');
         }
-        return redirect()->back()->with('error','Somthing wents wrong...');
+        return redirect()->back()->with('error','Something went wrong...');
     }
     public function delete($uid)
     {
         $u=User::find($uid);
         $u->isDeleted=1;
+        $u->firebase_token="";
+        $u->login_token="propertyoflogicalloop";
+        $u->msg_token="";
         if($u->save())
-            return redirect()->back()->with('success','User Deleted succesfully...');
+            return redirect()->back()->with('success','User Deleted successfully...');
             
-        return redirect()->back()->with('error','Somthing wents wrong...');
+        return redirect()->back()->with('error','Something went wrong...');
     }
     public function accounts($sid)
     {

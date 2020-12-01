@@ -48,7 +48,7 @@ class folderController extends Controller
         {
             $seller=emp_sel_rel::where('emp_id',$sid)->first();
             $sid=$seller->seller_id;
-
+            
         }
         $foldes=folderModel::where('sid',$sid)->get();
         foreach($foldes as $f)

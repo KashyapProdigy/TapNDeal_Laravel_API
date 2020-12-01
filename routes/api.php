@@ -183,3 +183,5 @@ Route::get('counts/{uid}','API\userController@count');
 
 Route::post('share/product','API\productController@addShareProduct');
 Route::get('view/shared/product/{sid}','API\productController@ViewShareProduct');
+
+Route::post('send/noti','API\userController@sendNoti');

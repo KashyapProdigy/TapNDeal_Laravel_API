@@ -63,7 +63,7 @@ class cartController extends Controller
             $seller=emp_sel_rel::where('emp_id',$req->cust_id)->first();
             $req->cust_id=$seller->seller_id;
         }
-        
+
         $product = Product::find($req->product_id);
         $otherseller = Cart::where('cust_id',$req->cust_id)->first();
         $cartrecord = Cart::where('product_id',$req->product_id)->where('cust_id',$req->cust_id)->first();
@@ -106,13 +106,20 @@ class cartController extends Controller
 
     public function delete(Request $req,$id)
     {
+        $User=User::find($req->cust_id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 ) {
+            $seller=emp_sel_rel::where('emp_id',$req->cust_id)->first();
+            $req->cust_id=$seller->seller_id;
+        }
+
+
         $cart_del=Cart::where('product_id',$id)->where('cust_id',$req->cust_id)->first();
         if($cart_del != null)
         {
             $cart_del->delete();
             return response()->json(['error' => false ,'message'=>'Product Removed From Cart'],200);
         }
-        return response()->json(['error' => true ,'message'=>'Record not found'],500);
+        return response()->json(['error' => true ,'message'=>'Record not found'],200);
     }
 
     public function update(Request $req,$cid)

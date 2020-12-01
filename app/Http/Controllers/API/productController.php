@@ -15,8 +15,8 @@ use App\CustomerCategoryRelationship;
 use App\User;
 use App\emp_sel_rel;
 use App\folderModel;
-use App\Notification;
 use App\sharedProducts;
+use App\Notification;
 class productController extends Controller
 {
     public function show($id)
@@ -74,32 +74,32 @@ class productController extends Controller
             $seller=emp_sel_rel::where('emp_id',$req->seller_id)->first();
             $req->seller_id=$seller->seller_id;
         }
-            $image_list = $req->image['array'];
-            if( $image_list != null)
-            {
-                $uploadsCount=0;
-                foreach ($image_list as $value) {
-                    if(Storage::disk('temp')->exists($value)){
-                        $file = Storage::disk('temp')->get($value);
-                        $filename= time().$uploadsCount.'-prod.png';
-                        Storage::disk('product')->put($filename, $file);
-                        $file = Storage::disk('temp')->delete($value);
-                        if($uploadsCount == 0){
+        $image_list = $req->image['array'];
+        if( $image_list != null)
+        {
+            $uploadsCount=0;
+            foreach ($image_list as $value) {
+                if(Storage::disk('temp')->exists($value)){
+                    $file = Storage::disk('temp')->get($value);
+                    $filename= time().$uploadsCount.'-prod.png';
+                    Storage::disk('product')->put($filename, $file);
+                    $file = Storage::disk('temp')->delete($value);
+                    if($uploadsCount == 0){
                         $names = $names.$filename;
-                        }
-                        else if($uploadsCount > 0){
+                    }
+                    else if($uploadsCount > 0){
                         $names = $names.",".$filename;
-                        }
                     }
-                    else{
-                        return response()->json(['error' => true ,'message'=>'Image does not exist'],500);
-                    }
-                $uploadsCount++;
                 }
+                else{
+                    return response()->json(['error' => true ,'message'=>'Image does not exist'],500);
+                }
+                $uploadsCount++;
             }
-            else{
-                // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
-            }
+        }
+        else{
+            // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
+        }
 
         // $image_list = json_decode($req->image);
         // if( is_array($image_list) || is_object($image_list) )
@@ -145,7 +145,7 @@ class productController extends Controller
         //         $watermark_name=time().$uploadsCount.'-wm.'.$file->getClientOriginalExtension();
         //         $file->move(public_path().'/watermarkPhotos/', $watermark_name);
         // }
-
+        $notificationData = [];
         $product=new Product;
         $product->seller_id=$req->seller_id;
         $product->name=$req->name;
@@ -170,10 +170,29 @@ class productController extends Controller
         {
             $sel=User::join('company_info','company_info.sid','users.id')->where('sid',$req->seller_id)->first();
             $prdct=['seller'=>$sel->name];
-            $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->where('isBlocked',0)->get()->toarray();
+            $cat=array();
+            if($req->category=="A+")
+            {
+                $cat=["A+"];
+            }
+            else if($req->category=="A")
+            {
+                $cat=["A+","A"];
+            }
+            else if($req->category=="B+")
+            {
+                $cat=["A+","A","B+"];
+            }
+            else
+            {
+                $cat=["A+","A","B+","B"];
+            }
+            $buyer=CustomerCategoryRelationship::select('cust_id')->where('seller_id',$req->seller_id)->whereIn('category',$cat)->where('isBlocked',0)->get()->toarray();
             $data['title']='Tap N Deal';
             $data['msg']="New product has been added by ".$sel->cname;
-
+            $notificationData['type'] = "product";
+            $notificationData['id'] = $product->id;
+            $data['data'] = $notificationData;
             $usr=User::whereIn('id',$buyer)->get();
             \Notification::send($usr, new onesignal($data));
             foreach($buyer as $b)
@@ -209,102 +228,102 @@ class productController extends Controller
 
     public function update(Request $req,$id)
     {
-            $validator = Validator::make($req->all(), [
-                'name' => 'required',
-                'price' => 'required',
-                'description' => 'required',
-                // 'image'=>'required',
-                'category'=>'required',
-                'tags'=>'required',
-                'colors'=>'required',
-                'seller_id' => 'required',
-            ]);
-            if ($validator->fails()) {
-                return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
-            }
-            $User=User::find($req->seller_id);
-            if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        $validator = Validator::make($req->all(), [
+            'name' => 'required',
+            'price' => 'required',
+            'description' => 'required',
+            // 'image'=>'required',
+            'category'=>'required',
+            'tags'=>'required',
+            'colors'=>'required',
+            'seller_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+        }
+        $User=User::find($req->seller_id);
+        if($User->type_id==4 || $User->type_id==5 || $User->type_id==6 || $User->type_id==8)
+        {
+            $seller=emp_sel_rel::where('emp_id',$req->seller_id)->first();
+            $req->seller_id=$seller->seller_id;
+        }
+        $prdct=Product::where('id',$id)->first();
+        if($prdct)
+        {
+            $names="";
+            if($prdct['image'])
             {
-                $seller=emp_sel_rel::where('emp_id',$req->seller_id)->first();
-                $req->seller_id=$seller->seller_id;
+                $names=$prdct['image'];
             }
-            $prdct=Product::where('id',$id)->first();
-            if($prdct)
-            {
-                $names="";
-                if($prdct['image'])
-                {
-                    $names=$prdct['image'];
-                }
 
-                if($req->image)
+            if($req->image)
+            {
+                $image_list = $req->image['array'];
+                if( $image_list != null)
                 {
-                    $image_list = $req->image['array'];
-                    if( $image_list != null)
-                    {
-                        $uploadsCount=0;
-                        foreach ($image_list as $value) {
-                            if(Storage::disk('temp')->exists($value)){
-                                $file = Storage::disk('temp')->get($value);
-                                $filename= time().$uploadsCount.'-prod.png';
-                                Storage::disk('product')->put($filename, $file);
-                                $file = Storage::disk('temp')->delete($value);
-                                if($uploadsCount == 0){
-                                    if($names!="")
-                                    {
-                                        $names = $names.",".$filename;
-                                    }
-                                    else{
+                    $uploadsCount=0;
+                    foreach ($image_list as $value) {
+                        if(Storage::disk('temp')->exists($value)){
+                            $file = Storage::disk('temp')->get($value);
+                            $filename= time().$uploadsCount.'-prod.png';
+                            Storage::disk('product')->put($filename, $file);
+                            $file = Storage::disk('temp')->delete($value);
+                            if($uploadsCount == 0){
+                                if($names!="")
+                                {
+                                    $names = $names.",".$filename;
+                                }
+                                else{
                                     $names = $names.$filename;
-                                    }
                                 }
-                                else if($uploadsCount > 0){
+                            }
+                            else if($uploadsCount > 0){
                                 $names = $names.",".$filename;
-                                }
                             }
-                            else{
-                                return response()->json(['error' => true ,'message'=>'Image does not exist'],500);
-                            }
-                        $uploadsCount++;
                         }
+                        else{
+                            return response()->json(['error' => true ,'message'=>'Image does not exist'],500);
+                        }
+                        $uploadsCount++;
                     }
+                }
                 else{
                     // return response()->json(['error' => true ,'message'=>'Image File ERROR']);
                 }
             }
 
-                if($req->watermark != null)
-                {
-                    $file2 = base64_decode($req->watermark);
-                    $watermark_name = time().'-wm.png';
-                    Storage::disk('watermark')->put($watermark_name, $file2);
-                }
-                else{
-                    $watermark_name="";
-                }
-
-                $product_data=[
-                    'seller_id'=>$req->seller_id,
-                    'name'=>$req->name,
-                    'price'=>$req->price,
-                    'description'=>$req->description,
-                    'image'=>$names,
-                    'category'=>$req->category,
-                    'tags'=>$req->tags,
-                    'watermark'=>$watermark_name,
-                    'colors'=>$req->colors,
-                    'agents_id'=>$req->agents_id,
-                    'fid'=>$req->fid,
-                    'stock'=>$req->stock
-                ];
-                $product_update=Product::where('id',$id)->update($product_data);
-
-                    return response()->json(['error' => false ,'message'=>'Product Updated Successfully'],200);
-
+            if($req->watermark != null)
+            {
+                $file2 = base64_decode($req->watermark);
+                $watermark_name = time().'-wm.png';
+                Storage::disk('watermark')->put($watermark_name, $file2);
             }
             else{
-                return response()->json(['error' => true ,'message'=>'Record not found']);
+                $watermark_name="";
             }
+
+            $product_data=[
+                'seller_id'=>$req->seller_id,
+                'name'=>$req->name,
+                'price'=>$req->price,
+                'description'=>$req->description,
+                'image'=>$names,
+                'category'=>$req->category,
+                'tags'=>$req->tags,
+                'watermark'=>$watermark_name,
+                'colors'=>$req->colors,
+                'agents_id'=>$req->agents_id,
+                'fid'=>$req->fid,
+                'stock'=>$req->stock
+            ];
+            $product_update=Product::where('id',$id)->update($product_data);
+
+            return response()->json(['error' => false ,'message'=>'Product Updated Successfully'],200);
+
+        }
+        else{
+            return response()->json(['error' => true ,'message'=>'Record not found']);
+        }
     }
 
     public function upload(Request $req)
@@ -319,51 +338,51 @@ class productController extends Controller
 
         if($req->image != null && $req->name != null)
         {
-                // $file = base64_decode($req->image);
-                // $img = imagecreatefromstring($file);
-                // //header('Content-Type: image/jpeg');
-                // header('Content-Type: bitmap; charset=utf-8');
-                // imagesavealpha($img, true);
-                // imagejpeg($img,public_path('tempPhotos')."/".$req->name,60);
-                // imagedestroy($img);
-                // Storage::disk('temp')->put($req->name, $file);
-                $percent = 1;
-                header('Content-Type: image/jpeg');
+            // $file = base64_decode($req->image);
+            // $img = imagecreatefromstring($file);
+            // //header('Content-Type: image/jpeg');
+            // header('Content-Type: bitmap; charset=utf-8');
+            // imagesavealpha($img, true);
+            // imagejpeg($img,public_path('tempPhotos')."/".$req->name,60);
+            // imagedestroy($img);
+            // Storage::disk('temp')->put($req->name, $file);
+            $percent = 1;
+            header('Content-Type: image/jpeg');
 
-                $data = base64_decode($req->image);
-                $im = imagecreatefromstring($data);
-                $width = imagesx($im);
-                $height = imagesy($im);
-                $newwidth = $width * $percent;
-                $newheight = $height * $percent;
+            $data = base64_decode($req->image);
+            $im = imagecreatefromstring($data);
+            $width = imagesx($im);
+            $height = imagesy($im);
+            $newwidth = $width * $percent;
+            $newheight = $height * $percent;
 
-                $size=strlen($data)/1000;
-                if($size <= 200)
-                {
-                    $qu=90;
-                }
-                else if($size <=400)
-                {
-                    $qu=60;
-                }
-                else if($size <=1000)
-                {
-                    $qu=30;
-                }
-                else{
-                    $qu=20;
-                }
-                $thumb = imagecreatetruecolor($newwidth, $newheight);
+            $size=strlen($data)/1000;
+            if($size <= 200)
+            {
+                $qu=90;
+            }
+            else if($size <=400)
+            {
+                $qu=60;
+            }
+            else if($size <=1000)
+            {
+                $qu=30;
+            }
+            else{
+                $qu=20;
+            }
+            $thumb = imagecreatetruecolor($newwidth, $newheight);
 
-                // Resize
-                imagecopyresized($thumb, $im, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
+            // Resize
+            imagecopyresized($thumb, $im, 0, 0, 0, 0, $newwidth, $newheight, $width, $height);
 
-                // Output
-                imagejpeg($thumb,public_path('tempPhotos')."/".$req->name,$qu);
-                if(Storage::disk('temp')->exists($req->name))
-                {
-                    return response()->json(['error' => false ,'message'=>'Image Uploaded Successfully'],200);
-                }
+            // Output
+            imagejpeg($thumb,public_path('tempPhotos')."/".$req->name,$qu);
+            if(Storage::disk('temp')->exists($req->name))
+            {
+                return response()->json(['error' => false ,'message'=>'Image Uploaded Successfully'],200);
+            }
         }
         else
         {

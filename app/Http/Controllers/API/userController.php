@@ -19,6 +19,9 @@ use App\AgentKnock;
 use App\CustomerKnock;
 use App\Banners;
 use App\Product;
+use App\Notifications\onesignal;
+use App\Notification;
+use App\Notifications\ChatNoti;
 
 class userController extends Controller
 {
@@ -49,7 +52,7 @@ class userController extends Controller
                 'msg_token'=>request('m_token')
             ];
             User::where([['mobile',request('mobile')],['isDeleted',0]])->update($update);
-
+            $user = User::where([['mobile',request('mobile')],['isDeleted',0]])->first();
             $ir=\DB::table('appSetting')->first();
 
             $user = User::where([['mobile',request('mobile')],['isDeleted',0]])->first();
@@ -62,6 +65,7 @@ class userController extends Controller
                 $user->seller_id=$user->id;
             }
             $user->isReportShow=$ir->isReportShow;
+            $user->isPayment=$ir->isPayment;
             return response()->json(['error' => false ,'data' => $user], $this-> successStatus);
         }
         else{
@@ -72,6 +76,7 @@ class userController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
+            'email'=>'required',
             'mobile'=>'required',
             'pass'=>'required',
             'sid'=>'required',
@@ -147,7 +152,7 @@ class userController extends Controller
         {
             return response()->json(['error'=> false , 'record' => true],200 );
         }
-        return response()->json(['error'=> true , 'record' => false],400 );
+        return response()->json(['error'=> true , 'record' => false],200 );
     }
     public function register(Request $request)
     {
@@ -161,8 +166,6 @@ class userController extends Controller
         {
             $validator = Validator::make($request->all(), [
                 'cname'=>'required',
-                'address'=>'required',
-                'b_scope'=>'required'
                 ]);
             if ($validator->fails()) {
                 return response()->json(['error' => true ,'message'=>$validator->errors()], 200);
@@ -451,28 +454,28 @@ class userController extends Controller
             'address' => 'required',
             'name' => 'required',
             'city_id' => 'required',
-            'email'=>'required',
+//            'email'=>'required',
             ]);
         }
         else{
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
                 'city_id' => 'required',
-                'email'=>'required',
+//                'email'=>'required',
                 ]);
         }
         if ($validator->fails()) {
-            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 200);
         }
 
-        if($u['email']!=$request->email)
+        /*if($u['email']!=$request->email)
         {
             $validator = Validator::make($request->all(), [
             'email'=>'required|unique:users,email',
             ]);
-        }
+        }*/
         if ($validator->fails()) {
-            return response()->json(['error' => true ,'message'=>$validator->errors()], 401);
+            return response()->json(['error' => true ,'message'=>$validator->errors()], 200);
         }
         $st=\DB::table('citys')->where('id',$request->city_id)->first();
         $user = User::find($uid);
@@ -503,9 +506,9 @@ class userController extends Controller
                 }
                 return response()->json(['error' => false ,'message'=>'User updated Successfully'],200);
             }
-            return response()->json(['error' => true ,'message'=>'Something went wrong'],500);
+            return response()->json(['error' => true ,'message'=>'Something went wrong'],200);
         }
-        return response()->json(['error' => true ,'message'=>'User not found '],500);
+        return response()->json(['error' => true ,'message'=>'User not found '],200);
 
     }
     public function regInfo1($uid)
@@ -653,8 +656,7 @@ class userController extends Controller
         }
         if($user)
         {
-            if($user->type_id==1)
-            {
+            if($user->type_id==1) {
                 $order=Order::where([['seller_id',$id],['status_id',1]])->count();
                 $tempReq=temp_req::where([['isResponded',0],['req_to',$id]])->count();
                 $ak=AgentKnock::where([['isApproved',0],['seller_id',$id]])->count();
@@ -662,15 +664,16 @@ class userController extends Controller
                 $knock=$ak+$ck;
                 return response()->json(['error' => false, 'order' => $order,'tempReq' => $tempReq,'knock'=>$knock,'chat'=>0], 200);
             }
-            if($user->type_id==2)
-            {
+
+            if($user->type_id==2) {
                 $order=Order::where([['agent_reference',$user->ref_code],['status_id',1]])->count();
                 $tempReq=temp_req::where([['isResponded',0],['req_by',$id]])->count();
                 return response()->json(['error' => false, 'order' => $order,'tempReq' => $tempReq,'knock'=>0,'chat'=>0], 200);
             }
-            if($user->type_id==3)
-            {
-                return response()->json(['error' => false, 'order' => 0,'tempReq' => 0,'knock'=>0,'chat'=>0], 200);
+
+            if($user->type_id==3) {
+                $order=Order::where([['cust_id',$id],['status_id',1]])->count();
+                return response()->json(['error' => false, 'order' => $order,'tempReq' => 0,'knock'=>0,'chat'=>0], 200);
             }
             return response()->json(['error' => true,'order' => 0,'tempReq' => 0,'knock'=>0,'chat'=>0], 500);
         }
@@ -714,5 +717,19 @@ class userController extends Controller
             $orders=Order::where('cust_id',$id)->count();
         }
         return response()->json(['error' => false, 'orders' => $orders,'banners' =>$ban,'accounts'=>$account,'products'=>$product], 200);
+    }
+    public function sendNoti(Request $req)
+    {
+        $usr=User::find($req->uid);
+        $title=$req->title;
+        $msg=$req->msg;
+        $data['title']=$title;
+        $data['msg']=$msg;
+        $notificationData=[];
+        $notificationData['type'] = "chat";
+        $notificationData['id'] = $req->uid;
+        $data['data'] = $notificationData;
+        \Notification::send($usr, new ChatNoti($data));
+        return response()->json(['error' => false, 'message'=>$title], 200);
     }
 }

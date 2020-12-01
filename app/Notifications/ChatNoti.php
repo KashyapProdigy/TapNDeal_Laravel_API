@@ -16,10 +16,10 @@ class ChatNoti extends Notification
      *
      * @return void
      */
-    protected $arr;
-    public function __construct(array $arr)
+    protected $data;
+    public function __construct(array $data)
     {
-        $this->arr=$arr;
+        $this->data=$data;
     }
 
     /**
@@ -46,14 +46,16 @@ class ChatNoti extends Notification
                     ->action('Notification Action', url('/'))
                     ->line('Thank you for using our application!');
     }
-    public function toFcm($notifiable) 
+    public function toFcm($notifiable)
     {
         $message = new FcmMessage();
         $message->content([
-            'title'        => 'TapAndDeal', 
-            'body'         => $this->arr['msg'], 
-        ])->priority(FcmMessage::PRIORITY_HIGH);
-        
+            'title'        => $this->data['title'],
+            'body'         => $this->data['msg'],
+        ])
+            ->data($this->data['data'])
+            ->priority(FcmMessage::PRIORITY_HIGH);
+
         return $message;
     }
     /**

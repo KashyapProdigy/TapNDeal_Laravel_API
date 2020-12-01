@@ -41,7 +41,8 @@ class onesignal extends Notification implements ShouldQueue
     {
         return OneSignalMessage::create()
             ->setSubject($this->data['title'])
-            ->setBody($this->data['msg']);
+            ->setBody($this->data['msg'])
+            ->setData("data",$this->data['data']);
             // ->setIcon('https://tapndeal.com/images/favicon.png');
     }
 }

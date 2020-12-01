@@ -45,7 +45,7 @@ class dashboardController extends Controller
             else{
                 $isExpired=0;
             }
-
+                
                 $dashboard=Product::where('seller_id',$id)->orderBy('created_at','desc')->get()->toarray();
                 $banner=\DB::table('banners')->where('manu_id',$id)->get()->toarray();
                 $folders=folderModel::select('id','fname')->where('sid',$id)->get();
@@ -81,7 +81,7 @@ class dashboardController extends Controller
             $seller['NotConnected_Sellers']=User::join('citys','citys.id','city_id')->where('type_id',1)->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','citys.city_name')->where('isDeleted',0)->orderBy('name')->where('isVerified',1)->whereNotIN('users.id',$Blocked_seller)->whereNotIN('users.id',$A_Plus_list)->whereNotIN('users.id',$A_list)->whereNotIN('users.id',$B_Plus_list)->whereNotIN('users.id',$B_list)->get()->toarray();
 
             $customer_list=CustomerAgentRelationship::select('cust_id')->where('agent_id',$id)->where('isBlocked',0)->get()->toarray();
-
+            
             $customer=User::whereIn('users.id',$customer_list)->join('citys','citys.id','city_id')->join('company_info','company_info.sid','users.id')->select('users.*','company_info.cname','city_name')->where('isVerified',1)->get()->toarray();
 
             $dashboard['Sellers']=$seller;
@@ -180,3 +180,4 @@ class dashboardController extends Controller
                 return response()->json(['error' => true ,'message'=>"Something Went Wrong",'data'=>[]],500);
     }
 }
+        
