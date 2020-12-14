@@ -223,7 +223,7 @@ class userController extends Controller
         $user->end_date="2020-12-31";
         if($request->sel_ref!="")
         {
-            $seller=com_info::join('users','company_info.sid','users.id')->where([['ref_code',$request->sel_ref],['type_id',1]])->select('users.id as sid','users.city_id','users.state_id','users.acc_allow','company_info.*')->first();
+            $seller=com_info::join('users','company_info.sid','users.id')->where('ref_code',$request->sel_ref)->select('users.id as sid','users.city_id','users.state_id','users.acc_allow','company_info.*')->first();
             if($seller == null)
             {
                 return response()->json(['error' => true ,'message'=>'invalid Reference code..!'],400);

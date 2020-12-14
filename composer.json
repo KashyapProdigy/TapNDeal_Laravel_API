@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.2.5",
         "ext-gd": "*",
+        "barryvdh/laravel-dompdf": "^0.8.7",
         "benwilkins/laravel-fcm-notification": "^4.0",
         "doctrine/dbal": "^2.10",
         "fideloper/proxy": "^4.2",

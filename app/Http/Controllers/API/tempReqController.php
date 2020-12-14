@@ -117,6 +117,12 @@ class tempReqController extends Controller
             $temp['agent'] = User::where('users.id', $t['req_by'])->join('company_info', 'sid', 'users.id')->select('users.id', 'company_info.cname as name', 'mobile')->first();
             $temp['seller'] = User::where('users.id', $t['req_to'])->join('company_info', 'sid', 'users.id')->select('users.id', 'company_info.cname as name', 'mobile')->first();
             $temp['expired'] = $expired;
+            $respone = temp_req_product::where([['sid', $t['req_to']], ['trid', $t['id']]])->first();
+            if ($respone) {
+                $temp['responded'] = true;
+            } else {
+                $temp['responded'] = false;
+            }
             $rec[] = $temp;
         }
         if ($rec != null)

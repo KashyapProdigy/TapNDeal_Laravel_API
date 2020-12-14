@@ -624,7 +624,6 @@ class orderController extends Controller
         if ($ordr) {
             $ordr->status_id = $req->status_id;
             $ordr->save();
-
             $ostat = \DB::table('order_status')->select('status_name')->where('id', $req->status_id)->first();
             $data['title'] = 'Tap N Deal';
             $data['msg'] = 'Order ' . $ordr->order_name . ' has been ' . $ostat->status_name;
@@ -643,31 +642,6 @@ class orderController extends Controller
             $n->type = "Order " . $ostat->status_name;
             $n->date_time = date('Y-m-d H:i:s');
             $n->save();
-            if ($req->status_id == 2) {
-                if ($ordr->agent_reference) {
-                    $seller = User::join('company_info', 'company_info.sid', 'users.id')->where('sid', $ordr->seller_id)->first();
-                    $agent = User::where('ref_code', $ordr->agent_reference)->first();
-                    if ($agent) {
-                        $data['title'] = 'Tap N Deal';
-                        $data['msg'] = 'Order no '.$ordr->order_name.' for ' . $seller->cname . ' is ready .';
-
-                        $notificationData['type'] = "order";
-                        $notificationData['id'] = $oid;
-                        $data['data'] = $notificationData;
-
-                        \Notification::send($agent, new onesignal($data));
-
-                        $n = new Notification;
-                        $n->receiver = $agent->id;
-                        $n->noti_for = $oid;
-                        $n->description = $data['msg'];
-                        $n->type = "Order Accept";
-                        $n->date_time = date('Y-m-d H:i:s');
-                        $n->save();
-                    }
-                }
-            }
-
             if ($req->status_id == 3) {
                 $salesman = emp_sel_rel::join('users', 'users.id', 'emp_sel_rel.emp_id')->where([['type_id', 5], ['seller_id', $ordr->seller_id]])->first();
                 if ($salesman) {
@@ -686,55 +660,8 @@ class orderController extends Controller
                     $n->type = "Order " . $ostat->status_name;
                     $n->date_time = date('Y-m-d H:i:s');
                     $n->save();
-                    if ($ordr->agent_reference) {
-                        $seller = User::join('company_info', 'company_info.sid', 'users.id')->where('sid', $ordr->seller_id)->first();
-                        $agent = User::where('ref_code', $ordr->agent_reference)->first();
-
-                        if ($agent) {
-                            $data['title'] = 'Tap N Deal';
-                            $data['msg'] = 'Order no '.$ordr->order_name.' for ' . $seller->cname . ' is ready .';
-
-                            $notificationData['type'] = "order";
-                            $notificationData['id'] = $oid;
-                            $data['data'] = $notificationData;
-
-                            \Notification::send($agent, new onesignal($data));
-
-                            $n = new Notification;
-                            $n->receiver = $agent->id;
-                            $n->noti_for = $id;
-                            $n->description = $data['msg'];
-                            $n->type = "Order Accept";
-                            $n->date_time = date('Y-m-d H:i:s');
-                            $n->save();
-                        }
-                    }
                 }
 
-            }
-            if ($req->status_id == 4) {
-                if ($ordr->agent_reference) {
-                    $seller = User::join('company_info', 'company_info.sid', 'users.id')->where('sid', $ordr->seller_id)->first();
-                    $agent = User::where('ref_code', $ordr->agent_reference)->first();
-                    if ($agent) {
-                        $data['title'] = 'Tap N Deal';
-                        $data['msg'] = 'Order no '.$ordr->order_name.' for ' . $seller->cname . ' has been dispatched.';
-
-                        $notificationData['type'] = "order";
-                        $notificationData['id'] = $oid;
-                        $data['data'] = $notificationData;
-
-                        \Notification::send($agent, new onesignal($data));
-
-                        $n = new Notification;
-                        $n->receiver = $agent->id;
-                        $n->noti_for = $oid;
-                        $n->description = $data['msg'];
-                        $n->type = "Order Accept";
-                        $n->date_time = date('Y-m-d H:i:s');
-                        $n->save();
-                    }
-                }
             }
             return response()->json(['error' => false, 'message' => 'Order status change'], 200);
         }
