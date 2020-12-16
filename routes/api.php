@@ -185,3 +185,4 @@ Route::post('share/product','API\productController@addShareProduct');
 Route::get('view/shared/product/{sid}','API\productController@ViewShareProduct');
 
 Route::post('send/noti','API\userController@sendNoti');
+Route::get('get/invoice/{oid}','PDFController@generatePDF');

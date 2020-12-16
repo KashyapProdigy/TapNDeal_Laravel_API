@@ -58,4 +58,16 @@ class ImagesController extends Controller
             return view('welcome');
         }
     }
+    public function pdf($name)
+    {
+        $storagePath = public_path().'/invoices/'.$name;
+
+        if(file_exists($storagePath))
+        {
+            return response()->file($storagePath);
+        }
+        else {
+            return view('welcome');
+        }
+    }
 }

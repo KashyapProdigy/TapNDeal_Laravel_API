@@ -95,4 +95,4 @@ Route::get('n',function(){
     // \onesignal::sendNoti($data);
     dd('abc');
 });
-Route::get('pdf','PDFController@generatePDF');
+Route::get('pdf/{name}','ImagesController@pdf');

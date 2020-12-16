@@ -219,6 +219,7 @@ class orderController extends Controller
                     $count++;
                 }
                 $record->no_of_products = $count;
+                $record->created_at=$record->order_date;
             }
             return response()->json(['error' => false, 'data' => $listreturn], 200);
         } else {
@@ -268,6 +269,7 @@ class orderController extends Controller
                     $count++;
                 }
                 $record->no_of_products = $count;
+                $record->created_at=$record->order_date;
             }
 
             return response()->json(['error' => false, 'data' => $listreturn], 200);
@@ -325,6 +327,7 @@ class orderController extends Controller
                             $count++;
                         }
                         $record->no_of_products = $count;
+                        $record->created_at=$record->order_date;
                     }
                     return response()->json(['error' => false, 'data' => $listreturn], 200);
                 } else {
@@ -368,6 +371,7 @@ class orderController extends Controller
                             $count++;
                         }
                         $record->no_of_products = $count;
+                        $record->created_at=$record->order_date;
                     }
 
                     return response()->json(['error' => false, 'data' => $listreturn], 200);
@@ -429,6 +433,7 @@ class orderController extends Controller
                             $count++;
                         }
                         $record->no_of_products = $count;
+                        $record->created_at=$record->order_date;
                     }
                     return response()->json(['error' => false, 'data' => $listreturn], 200);
                 } else {
@@ -473,6 +478,7 @@ class orderController extends Controller
                             $count++;
                         }
                         $record->no_of_products = $count;
+                        $record->created_at=$record->order_date;
                     }
 
                     return response()->json(['error' => false, 'data' => $listreturn], 200);
@@ -533,7 +539,9 @@ class orderController extends Controller
             $n->save();
         }
         if ($ord->agent_reference) {
+
             $agent = User::where('ref_code', $ord->agent_reference)->first();
+            $usr = User::find($agent->id);
             if ($agent) {
                 $data['title'] = 'Tap N Deal';
                 $data['msg'] = 'Order has been created by ' . $seller->cname . ' of your client ' . $cust_comp->cname;
@@ -792,6 +800,7 @@ class orderController extends Controller
                             $count++;
                         }
                         $record->no_of_products = $count;
+                        $record->created_at=$record->order_date;
                     }
                     return response()->json(['error' => false, 'data' => $listreturn], 200);
                 } else {
@@ -853,6 +862,7 @@ class orderController extends Controller
                             $count++;
                         }
                         $record->no_of_products = $count;
+                        $record->created_at=$record->order_date;
                     }
 
                     return response()->json(['error' => false, 'data' => $listreturn], 200);
