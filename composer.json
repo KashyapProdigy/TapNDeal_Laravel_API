@@ -13,6 +13,7 @@
         "barryvdh/laravel-dompdf": "^0.8.7",
         "benwilkins/laravel-fcm-notification": "^4.0",
         "doctrine/dbal": "^2.10",
+        "dompdf/dompdf": "^0.8.6",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
