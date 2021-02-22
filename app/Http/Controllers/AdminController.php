@@ -24,7 +24,7 @@ class AdminController extends Controller
             $selling=Order::join('order_status','order_status.id','orders.status_id')->where('status_name','Dispatched')->sum('total_price');
             return view('Admin.index',['ts'=>$tot_sel,'tc'=>$tot_cust,'ta'=>$tot_agt,'tp'=>$tot_pro,'to'=>$to,'sel'=>$selling]);
         }
-        return view('Admin.login');   
+        return view('Admin.login');
     }
     public function Login(Request $req)
     {
@@ -95,5 +95,35 @@ class AdminController extends Controller
     {
         $feedbacks=feedbackModel::join('users','users.id','uid')->join('company_info','company_info.sid','users.id')->orderby('date_time','desc')->get();
         return view('Admin.feedback',['feedbacks'=>$feedbacks]);
+    }
+    public function states()
+    {
+        $state=\DB::table('states')->get();
+        return view('Admin.states',['states'=>$state]);
+    }
+    public function stateUpdate(Request $req)
+    {
+        $update=\DB::table('states')->where('id',$req->sid)->update(['state_name'=>$req->name]);
+        return redirect()->back()->with('success','State updated successfully..');
+    }
+    public function stateAdd(Request $req)
+    {
+        \DB::table('states')->insert(['state_name'=>$req->name]);
+        return redirect()->back()->with('success','State Added successfully..');
+    }
+    public function cities($id)
+    {
+        $cities=\DB::table('citys')->where('state_id',$id)->get();
+        return view('Admin.cities',['cities'=>$cities,'sid'=>$id]);
+    }
+    public function cityUpdate(Request $req)
+    {
+        $update=\DB::table('citys')->where('id',$req->cid)->update(['city_name'=>$req->name]);
+        return redirect()->back()->with('success','city updated successfully..');
+    }
+    public function AddCity(Request $req)
+    {
+        \DB::table('citys')->insert(['city_name'=>$req->name,'state_id'=>$req->sid]);
+        return redirect()->back()->with('success','city added successfully..');
     }
 }

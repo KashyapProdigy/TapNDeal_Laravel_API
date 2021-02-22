@@ -30,6 +30,7 @@ class ProductImport implements ToModel,WithHeadingRow,WithValidation
            'tags'       =>@$row['Tags'],
            'colors'     =>@$row['Colors'],
             'image'     =>@$row['Image'],  
+            ''
         ]);
     } 
     public function rules(): array

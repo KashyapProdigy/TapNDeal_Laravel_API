@@ -72,6 +72,10 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-network-wired"></i></div>
                                 Reference
                             </a>
+                            <a class="nav-link" href="{{url('admin/states')}}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-network-wired"></i></div>
+                                States
+                            </a>
                             <a class="nav-link" href="{{url('admin/payments')}}">
                                 <div class="sb-nav-link-icon"><i class="far fa-money-bill-alt"></i></div>
                                 Payments

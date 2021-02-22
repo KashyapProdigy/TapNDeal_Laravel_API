@@ -47,6 +47,12 @@ Route::middleware([AdminCheck::class])->group(function () {
     Route::get('admin/orders/show/{id}','orderController@fullorder');
     route::get('admin/payments','AdminController@payments');
     route::get('admin/feedbacks','AdminController@feedbacks');
+    route::get('admin/states','AdminController@states');
+    route::post('update/state','AdminController@stateUpdate');
+    route::post('add/state','AdminController@stateAdd');
+    route::get('/state/city/{sid}','AdminController@cities');
+    route::post('update/city','AdminController@cityUpdate');
+    route::post('add/city','AdminController@AddCity');
 });
 
 Route::get('/manufacture',function(){
@@ -96,3 +102,4 @@ Route::get('n',function(){
     dd('abc');
 });
 Route::get('pdf/{name}','ImagesController@pdf');
+Route::get('get/pdf/{oid}','PDFController@pdf');

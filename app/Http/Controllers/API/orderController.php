@@ -80,18 +80,18 @@ class orderController extends Controller
                 $orderinsert->notes = $req->notes;
 
                 if ($orderinsert->save()) {
-                    foreach ($cartProducts as $anotherRecord) {
-                        $qty = $anotherRecord->qty;
-                        $productId = $anotherRecord->product_id;
+                    // foreach ($cartProducts as $anotherRecord) {
+                    //     $qty = $anotherRecord->qty;
+                    //     $productId = $anotherRecord->product_id;
 
-                        $originalProd = Product::find($productId);
-                        $originalQty = $originalProd->stock;
-                        $updatedQty = $originalQty - $qty;
-                        Product::where('id', $productId)->update(['stock' => $updatedQty]);
-                        if ($updatedQty < 0) {
-                            Product::where('id', $productId)->update(['isDisabled' => 1]);
-                        }
-                    }
+                    //     $originalProd = Product::find($productId);
+                    //     $originalQty = $originalProd->stock;
+                    //     $updatedQty = $originalQty - $qty;
+                    //     Product::where('id', $productId)->update(['stock' => $updatedQty]);
+                    //     if ($updatedQty < 0) {
+                    //         Product::where('id', $productId)->update(['isDisabled' => 1]);
+                    //     }
+                    // }
 
                     if ($req->cust_id != $cartrecord->seller_id) {
                         $relrecord = CustomerCategoryRelationship::where('cust_id', $req->cust_id)->where('seller_id', $cartrecord->seller_id)->first();

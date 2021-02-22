@@ -96,8 +96,11 @@
                                 <tr>
                                     <td class="text-center">{{$j+1}}</td>
                                     <td class="text-center">
+                                    @php
+                                        $image=explode(',',$prod[$j]->product_image);
+                                    @endphp
                                         <img
-                                            src="http://tapntrade.com/Tapndeal/public/productPhotos/{{$prod[$j]->product_image}}"
+                                            src="http://tapntrade.com/Tapndeal/public/productPhotos/{{$image[0]}}"
                                             alt=""
                                             style="width:100px;height:90px;"><br>{{$prod[$j]->product_name}}
                                     </td>

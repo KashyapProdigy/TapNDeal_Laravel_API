@@ -79,7 +79,7 @@ class ownersController extends Controller
             'cname'=>'required',
         ],[
             'cname.required'=>"company name required..!",
-        ]);   
+        ]);
         $state=\DB::table('citys')->where('id',$req->city)->first();
         $ref=$this->generateRefCode($req->name);
         $usr=new User;
@@ -115,7 +115,7 @@ class ownersController extends Controller
         $u->msg_token="";
         if($u->save())
             return redirect()->back()->with('success','User Deleted successfully...');
-            
+
         return redirect()->back()->with('error','Something went wrong...');
     }
     public function accounts($sid)
@@ -141,7 +141,7 @@ class ownersController extends Controller
             'mobile'=>'required|digits:10',
             'city'=>'required',
             'type'=>'required',
-        ]);   
+        ]);
         $ref=$this->generateRefCode($req->name);
         $state=\DB::table('citys')->where('id',$req->city)->first();
         $usr=new User;
@@ -161,12 +161,12 @@ class ownersController extends Controller
         $emp->seller_id=$req->seller;
         if($emp->save())
             return redirect()->back()->with('success','Account of this seller Added succesfully...');
-        
-        return redirect()->back()->with('error','Somthing wents wrong...');   
+
+        return redirect()->back()->with('error','Somthing wents wrong...');
     }
     public function updateEmployee(Request $req)
     {
-        
+
         $validatedData = $req->validate([
             'name' => 'required|',
             'email' => 'required|email',
@@ -205,7 +205,7 @@ class ownersController extends Controller
     {
         $product=Product::join('users','users.id','seller_id')->select('products.*','products.id as pid','users.name as sname')
         ->orderBy('products.created_at','desc')->get();
-        $sellers=User::where([['type_id',1],['isDeleted',0]])->get();
+        $sellers=User::join('company_info','company_info.sid','users.id')->select('users.*','cname as name')->where([['type_id',1],['isDeleted',0]])->get();
         return view('Admin.products',['products'=>$product,'sellers'=>$sellers]);
     }
     public function deletepro($pid)

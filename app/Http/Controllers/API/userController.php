@@ -486,6 +486,10 @@ class userController extends Controller
             $user->email = $request->email;
             $user->city_id = $request->city_id;
             $user->state_id=$st->state_id;
+            if(!$request->business_scope)
+            {
+                $request->business_scope=" ";
+            }
             $user->business_scope=$request->business_scope;
             if($user->save())
             {
